@@ -7,11 +7,10 @@
   <body>
     <!-- load wasm -->
     <script src="./rust-web-roguelike.js"></script>
-    <script>
-      window.addEventListener("load", async () => {
-        await wasm_bindgen("./rust-web-roguelike_bg.wasm");
-      });
-    </script>
+    <script type="module" src="index.js"></script>
+    <!-- <script src="interact.js"></script> -->
+
+
     <div class="wrapper">
     <canvas id="canvas" height="600" width="800"/></canvas>
     <div id="keypad" class="keypad">
