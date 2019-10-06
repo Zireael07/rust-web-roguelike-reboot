@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>My Rust project!</title>
+  </head>
+  <body>
+    <!-- load wasm -->
+    <script src="./rust-web-roguelike.js"></script>
+    <script>
+      window.addEventListener("load", async () => {
+        await wasm_bindgen("./rust-web-roguelike_bg.wasm");
+      });
+    </script>
+    <div class="wrapper">
+    <canvas id="canvas" height="600" width="800"/></canvas>
+    <div id="keypad" class="keypad">
+      <table>
+      <tbody>
+      <tr>
+        <!-- button tag can be buggy so we use input type=button -->
+        <!-- using hex values for Unicode characters -->
+        <td><input class="key_arrow1" type="button" value="&#9700" > </td>
+        <!-- for consistency -->
+        <td><input class="key_arrow2" type="button" value="&#9650"> </td>
+        <td><input class="key_arrow3" type="button" value="&#9701" > </td>
+        </tr>
+        <tr>
+        <td><input class="key_arrow4" type="button" value= "&#9664"> </td>
+        <!-- midline ellipsis -->
+        <td><input class="key_arrow5" type="button" value= "&#8943"> </td>
+        <td><input class="key_arrow6" type="button" value= "&#9654"> </td>
+        </tr>
+        <tr>
+        <td><input class="key_arrow7" type="button" value= "&#9699"> </td>
+        <!-- for consistency -->
+        <td><input class="key_arrow8" type="button" value= "&#9660"> </td>
+        <td><input class="key_arrow9" type="button" value="&#9698"> </td>
+      </tr>
+      </tbody>
+      </table>
+    </div> 
+    </div>
+  </body>
+</html>
