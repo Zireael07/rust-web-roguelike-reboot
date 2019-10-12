@@ -42,6 +42,7 @@ pub fn setHTMLCommand(com_id: i32){
 
 rltk::add_wasm_support!();
 use rltk::{Console, GameState, Rltk, VirtualKeyCode, RGB };
+use rltk::{platform_specific::Command};
 
 // We'll allow map tiles to be either a wall or a floor. We're deriving PartialEq so we don't
 // have to match on it every time. We'll make it a copy type because it's really just an int.
@@ -124,6 +125,20 @@ impl State {
 // Implement the game loop
 impl GameState for State {
     fn tick(&mut self, ctx: &mut Rltk) {
+        // HTML input
+        match ctx.command {
+            None => {} //Nothing
+            Some(command) => {
+                match command {
+                    Command::MoveLeft => self.move_player(-1, 0),
+                    Command::MoveRight => self.move_player(1, 0),
+                    Command::MoveUp => self.move_player(0,-1),
+                    Command::MoveDown => self.move_player(0,1),
+                     _ => {} // Ignore all the other possibilities
+                }
+            }
+        }
+        
         // New: handle keyboard inputs.
         match ctx.key {
             None => {} // Nothing happened
