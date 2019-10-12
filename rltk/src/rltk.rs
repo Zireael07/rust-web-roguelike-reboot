@@ -1,7 +1,7 @@
 use super::GameState;
 use super::{
     font, framebuffer::Framebuffer, platform_specific, rex::XpFile, rex::XpLayer, Console, Shader,
-    SimpleConsole, VirtualKeyCode, RGB,
+    SimpleConsole, VirtualKeyCode, RGB, platform_specific::Command
 };
 
 /// A display console, used internally to provide console render support.
@@ -24,6 +24,7 @@ pub struct Rltk {
     pub frame_time_ms: f32,
     pub active_console: usize,
     pub key: Option<super::VirtualKeyCode>,
+    pub command: Option<platform_specific::Command>,
     pub mouse_pos: (i32, i32),
     pub left_click: bool,
     pub context_wrapper: Option<platform_specific::WrappedContext>,

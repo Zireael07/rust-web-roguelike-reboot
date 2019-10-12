@@ -13,6 +13,15 @@ use glow::HasContext;
 #[cfg(not(target_arch = "wasm32"))]
 use std::time::Instant;
 
+#[cfg(target_arch = "wasm32")]
+// A macro to provide `println!(..)`-style syntax for `console.log` logging.
+macro_rules! log {
+    ( $( $t:tt )* ) => {
+        web_sys::console::log_1(&format!( $( $t )* ).into());
+    }
+}
+
+
 // Glutin version:
 
 /// A helper, to get around difficulties with moving the event loop
@@ -372,6 +381,73 @@ pub fn init_raw<S: ToString>(width_pixels: u32, height_pixels: u32, _window_titl
     canvas.set_onmousedown(Some(mouseclick_callback.as_ref().unchecked_ref()));;
     mouseclick_callback.forget();
 
+    // handle html keys
+    //TODO: macro this repetitive bit
+    let mut button = web_sys::window()
+        .unwrap()
+        .document()
+        .unwrap()
+        .get_element_by_id("key_arrow4")
+        .unwrap()
+        .dyn_into::<web_sys::HtmlElement>()
+        .unwrap();
+
+    let html_callback = Closure::wrap(Box::new(|e: web_sys::Event| {
+        on_html_click(e.clone());
+    }) as Box<dyn FnMut(_)>);
+
+    button.set_onclick(Some(html_callback.as_ref().unchecked_ref()));
+    html_callback.forget();
+
+    button = web_sys::window()
+        .unwrap()
+        .document()
+        .unwrap()
+        .get_element_by_id("key_arrow2")
+        .unwrap()
+        .dyn_into::<web_sys::HtmlElement>()
+        .unwrap();
+
+    let html_callback = Closure::wrap(Box::new(|e: web_sys::Event| {
+        on_html_click2(e.clone());
+    }) as Box<dyn FnMut(_)>);
+
+    button.set_onclick(Some(html_callback.as_ref().unchecked_ref()));
+    html_callback.forget();
+
+    button = web_sys::window()
+        .unwrap()
+        .document()
+        .unwrap()
+        .get_element_by_id("key_arrow6")
+        .unwrap()
+        .dyn_into::<web_sys::HtmlElement>()
+        .unwrap();
+
+    let html_callback = Closure::wrap(Box::new(|e: web_sys::Event| {
+        on_html_click6(e.clone());
+    }) as Box<dyn FnMut(_)>);
+
+    button.set_onclick(Some(html_callback.as_ref().unchecked_ref()));
+    html_callback.forget();
+
+    button = web_sys::window()
+        .unwrap()
+        .document()
+        .unwrap()
+        .get_element_by_id("key_arrow8")
+        .unwrap()
+        .dyn_into::<web_sys::HtmlElement>()
+        .unwrap();
+
+    let html_callback = Closure::wrap(Box::new(|e: web_sys::Event| {
+        on_html_click8(e.clone());
+    }) as Box<dyn FnMut(_)>);
+
+    button.set_onclick(Some(html_callback.as_ref().unchecked_ref()));
+    html_callback.forget();
+
+    //original
     let webgl2_context = canvas
         .get_context("webgl2")
         .unwrap()
@@ -425,6 +501,7 @@ pub fn init_raw<S: ToString>(width_pixels: u32, height_pixels: u32, _window_titl
         frame_time_ms: 0.0,
         active_console: 0,
         key: None,
+        command: None,
         mouse_pos: (0, 0),
         left_click: false,
         context_wrapper: Some(WrappedContext {}),
@@ -434,6 +511,27 @@ pub fn init_raw<S: ToString>(width_pixels: u32, height_pixels: u32, _window_titl
         post_scanlines: false,
         post_screenburn: false,
     }
+}
+
+//HTML key callbacks
+#[cfg(target_arch = "wasm32")]
+pub fn on_html_click(_event: web_sys::Event){
+    set_command(Command::MoveLeft);
+}
+
+#[cfg(target_arch = "wasm32")]
+pub fn on_html_click2(_event: web_sys::Event){
+    set_command(Command::MoveUp);
+}
+
+#[cfg(target_arch = "wasm32")]
+pub fn on_html_click6(_event: web_sys::Event){
+    set_command(Command::MoveRight);
+}
+
+#[cfg(target_arch = "wasm32")]
+pub fn on_html_click8(_event: web_sys::Event){
+    set_command(Command::MoveDown);
 }
 
 // WASM version of main loop
@@ -550,6 +648,18 @@ fn on_mouse_down(_mouse: web_sys::MouseEvent) {
 }
 
 #[cfg(target_arch = "wasm32")]
+static mut GLOBAL_COMMAND: Option<Command> = None;
+
+#[cfg(target_arch = "wasm32")]
+pub fn set_command(command: Command){
+    //debugging
+    log!("{:?}", command);
+    unsafe {
+        GLOBAL_COMMAND = Some(command);
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
 pub fn main_loop<GS: GameState>(mut rltk: Rltk, mut gamestate: GS) {
     use glow::HasRenderLoop;
 
@@ -565,6 +675,7 @@ pub fn main_loop<GS: GameState>(mut rltk: Rltk, mut gamestate: GS) {
             rltk.key = GLOBAL_KEY;
             rltk.mouse_pos = (GLOBAL_MOUSE_POS.0, GLOBAL_MOUSE_POS.1);
             rltk.left_click = GLOBAL_LEFT_CLICK;
+            rltk.command = GLOBAL_COMMAND;
         }
 
         // Call the tock function
@@ -580,9 +691,11 @@ pub fn main_loop<GS: GameState>(mut rltk: Rltk, mut gamestate: GS) {
         // Clear any input
         rltk.left_click = false;
         rltk.key = None;
+        rltk.command = None;
         unsafe {
             GLOBAL_KEY = None;
             GLOBAL_LEFT_CLICK = false;
+            GLOBAL_COMMAND = None;
         }
     });
 }
@@ -785,4 +898,15 @@ pub enum VirtualKeyCode {
     Copy,
     Paste,
     Cut,
+}
+
+
+#[cfg(target_arch = "wasm32")]
+#[repr(u8)] //single byte representation - enough for our needs since a byte can carry 256 things
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Command {
+    MoveLeft = 0,
+    MoveRight = 1,
+    MoveDown = 2,
+    MoveUp = 3,
 }
