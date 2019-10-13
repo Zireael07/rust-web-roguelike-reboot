@@ -5,7 +5,13 @@ authors = ["Zireael07 <zi@mail.com>"]
 edition = "2018"
 
 [dependencies]
+# pulling in our local copy of RLTK because we do some custom tinkering
 rltk = { path = "rltk" }
+
+# ECS
+specs = "0.15.0"
+specs-derive = "0.4.0"
+
 
 # The `wasm-bindgen` crate provides the bare minimum functionality needed
 # to interact with JavaScript.
