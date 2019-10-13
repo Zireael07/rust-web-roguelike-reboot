@@ -2,9 +2,6 @@ extern crate wasm_bindgen;
 
 use wasm_bindgen::prelude::*;
 
-//the websys Canvas bindings uses it
-use wasm_bindgen::JsCast; // for dyn_into
-use std::f64;
 
 // A macro to provide `println!(..)`-style syntax for `console.log` logging.
 macro_rules! log {
@@ -13,29 +10,6 @@ macro_rules! log {
     }
 }
 
-#[wasm_bindgen]
-#[repr(u8)] //single byte representation - enough for our needs since a byte can carry 256 things
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum HTMLCommand {
-    MoveLeft = 0,
-    MoveRight = 1,
-    MoveDown = 2,
-    MoveUp = 3,
-}
-
-#[wasm_bindgen]
-pub fn setHTMLCommand(com_id: i32){
-        log!("{}", com_id);
-        //need to match back to enum
-        // https://stackoverflow.com/questions/28028854/how-do-i-match-enum-values-with-an-integer
-        match com_id {
-            com_id if com_id == HTMLCommand::MoveLeft as i32 => log!("{:?}", HTMLCommand::MoveLeft),
-            com_id if com_id == HTMLCommand::MoveRight as i32 => log!("{:?}", HTMLCommand::MoveRight),
-            com_id if com_id == HTMLCommand::MoveDown as i32 => log!("{:?}", HTMLCommand::MoveDown),
-            com_id if com_id == HTMLCommand::MoveUp as i32 => log!("{:?}", HTMLCommand::MoveUp),
-            _ => log!("Unknown command"),
-}
-}
 
 // This the first roguelike-ish example - a walking @. We build a very simple map,
 // and you can use the cursor keys to move around a world.
@@ -221,36 +195,11 @@ impl GameState for State {
 }
 
 
-
-pub fn main_old() {
- let document = web_sys::window().unwrap().document().unwrap();
-    let canvas = document.get_element_by_id("canvas").unwrap();
-    let canvas: web_sys::HtmlCanvasElement = canvas
-        .dyn_into::<web_sys::HtmlCanvasElement>()
-        .map_err(|_| ())
-        .unwrap();
-
-    let context = canvas
-        .get_context("2d")
-        .unwrap()
-        .unwrap()
-        .dyn_into::<web_sys::CanvasRenderingContext2d>()
-        .unwrap();
-
-    log!("We have a context {:?}", context);
-
-    //clear
-    context.set_fill_style(&wasm_bindgen::JsValue::from_str("black"));
-    context.fill_rect(0.0, 0.0, 800.0, 600.0);
-}
-
-
 // Auto-starts on page load
 //start section of the executable may not literally point to main
 //#[wasm_bindgen(start)]
 //can't use wasm_bindgen(start) because RLTK-rs uses it
 pub fn main() {
-   //main_old()
     
     let context = Rltk::init_simple8x8(80, 50, "RLTK Example 03 - Walking Around", "resources");
     let gs = State::new();
