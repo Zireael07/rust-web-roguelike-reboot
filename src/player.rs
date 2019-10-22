@@ -3,8 +3,6 @@ use specs::prelude::*;
 use super::{Position, Player, TileType, State, Map};
 use std::cmp::{min, max};
 
-use rltk::{platform_specific::Command};
-
 // Handle player movement. Delta X and Y are the relative move
 // requested by the player. We calculate the new coordinates,
 // and if it is a floor - move the player there.
@@ -31,17 +29,18 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
 // Implement the game loop
 pub fn player_input(gs: &mut State, ctx: &mut Rltk) {
     // Player movement
-    // HTML input
-    match ctx.command {
-        None => {} //Nothing
-        Some(command) => {
-            match command {
-                Command::MoveLeft => try_move_player(-1, 0, &mut gs.ecs),
-                Command::MoveRight => try_move_player(1, 0, &mut gs.ecs),
-                Command::MoveUp => try_move_player(0,-1, &mut gs.ecs),
-                Command::MoveDown => try_move_player(0,1, &mut gs.ecs),
-                    _ => {} // Ignore all the other possibilities
-            }
+    // New: Handle web buttons
+    if let Some(btn) = &ctx.web_button {
+        match btn.trim() {
+            "go_nw" => try_move_player(-1, -1, &mut gs.ecs),
+            "go_n" => try_move_player(0, -1, &mut gs.ecs),
+            "go_ne" => try_move_player(1, -1, &mut gs.ecs),
+            "go_w" => try_move_player(-1, 0, &mut gs.ecs),
+            "go_e" => try_move_player(1, 0, &mut gs.ecs),
+            "go_sw" => try_move_player(-1, 1, &mut gs.ecs),
+            "go_s" => try_move_player(0, 1, &mut gs.ecs),
+            "go_se" => try_move_player(1, 1, &mut gs.ecs),
+            _ => {}
         }
     }
         

@@ -6,7 +6,9 @@ edition = "2018"
 
 [dependencies]
 # pulling in our local copy of RLTK because we do some custom tinkering
-rltk = { path = "rltk" }
+#rltk = { path = "rltk" }
+
+rltk = { git = "https://github.com/thebracket/rltk_rs" }
 
 # ECS
 specs = "0.15.0"

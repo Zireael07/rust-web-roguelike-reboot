@@ -96,5 +96,15 @@ pub fn main() {
         .with(Player{})
         .build();
 
+    //register html buttons
+    rltk::register_html_button("go_nw");
+    rltk::register_html_button("go_n");
+    rltk::register_html_button("go_ne");
+    rltk::register_html_button("go_w");
+    rltk::register_html_button("go_e");
+    rltk::register_html_button("go_sw");
+    rltk::register_html_button("go_s");
+    rltk::register_html_button("go_se");
+
     rltk::main_loop(context, gs);
 } 
