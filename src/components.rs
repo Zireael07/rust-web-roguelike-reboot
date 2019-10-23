@@ -14,6 +14,14 @@ pub struct Renderable {
     pub fg: RGB,
     pub bg: RGB,
 }
- 
+
+//the name comes from cartography, ie. 'what do I see?'
+#[derive(Component)]
+pub struct Viewshed {
+    pub visible_tiles : Vec<rltk::Point>,
+    pub range : i32,
+    pub dirty : bool
+}
+
 #[derive(Component, Debug)]
 pub struct Player {}

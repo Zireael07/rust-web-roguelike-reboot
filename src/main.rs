@@ -15,6 +15,8 @@ mod player;
 use player::*;
 mod rect;
 pub use rect::Rect;
+mod visibility_system;
+use visibility_system::VisibilitySystem;
 
 
 // A macro to provide `println!(..)`-style syntax for `console.log` logging.
@@ -60,6 +62,8 @@ impl GameState for State {
 //the meat of the EC*S*
 impl State {
     fn run_systems(&mut self) {
+        let mut vis = VisibilitySystem{};
+        vis.run_now(&self.ecs);
         self.ecs.maintain();
     }
 }
@@ -79,6 +83,7 @@ pub fn main() {
     };
     gs.ecs.register::<Position>();
     gs.ecs.register::<Renderable>();
+    gs.ecs.register::<Viewshed>();
     gs.ecs.register::<Player>();
 
     let map: Map = Map::new_map_rooms_and_corridors();
@@ -93,6 +98,7 @@ pub fn main() {
             fg: RGB::named(rltk::YELLOW),
             bg: RGB::named(rltk::BLACK),
         })
+        .with(Viewshed{ visible_tiles : Vec::new(), range : 8, dirty: true })
         .with(Player{})
         .build();
 
