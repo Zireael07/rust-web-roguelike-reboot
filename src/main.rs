@@ -51,10 +51,12 @@ impl GameState for State {
 
         let positions = self.ecs.read_storage::<Position>();
         let renderables = self.ecs.read_storage::<Renderable>();
+        let map = self.ecs.fetch::<Map>();
 
         // Render the player @ symbol
         for (pos, render) in (&positions, &renderables).join() {
-            ctx.set(pos.x, pos.y, render.fg, render.bg, render.glyph);
+            let idx = map.xy_idx(pos.x, pos.y);
+            if map.visible_tiles[idx] { ctx.set(pos.x, pos.y, render.fg, render.bg, render.glyph); }
         }
     }
 }
@@ -88,6 +90,32 @@ pub fn main() {
 
     let map: Map = Map::new_map_rooms_and_corridors();
     let (player_x, player_y) = map.rooms[0].center();
+
+    //spawn monsters
+    let mut rng = rltk::RandomNumberGenerator::new();
+    //we skip room 1 because we don't want any in starting room
+    for room in map.rooms.iter().skip(1) {
+        let (x,y) = room.center();
+
+        //random selection
+        let glyph : u8;
+        let roll = rng.roll_dice(1, 2);
+        match roll {
+            1 => { glyph = rltk::to_cp437('h') } //humanoid or hobo? not too sure yet..
+            _ => { glyph = rltk::to_cp437('c') } //'c'op
+        }
+
+        gs.ecs.create_entity()
+            .with(Position{ x, y })
+            .with(Renderable{
+                glyph: glyph,
+                fg: RGB::named(rltk::RED),
+                bg: RGB::named(rltk::BLACK),
+            })
+            .with(Viewshed{ visible_tiles : Vec::new(), range: 8, dirty: true })
+            .build();
+    }
+
     gs.ecs.insert(map);
 
     gs.ecs
