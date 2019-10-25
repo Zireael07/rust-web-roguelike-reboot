@@ -1,4 +1,4 @@
-use rltk::{VirtualKeyCode, Rltk};
+use rltk::{VirtualKeyCode, Rltk, Point};
 use specs::prelude::*;
 use super::{Position, Player, Viewshed, TileType, State, Map, RunState};
 use std::cmp::{min, max};
@@ -26,6 +26,11 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
 
             //mark our FoV as dirty after a move
             viewshed.dirty = true;
+
+            //update player location data
+            let mut ppos = ecs.write_resource::<Point>();
+            ppos.x = pos.x;
+            ppos.y = pos.y;
         }
     }
 }

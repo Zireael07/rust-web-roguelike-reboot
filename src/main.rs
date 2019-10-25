@@ -20,6 +20,7 @@ use visibility_system::VisibilitySystem;
 mod NPC_ai_system;
 use NPC_ai_system::NPCAI;
 
+use rltk::{Console, GameState, Rltk, VirtualKeyCode, RGB, Point };
 
 // A macro to provide `println!(..)`-style syntax for `console.log` logging.
 macro_rules! log {
@@ -29,11 +30,9 @@ macro_rules! log {
 }
 
 
-// This the first roguelike-ish example - a walking @. We build a very simple map,
-// and you can use the cursor keys to move around a world.
+// This the code for a roguelike game
 
 rltk::add_wasm_support!();
-use rltk::{Console, GameState, Rltk, VirtualKeyCode, RGB };
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum RunState { Paused, Running }
@@ -148,6 +147,9 @@ pub fn main() {
         .with(Viewshed{ visible_tiles : Vec::new(), range : 8, dirty: true })
         .with(Player{})
         .build();
+
+    //special treatment for player location
+    gs.ecs.insert(Point::new(player_x, player_y));
 
     //register html buttons
     rltk::register_html_button("go_nw");
