@@ -1,6 +1,6 @@
 use rltk::{VirtualKeyCode, Rltk};
 use specs::prelude::*;
-use super::{Position, Player, Viewshed, TileType, State, Map};
+use super::{Position, Player, Viewshed, TileType, State, Map, RunState};
 use std::cmp::{min, max};
 
 // Handle player movement. Delta X and Y are the relative move
@@ -31,7 +31,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
 }
 
 // Implement the game loop
-pub fn player_input(gs: &mut State, ctx: &mut Rltk) {
+pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
     // Player movement
     // New: Handle web buttons
     if let Some(btn) = &ctx.web_button {
@@ -44,13 +44,13 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) {
             "go_sw" => try_move_player(-1, 1, &mut gs.ecs),
             "go_s" => try_move_player(0, 1, &mut gs.ecs),
             "go_se" => try_move_player(1, 1, &mut gs.ecs),
-            _ => {}
+            _ => { return RunState::Paused } //Nothing happened
         }
     }
         
     // New: handle keyboard inputs.
     match ctx.key {
-        None => {} // Nothing happened
+        None => { return RunState::Paused } // Nothing happened
         Some(key) => {
             // A key is pressed or held
             match key {
@@ -75,8 +75,9 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) {
                 VirtualKeyCode::Left => try_move_player(-1, 0, &mut gs.ecs),
                 VirtualKeyCode::Right => try_move_player(1, 0, &mut gs.ecs),
 
-                _ => {} // Ignore all the other possibilities
+                _ => { return RunState::Paused } // Nothing happened, ignore all the other possibilities
             }
         }
     }
+    RunState::Running
 }

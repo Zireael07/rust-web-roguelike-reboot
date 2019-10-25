@@ -17,6 +17,8 @@ mod rect;
 pub use rect::Rect;
 mod visibility_system;
 use visibility_system::VisibilitySystem;
+mod NPC_ai_system;
+use NPC_ai_system::NPCAI;
 
 
 // A macro to provide `println!(..)`-style syntax for `console.log` logging.
@@ -33,10 +35,14 @@ macro_rules! log {
 rltk::add_wasm_support!();
 use rltk::{Console, GameState, Rltk, VirtualKeyCode, RGB };
 
+#[derive(PartialEq, Copy, Clone)]
+pub enum RunState { Paused, Running }
 
 // We're extending State to include the ECS world.
 pub struct State {
-    ecs: World
+    pub ecs: World,
+    //necessary for turn-basedness
+    pub runstate : RunState
 }
 
 impl GameState for State {
@@ -44,8 +50,13 @@ impl GameState for State {
         // Clear the screen
         ctx.cls();
 
-        player_input(self, ctx);
-        self.run_systems();
+        //turn-basedness
+        if self.runstate == RunState::Running {
+            self.run_systems();
+            self.runstate = RunState::Paused;
+        } else {
+            self.runstate = player_input(self, ctx);
+        }
 
         draw_map(&self.ecs, ctx);
 
@@ -66,6 +77,8 @@ impl State {
     fn run_systems(&mut self) {
         let mut vis = VisibilitySystem{};
         vis.run_now(&self.ecs);
+        let mut mob = NPCAI{};
+        mob.run_now(&self.ecs);
         self.ecs.maintain();
     }
 }
@@ -76,16 +89,19 @@ impl State {
 //can't use wasm_bindgen(start) because RLTK-rs uses it
 pub fn main() {
     
-    let context = Rltk::init_simple8x8(80, 50, "RLTK Example 03 - Walking Around", "resources");
+    let context = Rltk::init_simple8x8(80, 50, "RLTK Web roguelike", "resources");
     //let gs = State::new();
 
     //ECS takes more lines to set up
     let mut gs = State {
-        ecs: World::new()
+        ecs: World::new(),
+        runstate : RunState::Running
     };
     gs.ecs.register::<Position>();
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Viewshed>();
+    gs.ecs.register::<Monster>();
+    gs.ecs.register::<Name>();
     gs.ecs.register::<Player>();
 
     let map: Map = Map::new_map_rooms_and_corridors();
@@ -94,15 +110,16 @@ pub fn main() {
     //spawn monsters
     let mut rng = rltk::RandomNumberGenerator::new();
     //we skip room 1 because we don't want any in starting room
-    for room in map.rooms.iter().skip(1) {
+    for (i, room) in map.rooms.iter().skip(1).enumerate() {
         let (x,y) = room.center();
 
         //random selection
         let glyph : u8;
+        let name : String;
         let roll = rng.roll_dice(1, 2);
         match roll {
-            1 => { glyph = rltk::to_cp437('h') } //humanoid or hobo? not too sure yet..
-            _ => { glyph = rltk::to_cp437('c') } //'c'op
+            1 => { glyph = rltk::to_cp437('h'); name = "Human".to_string(); } //humanoid or hobo? not too sure yet..
+            _ => { glyph = rltk::to_cp437('c'); name = "Cop".to_string(); } //'c'op
         }
 
         gs.ecs.create_entity()
@@ -113,6 +130,8 @@ pub fn main() {
                 bg: RGB::named(rltk::BLACK),
             })
             .with(Viewshed{ visible_tiles : Vec::new(), range: 8, dirty: true })
+            .with(Monster{})
+            .with(Name{ name: format!("{} #{}", &name, i) })
             .build();
     }
 
