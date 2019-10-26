@@ -19,6 +19,7 @@ mod visibility_system;
 use visibility_system::VisibilitySystem;
 mod NPC_ai_system;
 use NPC_ai_system::NPCAI;
+mod spawner;
 
 use rltk::{Console, GameState, Rltk, VirtualKeyCode, RGB, Point };
 
@@ -106,47 +107,18 @@ pub fn main() {
     let map: Map = Map::new_map_rooms_and_corridors();
     let (player_x, player_y) = map.rooms[0].center();
 
+    gs.ecs.insert(rltk::RandomNumberGenerator::new());
     //spawn monsters
-    let mut rng = rltk::RandomNumberGenerator::new();
     //we skip room 1 because we don't want any in starting room
     for (i, room) in map.rooms.iter().skip(1).enumerate() {
         let (x,y) = room.center();
 
-        //random selection
-        let glyph : u8;
-        let name : String;
-        let roll = rng.roll_dice(1, 2);
-        match roll {
-            1 => { glyph = rltk::to_cp437('h'); name = "Human".to_string(); } //humanoid or hobo? not too sure yet..
-            _ => { glyph = rltk::to_cp437('c'); name = "Cop".to_string(); } //'c'op
-        }
-
-        gs.ecs.create_entity()
-            .with(Position{ x, y })
-            .with(Renderable{
-                glyph: glyph,
-                fg: RGB::named(rltk::RED),
-                bg: RGB::named(rltk::BLACK),
-            })
-            .with(Viewshed{ visible_tiles : Vec::new(), range: 8, dirty: true })
-            .with(Monster{})
-            .with(Name{ name: format!("{} #{}", &name, i) })
-            .build();
+        spawner::random_monster(&mut gs.ecs, x, y);
     }
 
     gs.ecs.insert(map);
 
-    gs.ecs
-        .create_entity()
-        .with(Position { x: player_x, y: player_y })
-        .with(Renderable {
-            glyph: rltk::to_cp437('@'),
-            fg: RGB::named(rltk::YELLOW),
-            bg: RGB::named(rltk::BLACK),
-        })
-        .with(Viewshed{ visible_tiles : Vec::new(), range : 8, dirty: true })
-        .with(Player{})
-        .build();
+    let player_entity = spawner::player(&mut gs.ecs, player_x, player_y);
 
     //special treatment for player location
     gs.ecs.insert(Point::new(player_x, player_y));
