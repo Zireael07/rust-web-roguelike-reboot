@@ -1,22 +1,22 @@
 use super::{MapBuilder, Map, common, Rect, apply_room_to_map, 
-    apply_horizontal_tunnel, apply_vertical_tunnel};
+    apply_horizontal_tunnel, apply_vertical_tunnel, Position};
 use rltk::RandomNumberGenerator;
 use specs::prelude::*;
 
 pub struct SimpleMapBuilder {}
 
 impl MapBuilder for SimpleMapBuilder {
-    fn build() -> Map {
+    fn build() -> (Map, Position) {
         let mut map = Map::new();
-        SimpleMapBuilder::rooms_and_corridors(&mut map);
-        map
+        let playerpos = SimpleMapBuilder::rooms_and_corridors(&mut map);
+        (map, playerpos)
     }
 }
 
 impl SimpleMapBuilder {
     /// Makes a new map using the algorithm from http://rogueliketutorials.com/tutorials/tcod/part-3/
     /// This gives a handful of random rooms and corridors joining them together.
-    fn rooms_and_corridors(map : &mut Map) {
+    fn rooms_and_corridors(map : &mut Map) -> Position {
         const MAX_ROOMS : i32 = 30;
         const MIN_SIZE : i32 = 6;
         const MAX_SIZE : i32 = 10;
@@ -52,5 +52,8 @@ impl SimpleMapBuilder {
                 map.rooms.push(new_room);            
             }
         }
+
+        let start_pos = map.rooms[0].center();
+        Position{ x: start_pos.0, y: start_pos.1 }
     }
 }

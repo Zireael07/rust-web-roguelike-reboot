@@ -105,9 +105,8 @@ pub fn main() {
     gs.ecs.register::<Name>();
     gs.ecs.register::<Player>();
 
-    //let map: Map = Map::new_map_rooms_and_corridors();
-    let map: Map = map_builders::build_random_map();
-    let (player_x, player_y) = map.rooms[0].center();
+    let (map, start) = map_builders::build_random_map();
+    let (player_x, player_y) = (start.x, start.y);
 
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
     //spawn monsters
