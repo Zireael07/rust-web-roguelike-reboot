@@ -20,6 +20,7 @@ use visibility_system::VisibilitySystem;
 mod NPC_ai_system;
 use NPC_ai_system::NPCAI;
 mod spawner;
+pub mod map_builders;
 
 use rltk::{Console, GameState, Rltk, VirtualKeyCode, RGB, Point };
 
@@ -104,7 +105,8 @@ pub fn main() {
     gs.ecs.register::<Name>();
     gs.ecs.register::<Player>();
 
-    let map: Map = Map::new_map_rooms_and_corridors();
+    //let map: Map = Map::new_map_rooms_and_corridors();
+    let map: Map = map_builders::build_random_map();
     let (player_x, player_y) = map.rooms[0].center();
 
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
