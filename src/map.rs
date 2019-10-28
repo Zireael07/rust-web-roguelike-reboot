@@ -1,5 +1,4 @@
 use rltk::{ RGB, Rltk, Console, BaseMap, Algorithm2D, Point };
-use super::{Rect};
 use std::cmp::{max, min};
 extern crate specs;
 use specs::prelude::*;
@@ -18,7 +17,6 @@ pub enum TileType {
 #[derive(Default, Clone)]
 pub struct Map {
     pub tiles : Vec<TileType>,
-    pub rooms : Vec<Rect>,
     pub width : i32,
     pub height : i32,
     pub revealed_tiles : Vec<bool>,
@@ -43,7 +41,6 @@ impl Map {
     pub fn new() -> Map {
         Map{
             tiles : vec![TileType::Wall; 80*50],
-            rooms : Vec::new(),
             width : 80,
             height: 50,
             revealed_tiles : vec![false; 80*50],
