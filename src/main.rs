@@ -105,12 +105,16 @@ pub fn main() {
     gs.ecs.register::<Name>();
     gs.ecs.register::<Player>();
 
-    let (mut map, start) = map_builders::build_random_map();
+    //the builder object is now kept
+    let mut builder = map_builders::random_builder();
+    builder.build_map();
+    let mut map = builder.get_map();
+    let start = builder.get_starting_position();
     let (player_x, player_y) = (start.x, start.y);
 
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
     //spawn monsters
-    map_builders::spawn(&mut map, &mut gs.ecs);
+    builder.spawn_entities(&mut map, &mut gs.ecs);
 
     gs.ecs.insert(map);
 

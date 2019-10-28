@@ -14,6 +14,8 @@ pub enum TileType {
 
 //After the refactor, this is just the data structure
 //Map building is done by the map_builders module
+//Default is to create an empty instance
+#[derive(Default, Clone)]
 pub struct Map {
     pub tiles : Vec<TileType>,
     pub rooms : Vec<Rect>,

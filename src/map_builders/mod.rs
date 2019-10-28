@@ -7,18 +7,24 @@ use common::*;
 use specs::prelude::*;
 
 //Rust's interface
-trait MapBuilder {
-    //Position is the player start position
-    //it can be overridden by each of various map builders
-    fn build() -> (Map, Position);
-    fn spawn(map : &mut Map, ecs : &mut World);
+pub trait MapBuilder {
+    fn build_map(&mut self);
+    fn spawn_entities(&mut self, map : &mut Map, ecs : &mut World);
+    fn get_map(&mut self) -> Map;
+    fn get_starting_position(&self) -> Position;
 }
 
-//Public functions for separate builders
-pub fn build_random_map() -> (Map, Position) {
-    SimpleMapBuilder::build()
+//Factory function for builder
+pub fn random_builder() -> Box<dyn MapBuilder> {
+    // Note that until we have a second map type, this isn't even slightly random
+    Box::new(SimpleMapBuilder::new())
 }
 
-pub fn spawn(map : &mut Map, ecs : &mut World) {
-    SimpleMapBuilder::spawn(map, ecs);
-}
+// //Public functions for separate builders
+// pub fn build_random_map() -> (Map, Position) {
+//     SimpleMapBuilder::build()
+// }
+
+// pub fn spawn(map : &mut Map, ecs : &mut World) {
+//     SimpleMapBuilder::spawn(map, ecs);
+// }
