@@ -1,5 +1,6 @@
 use super::{MapBuilder, Map, common, Rect, apply_room_to_map, 
-    apply_horizontal_tunnel, apply_vertical_tunnel, Position};
+    apply_horizontal_tunnel, apply_vertical_tunnel, Position,
+    spawner};
 use rltk::RandomNumberGenerator;
 use specs::prelude::*;
 
@@ -10,6 +11,14 @@ impl MapBuilder for SimpleMapBuilder {
         let mut map = Map::new();
         let playerpos = SimpleMapBuilder::rooms_and_corridors(&mut map);
         (map, playerpos)
+    }
+
+    fn spawn(map : &mut Map, ecs : &mut World) {
+        //we skip room 1 because we don't want any in starting room
+        for room in map.rooms.iter().skip(1) {
+            let (x,y) = room.center();
+            spawner::random_monster(ecs, x, y);
+        }
     }
 }
 

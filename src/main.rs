@@ -105,17 +105,12 @@ pub fn main() {
     gs.ecs.register::<Name>();
     gs.ecs.register::<Player>();
 
-    let (map, start) = map_builders::build_random_map();
+    let (mut map, start) = map_builders::build_random_map();
     let (player_x, player_y) = (start.x, start.y);
 
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
     //spawn monsters
-    //we skip room 1 because we don't want any in starting room
-    for (i, room) in map.rooms.iter().skip(1).enumerate() {
-        let (x,y) = room.center();
-
-        spawner::random_monster(&mut gs.ecs, x, y);
-    }
+    map_builders::spawn(&mut map, &mut gs.ecs);
 
     gs.ecs.insert(map);
 
