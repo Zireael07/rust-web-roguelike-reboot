@@ -36,14 +36,24 @@ macro_rules! log {
 
 rltk::add_wasm_support!();
 
+const SHOW_MAPGEN_VISUALIZER : bool = true;
+
 #[derive(PartialEq, Copy, Clone)]
-pub enum RunState { Paused, Running }
+pub enum RunState { Paused, 
+    Running,
+    MapGeneration
+}
 
 // We're extending State to include the ECS world.
 pub struct State {
     pub ecs: World,
     //necessary for turn-basedness
-    pub runstate : RunState
+    pub runstate : RunState,
+    //mapgen visualizer stuff that has nowhere else to go
+    mapgen_next_state : Option<RunState>,
+    mapgen_history : Vec<Map>,
+    mapgen_index : usize,
+    mapgen_timer : f32
 }
 
 impl GameState for State {
@@ -51,19 +61,38 @@ impl GameState for State {
         // Clear the screen
         ctx.cls();
 
+        //mapgen visualization
+        if self.runstate == RunState::MapGeneration {
+            if !SHOW_MAPGEN_VISUALIZER {
+                self.runstate = self.mapgen_next_state.unwrap();
+            }
+            ctx.cls();                
+            draw_map(&self.mapgen_history[self.mapgen_index], ctx);
+
+            self.mapgen_timer += ctx.frame_time_ms;
+            if self.mapgen_timer > 300.0 {
+                self.mapgen_timer = 0.0;
+                self.mapgen_index += 1;
+                if self.mapgen_index == self.mapgen_history.len() {
+                    self.runstate = self.mapgen_next_state.unwrap();
+                }
+            }
+        }
+
         //turn-basedness
         if self.runstate == RunState::Running {
             self.run_systems();
             self.runstate = RunState::Paused;
-        } else {
+        } else if self.runstate != RunState::MapGeneration {
             self.runstate = player_input(self, ctx);
         }
 
-        draw_map(&self.ecs, ctx);
+        //normal map drawing
+        let map = self.ecs.fetch::<Map>();
+        draw_map(&map, ctx);
 
         let positions = self.ecs.read_storage::<Position>();
         let renderables = self.ecs.read_storage::<Renderable>();
-        let map = self.ecs.fetch::<Map>();
 
         // Render the player @ symbol
         for (pos, render) in (&positions, &renderables).join() {
@@ -96,7 +125,12 @@ pub fn main() {
     //ECS takes more lines to set up
     let mut gs = State {
         ecs: World::new(),
-        runstate : RunState::Running
+        runstate : RunState::Running,
+        //same as actual game starting state
+        mapgen_next_state : Some(RunState::Running),
+        mapgen_index : 0,
+        mapgen_history: Vec::new(),
+        mapgen_timer: 0.0
     };
     gs.ecs.register::<Position>();
     gs.ecs.register::<Renderable>();
@@ -109,6 +143,11 @@ pub fn main() {
     let mut builder = map_builders::random_builder();
     builder.build_map();
     let mut map = builder.get_map();
+    //mapgen visualizer data
+    gs.mapgen_history = builder.get_snapshot_history();
+
+    gs.runstate = RunState::MapGeneration;
+
     let start = builder.get_starting_position();
     let (player_x, player_y) = (start.x, start.y);
 

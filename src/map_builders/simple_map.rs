@@ -1,6 +1,6 @@
 use super::{MapBuilder, Map, common, Rect, apply_room_to_map, 
     apply_horizontal_tunnel, apply_vertical_tunnel, Position,
-    spawner};
+    spawner, SHOW_MAPGEN_VISUALIZER};
 use rltk::RandomNumberGenerator;
 use specs::prelude::*;
 
@@ -8,7 +8,9 @@ pub struct SimpleMapBuilder {
     map : Map,
     starting_position : Position,
     //specific to this builder
-    rooms: Vec<Rect>
+    rooms: Vec<Rect>,
+    //for mapgen visualizer
+    history: Vec<Map>
 }
 
 impl MapBuilder for SimpleMapBuilder {
@@ -31,6 +33,21 @@ impl MapBuilder for SimpleMapBuilder {
             spawner::random_monster(ecs, x, y);
         }
     }
+
+    //mapgen visualizer
+    fn get_snapshot_history(&self) -> Vec<Map> {
+        self.history.clone()
+    }
+
+    fn take_snapshot(&mut self) {
+        if SHOW_MAPGEN_VISUALIZER {
+            let mut snapshot = self.map.clone();
+            for v in snapshot.revealed_tiles.iter_mut() {
+                *v = true;
+            }
+            self.history.push(snapshot);
+        }
+    }
 }
 
 impl SimpleMapBuilder {
@@ -38,7 +55,8 @@ impl SimpleMapBuilder {
         SimpleMapBuilder{
             map : Map::new(),
             starting_position : Position{ x: 0, y : 0 },
-            rooms: Vec::new()
+            rooms: Vec::new(),
+            history: Vec::new()
         }
     }
 
@@ -62,7 +80,8 @@ impl SimpleMapBuilder {
                 if new_room.intersect(other_room) { ok = false }
             }
             if ok {
-                apply_room_to_map(&mut self.map, &new_room);        
+                apply_room_to_map(&mut self.map, &new_room);
+                self.take_snapshot();  
 
                 //connect rooms
                 if !self.rooms.is_empty() {
@@ -77,7 +96,8 @@ impl SimpleMapBuilder {
                     }
                 }
 
-                self.rooms.push(new_room);            
+                self.rooms.push(new_room);
+                self.take_snapshot();
             }
         }
 
