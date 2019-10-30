@@ -2,6 +2,8 @@ use super::{Map, TileType, Rect, Position, spawner, SHOW_MAPGEN_VISUALIZER};
 
 mod simple_map;
 use simple_map::SimpleMapBuilder;
+mod bsp_dungeon;
+use bsp_dungeon::BSPDungeonBuilder;
 mod common;
 use common::*;
 use specs::prelude::*;
@@ -20,14 +22,5 @@ pub trait MapBuilder {
 //Factory function for builder
 pub fn random_builder() -> Box<dyn MapBuilder> {
     // Note that until we have a second map type, this isn't even slightly random
-    Box::new(SimpleMapBuilder::new())
+    Box::new(BSPDungeonBuilder::new())
 }
-
-// //Public functions for separate builders
-// pub fn build_random_map() -> (Map, Position) {
-//     SimpleMapBuilder::build()
-// }
-
-// pub fn spawn(map : &mut Map, ecs : &mut World) {
-//     SimpleMapBuilder::spawn(map, ecs);
-// }
