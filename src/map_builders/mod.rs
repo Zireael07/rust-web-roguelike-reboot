@@ -4,6 +4,8 @@ mod simple_map;
 use simple_map::SimpleMapBuilder;
 mod bsp_dungeon;
 use bsp_dungeon::BSPDungeonBuilder;
+mod bsp_interior;
+use bsp_interior::BSPInteriorBuilder;
 mod common;
 use common::*;
 use specs::prelude::*;
@@ -22,5 +24,5 @@ pub trait MapBuilder {
 //Factory function for builder
 pub fn random_builder() -> Box<dyn MapBuilder> {
     // Note that until we have a second map type, this isn't even slightly random
-    Box::new(BSPDungeonBuilder::new())
+    Box::new(BSPInteriorBuilder::new())
 }
