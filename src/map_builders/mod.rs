@@ -6,6 +6,8 @@ mod bsp_dungeon;
 use bsp_dungeon::BSPDungeonBuilder;
 mod bsp_interior;
 use bsp_interior::BSPInteriorBuilder;
+mod cellular_automata;
+use cellular_automata::CellularAutomataBuilder;
 mod common;
 use common::*;
 use specs::prelude::*;
@@ -24,5 +26,5 @@ pub trait MapBuilder {
 //Factory function for builder
 pub fn random_builder() -> Box<dyn MapBuilder> {
     // Note that until we have a second map type, this isn't even slightly random
-    Box::new(BSPInteriorBuilder::new())
+    Box::new(CellularAutomataBuilder::new())
 }
