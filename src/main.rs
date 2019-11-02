@@ -148,14 +148,14 @@ pub fn main() {
 
     gs.runstate = RunState::MapGeneration;
 
+    gs.ecs.insert(map);
+
     let start = builder.get_starting_position();
     let (player_x, player_y) = (start.x, start.y);
 
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
     //spawn monsters
-    builder.spawn_entities(&mut map, &mut gs.ecs);
-
-    gs.ecs.insert(map);
+    builder.spawn_entities(&mut gs.ecs);
 
     let player_entity = spawner::player(&mut gs.ecs, player_x, player_y);
 

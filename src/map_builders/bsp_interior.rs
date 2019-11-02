@@ -30,11 +30,12 @@ impl MapBuilder for BSPInteriorBuilder {
         self.build();
     }
 
-    fn spawn_entities(&mut self, map : &mut Map, ecs : &mut World) {
+    fn spawn_entities(&mut self, ecs : &mut World) {
         //we skip room 1 because we don't want any in starting room
         for room in self.rooms.iter().skip(1) {
-            let (x,y) = room.center();
-            spawner::random_monster(ecs, x, y);
+            //let (x,y) = room.center();
+            //spawner::random_monster(ecs, x, y);
+            spawner::spawn_room(ecs, room);
         }
     }
 

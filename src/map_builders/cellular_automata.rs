@@ -28,7 +28,7 @@ impl MapBuilder for CellularAutomataBuilder {
         self.build();
     }
 
-    fn spawn_entities(&mut self, map : &mut Map, ecs : &mut World) {
+    fn spawn_entities(&mut self, ecs : &mut World) {
         // We need to rewrite this, too.
     }
 
