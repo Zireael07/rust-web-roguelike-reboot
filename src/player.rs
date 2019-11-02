@@ -52,37 +52,39 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
             _ => { return RunState::Paused } //Nothing happened
         }
     }
-        
-    // New: handle keyboard inputs.
-    match ctx.key {
-        None => { return RunState::Paused } // Nothing happened
-        Some(key) => {
-            // A key is pressed or held
-            match key {
-                // We're matching a key code from GLFW (the GL library underlying RLTK),
-                // and applying movement via the move_player function.
+    else {
+        // New: handle keyboard inputs.
+        match ctx.key {
+            None => { return RunState::Paused } // Nothing happened
+            Some(key) => {
+                // A key is pressed or held
+                match key {
+                    // We're matching a key code from GLFW (the GL library underlying RLTK),
+                    // and applying movement via the move_player function.
 
-                // Numpad
-                VirtualKeyCode::Numpad8 => try_move_player(0, -1, &mut gs.ecs),
-                VirtualKeyCode::Numpad4 => try_move_player(-1, 0, &mut gs.ecs),
-                VirtualKeyCode::Numpad6 => try_move_player(1, 0, &mut gs.ecs),
-                VirtualKeyCode::Numpad2 => try_move_player(0, 1, &mut gs.ecs),
+                    // Numpad
+                    VirtualKeyCode::Numpad8 => try_move_player(0, -1, &mut gs.ecs),
+                    VirtualKeyCode::Numpad4 => try_move_player(-1, 0, &mut gs.ecs),
+                    VirtualKeyCode::Numpad6 => try_move_player(1, 0, &mut gs.ecs),
+                    VirtualKeyCode::Numpad2 => try_move_player(0, 1, &mut gs.ecs),
 
-                // Numpad diagonals
-                VirtualKeyCode::Numpad7 => try_move_player(-1, -1, &mut gs.ecs),
-                VirtualKeyCode::Numpad9 => try_move_player(1, -1, &mut gs.ecs),
-                VirtualKeyCode::Numpad1 => try_move_player(-1, 1, &mut gs.ecs),
-                VirtualKeyCode::Numpad3 => try_move_player(1, 1, &mut gs.ecs),
+                    // Numpad diagonals
+                    VirtualKeyCode::Numpad7 => try_move_player(-1, -1, &mut gs.ecs),
+                    VirtualKeyCode::Numpad9 => try_move_player(1, -1, &mut gs.ecs),
+                    VirtualKeyCode::Numpad1 => try_move_player(-1, 1, &mut gs.ecs),
+                    VirtualKeyCode::Numpad3 => try_move_player(1, 1, &mut gs.ecs),
 
-                // Cursors
-                VirtualKeyCode::Up => try_move_player(0, -1, &mut gs.ecs),
-                VirtualKeyCode::Down => try_move_player(0, 1, &mut gs.ecs),
-                VirtualKeyCode::Left => try_move_player(-1, 0, &mut gs.ecs),
-                VirtualKeyCode::Right => try_move_player(1, 0, &mut gs.ecs),
+                    // Cursors
+                    VirtualKeyCode::Up => try_move_player(0, -1, &mut gs.ecs),
+                    VirtualKeyCode::Down => try_move_player(0, 1, &mut gs.ecs),
+                    VirtualKeyCode::Left => try_move_player(-1, 0, &mut gs.ecs),
+                    VirtualKeyCode::Right => try_move_player(1, 0, &mut gs.ecs),
 
-                _ => { return RunState::Paused } // Nothing happened, ignore all the other possibilities
+                    _ => { return RunState::Paused } // Nothing happened, ignore all the other possibilities
+                }
             }
         }
     }
+
     RunState::Running
 }
