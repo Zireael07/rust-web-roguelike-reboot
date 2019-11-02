@@ -17,6 +17,7 @@ mod rect;
 pub use rect::Rect;
 mod visibility_system;
 use visibility_system::VisibilitySystem;
+#[allow(non_snake_case)]
 mod NPC_ai_system;
 use NPC_ai_system::NPCAI;
 mod spawner;

@@ -9,6 +9,7 @@ use specs::prelude::*;
 pub enum TileType {
     Wall,
     Floor,
+    DownStairs,
 }
 
 //After the refactor, this is just the data structure
@@ -162,6 +163,10 @@ pub fn draw_map(map : &Map, ctx : &mut Rltk) {
             match tile {
                 TileType::Floor => {
                     glyph = rltk::to_cp437('.');
+                    fg = RGB::from_f32(0.0, 0.5, 0.5);
+                }
+                TileType::DownStairs => {
+                    glyph = rltk::to_cp437('>');
                     fg = RGB::from_f32(0.0, 0.5, 0.5);
                 }
                 TileType::Wall => {

@@ -8,6 +8,8 @@ mod bsp_interior;
 use bsp_interior::BSPInteriorBuilder;
 mod cellular_automata;
 use cellular_automata::CellularAutomataBuilder;
+mod drunkard_walk;
+use drunkard_walk::DrunkardsWalkBuilder;
 mod common;
 use common::*;
 use specs::prelude::*;
@@ -31,5 +33,6 @@ pub fn random_builder() -> Box<dyn MapBuilder> {
     //Box::new(SimpleMapBuilder::new())
     //console::log("Simple map builder!");
     //Box::new(BSPDungeonBuilder::new())
-    Box::new(CellularAutomataBuilder::new())
+    //Box::new(CellularAutomataBuilder::new())
+    Box::new(DrunkardsWalkBuilder::new())
 }
