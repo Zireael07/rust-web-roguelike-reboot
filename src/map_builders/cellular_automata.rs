@@ -1,5 +1,6 @@
 use super::{MapBuilder, Map, Rect, apply_room_to_map, 
-    TileType, Position, spawner, SHOW_MAPGEN_VISUALIZER};
+    TileType, Position, spawner, SHOW_MAPGEN_VISUALIZER,
+    generate_voronoi_spawn_regions};
 use rltk::RandomNumberGenerator;
 use specs::prelude::*;
 use std::collections::HashMap; //for region spawning
@@ -110,25 +111,6 @@ impl CellularAutomataBuilder {
         }
 
         // Now we build a noise map for use in spawning entities later
-        let mut noise = rltk::FastNoise::seeded(rng.roll_dice(1, 65536) as u64);
-        noise.set_noise_type(rltk::NoiseType::Cellular); //Voronoi
-        noise.set_frequency(0.08);
-        noise.set_cellular_distance_function(rltk::CellularDistanceFunction::Manhattan);
-
-        for y in 1 .. self.map.height-1 {
-            for x in 1 .. self.map.width-1 {
-                let idx = self.map.xy_idx(x, y);
-                if self.map.tiles[idx] == TileType::Floor {
-                    let cell_value_f = noise.get_noise(x as f32, y as f32) * 10240.0; //brings values up to reasonable range
-                    let cell_value = cell_value_f as i32;
-
-                    if self.noise_areas.contains_key(&cell_value) {
-                        self.noise_areas.get_mut(&cell_value).unwrap().push(idx);
-                    } else {
-                        self.noise_areas.insert(cell_value, vec![idx]);
-                    }
-                }
-            }
-        }
+        self.noise_areas = generate_voronoi_spawn_regions(&self.map, &mut rng);
     }
 }
