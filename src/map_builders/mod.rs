@@ -9,7 +9,7 @@ use bsp_interior::BSPInteriorBuilder;
 mod cellular_automata;
 use cellular_automata::CellularAutomataBuilder;
 mod drunkard_walk;
-use drunkard_walk::DrunkardsWalkBuilder;
+use drunkard_walk::*;
 mod common;
 use common::*;
 use specs::prelude::*;
@@ -34,5 +34,14 @@ pub fn random_builder() -> Box<dyn MapBuilder> {
     //console::log("Simple map builder!");
     //Box::new(BSPDungeonBuilder::new())
     //Box::new(CellularAutomataBuilder::new())
-    Box::new(DrunkardsWalkBuilder::new())
+    // three variants of the drunkard walk algo
+    Box::new(DrunkardsWalkBuilder::open_area())
+    //Box::new(DrunkardsWalkBuilder::open_halls())
+    //Box::new(DrunkardsWalkBuilder::winding_passages())
+    // //custom one
+    // Box::new(DrunkardsWalkBuilder::new(DrunkardSettings{ 
+    //     spawn_mode: DrunkSpawnMode::Random,
+    //     drunken_lifetime: 100,
+    //     floor_percent: 0.4
+    //     }))
 }
