@@ -10,6 +10,8 @@ mod cellular_automata;
 use cellular_automata::CellularAutomataBuilder;
 mod drunkard_walk;
 use drunkard_walk::*;
+mod maze;
+use maze::MazeBuilder;
 mod common;
 use common::*;
 use specs::prelude::*;
@@ -35,7 +37,7 @@ pub fn random_builder() -> Box<dyn MapBuilder> {
     //Box::new(BSPDungeonBuilder::new())
     //Box::new(CellularAutomataBuilder::new())
     // three variants of the drunkard walk algo
-    Box::new(DrunkardsWalkBuilder::open_area())
+    //Box::new(DrunkardsWalkBuilder::open_area())
     //Box::new(DrunkardsWalkBuilder::open_halls())
     //Box::new(DrunkardsWalkBuilder::winding_passages())
     // //custom one
@@ -44,4 +46,5 @@ pub fn random_builder() -> Box<dyn MapBuilder> {
     //     drunken_lifetime: 100,
     //     floor_percent: 0.4
     //     }))
+    Box::new(MazeBuilder::new())
 }
