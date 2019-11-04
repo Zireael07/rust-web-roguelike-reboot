@@ -15,7 +15,7 @@ use maze::MazeBuilder;
 mod dla;
 use dla::*;
 mod voronoi;
-use voronoi::VoronoiBuilder;
+use voronoi::*;
 mod common;
 use common::*;
 use specs::prelude::*;
@@ -57,5 +57,6 @@ pub fn random_builder() -> Box<dyn MapBuilder> {
     //Box::new(DLABuilder::insectoid())
     //Box::new(DrunkardsWalkBuilder::fat_passages())
     //Box::new(DrunkardsWalkBuilder::fearful_symmetry())
-    Box::new(VoronoiBuilder::new())
+    Box::new(VoronoiBuilder::pythagoras())
+    //Box::new(VoronoiBuilder::manhattan())
 }
