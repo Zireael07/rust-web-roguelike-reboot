@@ -46,9 +46,13 @@ pub fn random_builder() -> Box<dyn MapBuilder> {
     // Box::new(DrunkardsWalkBuilder::new(DrunkardSettings{ 
     //     spawn_mode: DrunkSpawnMode::Random,
     //     drunken_lifetime: 100,
-    //     floor_percent: 0.4
+    //     floor_percent: 0.4,
+    //     brush_size: 1,
+    //     symmetry: Symmetry::None
     //     }))
     //Box::new(MazeBuilder::new())
     //Box::new(DLABuilder::walk_outwards())
-    Box::new(DLABuilder::insectoid())
+    //Box::new(DLABuilder::insectoid())
+    //Box::new(DrunkardsWalkBuilder::fat_passages())
+    Box::new(DrunkardsWalkBuilder::fearful_symmetry())
 }
