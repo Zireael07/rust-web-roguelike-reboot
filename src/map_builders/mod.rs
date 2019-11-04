@@ -12,6 +12,8 @@ mod drunkard_walk;
 use drunkard_walk::*;
 mod maze;
 use maze::MazeBuilder;
+mod dla;
+use dla::*;
 mod common;
 use common::*;
 use specs::prelude::*;
@@ -46,5 +48,7 @@ pub fn random_builder() -> Box<dyn MapBuilder> {
     //     drunken_lifetime: 100,
     //     floor_percent: 0.4
     //     }))
-    Box::new(MazeBuilder::new())
+    //Box::new(MazeBuilder::new())
+    //Box::new(DLABuilder::walk_outwards())
+    Box::new(DLABuilder::insectoid())
 }
