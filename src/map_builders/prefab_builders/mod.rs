@@ -21,7 +21,8 @@ pub struct PrefabBuilder {
     history: Vec<Map>,
     mode: PrefabMode,
     //because sections take a completed map
-    previous_builder : Option<Box<dyn MapBuilder>>
+    previous_builder : Option<Box<dyn MapBuilder>>,
+    list_spawns: Vec<(usize, String)>
 }
 
 impl MapBuilder for PrefabBuilder {
@@ -41,7 +42,8 @@ impl MapBuilder for PrefabBuilder {
         self.build();
     }
 
-    fn spawn_entities(&mut self, ecs : &mut World) {
+    fn get_list_spawns(&self) -> &Vec<(usize, String)> {
+        &self.list_spawns
     }
 
     fn take_snapshot(&mut self) {
@@ -62,7 +64,8 @@ impl PrefabBuilder {
             starting_position : Position{ x: 0, y : 0 },
             history : Vec::new(),
             mode : PrefabMode::Sectional{ section: prefab_sections::UNDERGROUND_FORT },
-            previous_builder
+            previous_builder,
+            list_spawns: Vec::new()
         }
     }
 
@@ -89,6 +92,10 @@ impl PrefabBuilder {
         match ch {
             ' ' => self.map.tiles[idx] = TileType::Floor, //space
             '#' => self.map.tiles[idx] = TileType::Wall, // #
+            'g' => {
+                self.map.tiles[idx] = TileType::Floor;
+                self.list_spawns.push((idx, "Human".to_string()));
+            }
             _ => {
                 //put a floor
                 self.map.tiles[idx] = TileType::Floor;
@@ -128,14 +135,6 @@ impl PrefabBuilder {
     }
 
     pub fn apply_sectional(&mut self, section : &prefab_sections::PrefabSection) {
-        // Build the map
-        let prev_builder = self.previous_builder.as_mut().unwrap();
-        prev_builder.build_map();
-        //copy starting position and map from previous
-        self.starting_position = prev_builder.get_starting_position();
-        self.map = prev_builder.get_map().clone();
-        self.take_snapshot();
-
         use prefab_sections::*;
 
         let string_vec = PrefabBuilder::read_ascii_to_vec(section.template);
@@ -155,6 +154,26 @@ impl PrefabBuilder {
             VerticalPlacement::Bottom => chunk_y = (self.map.height-1) - section.height as i32
         }
         console::log(&format!("{},{}", chunk_x, chunk_y));
+
+        // Build the map
+        let prev_builder = self.previous_builder.as_mut().unwrap();
+        prev_builder.build_map();
+        //copy starting position and map from previous
+        self.starting_position = prev_builder.get_starting_position();
+        self.map = prev_builder.get_map().clone();
+        //spawning from previous list [of] spawns
+        for e in prev_builder.get_list_spawns().iter() {
+            let idx = e.0;
+            let x = idx as i32 % self.map.width;
+            let y = idx as i32 / self.map.width;
+            if x < chunk_x || x > (chunk_x + section.width as i32) ||
+                y < chunk_y || y > (chunk_y + section.height as i32) {
+                    self.list_spawns.push(
+                        (idx, e.1.to_string())
+                    )
+                }
+        }    
+        self.take_snapshot();
 
         let mut i = 0;
         for ty in 0..section.height {
