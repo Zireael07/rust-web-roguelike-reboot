@@ -27,12 +27,20 @@ use rltk::{console};
 //Rust's interface - unfortunately, no variables allowed here!
 pub trait MapBuilder {
     fn build_map(&mut self);
-    fn spawn_entities(&mut self, ecs : &mut World);
     fn get_map(&mut self) -> Map;
     fn get_starting_position(&self) -> Position;
     //mapgen visualizer
     fn get_snapshot_history(&self) -> Vec<Map>;
     fn take_snapshot(&mut self);
+    //for spawning with multiple layers
+    fn get_list_spawns(&self) -> &Vec<(usize, String)>;
+    //default implementation
+    fn spawn_entities(&mut self, ecs : &mut World) {
+        for entity in self.get_list_spawns().iter() {
+            spawner::spawn_entity(ecs, &(&entity.0, &entity.1));
+        }
+    }
+
 }
 
 //Factory function for builder

@@ -8,7 +8,8 @@ pub struct BSPDungeonBuilder {
     starting_position : Position,
     rooms: Vec<Rect>,
     history: Vec<Map>,
-    rects: Vec<Rect>
+    rects: Vec<Rect>,
+    list_spawns: Vec<(usize, String)>
 }
 
 impl MapBuilder for BSPDungeonBuilder {
@@ -28,13 +29,8 @@ impl MapBuilder for BSPDungeonBuilder {
         self.build();
     }
 
-    fn spawn_entities(&mut self, ecs : &mut World) {
-        //we skip room 1 because we don't want any in starting room
-        for room in self.rooms.iter().skip(1) {
-            spawner::spawn_room(ecs, room);
-            //let (x,y) = room.center();
-            //spawner::random_monster(ecs, x, y);
-        }
+    fn get_list_spawns(&self) -> &Vec<(usize, String)> {
+        &self.list_spawns
     }
 
     fn take_snapshot(&mut self) {
@@ -55,7 +51,8 @@ impl BSPDungeonBuilder {
             starting_position : Position{ x: 0, y : 0 },
             rooms: Vec::new(),
             history: Vec::new(),
-            rects: Vec::new()
+            rects: Vec::new(),
+            list_spawns: Vec::new()
         }
     }
 
@@ -102,6 +99,12 @@ impl BSPDungeonBuilder {
 
         let start = self.rooms[0].center();
         self.starting_position = Position{ x: start.0, y: start.1 };
+
+        // Spawn some entities
+        //we skip room 1 because we don't want any in starting room
+        for room in self.rooms.iter().skip(1) {
+            spawner::spawn_room(&self.map, &mut rng, room, &mut self.list_spawns);
+        }
     }
 
     //BSP subdivision happens here

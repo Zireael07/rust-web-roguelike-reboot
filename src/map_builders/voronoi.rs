@@ -14,7 +14,8 @@ pub struct VoronoiBuilder {
     history: Vec<Map>,
     noise_areas : HashMap<i32, Vec<usize>>,
     n_seeds: usize,
-    distance_algorithm: DistanceAlgorithm
+    distance_algorithm: DistanceAlgorithm,
+    list_spawns: Vec<(usize, String)>
 }
 
 impl MapBuilder for VoronoiBuilder {
@@ -34,10 +35,8 @@ impl MapBuilder for VoronoiBuilder {
         self.build();
     }
 
-    fn spawn_entities(&mut self, ecs : &mut World) {
-        for area in self.noise_areas.iter() {
-            spawner::spawn_region(ecs, area.1);
-        }
+    fn get_list_spawns(&self) -> &Vec<(usize, String)> {
+        &self.list_spawns
     }
 
     fn take_snapshot(&mut self) {
@@ -59,7 +58,8 @@ impl VoronoiBuilder {
             history: Vec::new(),
             noise_areas : HashMap::new(),
             n_seeds: 64,
-            distance_algorithm: DistanceAlgorithm::Pythagoras
+            distance_algorithm: DistanceAlgorithm::Pythagoras,
+            list_spawns: Vec::new()
         }
     }
 
@@ -71,7 +71,8 @@ impl VoronoiBuilder {
             history: Vec::new(),
             noise_areas : HashMap::new(),
             n_seeds: 64,
-            distance_algorithm: DistanceAlgorithm::Pythagoras
+            distance_algorithm: DistanceAlgorithm::Pythagoras,
+            list_spawns: Vec::new()
         }
     }
 
@@ -82,7 +83,8 @@ impl VoronoiBuilder {
             history: Vec::new(),
             noise_areas : HashMap::new(),
             n_seeds: 64,
-            distance_algorithm: DistanceAlgorithm::Manhattan
+            distance_algorithm: DistanceAlgorithm::Manhattan,
+            list_spawns: Vec::new()
         }
     }
 
@@ -170,5 +172,10 @@ impl VoronoiBuilder {
 
         // Now we build a noise map for use in spawning entities later
         self.noise_areas = generate_voronoi_spawn_regions(&self.map, &mut rng);
+
+        // Spawn the entities
+        for area in self.noise_areas.iter() {
+            spawner::spawn_region(&self.map, &mut rng, area.1, &mut self.list_spawns);
+        }
     }
 }

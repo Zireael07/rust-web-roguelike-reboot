@@ -10,7 +10,8 @@ pub struct SimpleMapBuilder {
     //specific to this builder
     rooms: Vec<Rect>,
     //for mapgen visualizer
-    history: Vec<Map>
+    history: Vec<Map>,
+    list_spawns: Vec<(usize, String)>
 }
 
 impl MapBuilder for SimpleMapBuilder {
@@ -26,13 +27,8 @@ impl MapBuilder for SimpleMapBuilder {
         self.rooms_and_corridors();
     }
 
-    fn spawn_entities(&mut self, ecs : &mut World) {
-        //we skip room 1 because we don't want any in starting room
-        for room in self.rooms.iter().skip(1) {
-            //let (x,y) = room.center();
-            //spawner::random_monster(ecs, x, y);
-            spawner::spawn_room(ecs, room);
-        }
+    fn get_list_spawns(&self) -> &Vec<(usize, String)> {
+        &self.list_spawns
     }
 
     //mapgen visualizer
@@ -57,7 +53,8 @@ impl SimpleMapBuilder {
             map : Map::new(),
             starting_position : Position{ x: 0, y : 0 },
             rooms: Vec::new(),
-            history: Vec::new()
+            history: Vec::new(),
+            list_spawns: Vec::new()
         }
     }
 
@@ -103,6 +100,12 @@ impl SimpleMapBuilder {
         }
 
         let start_pos = self.rooms[0].center();
-        self.starting_position = Position{ x: start_pos.0, y: start_pos.1 }
+        self.starting_position = Position{ x: start_pos.0, y: start_pos.1 };
+
+        // Spawn some entities
+        //we skip room 1 because we don't want any in starting room
+        for room in self.rooms.iter().skip(1) {
+            spawner::spawn_room(&self.map, &mut rng, room, &mut self.list_spawns);
+        }
     }
 }
