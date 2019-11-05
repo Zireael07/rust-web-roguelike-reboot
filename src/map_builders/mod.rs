@@ -61,5 +61,11 @@ pub fn random_builder() -> Box<dyn MapBuilder> {
     //Box::new(DrunkardsWalkBuilder::fearful_symmetry())
     //Box::new(VoronoiBuilder::pythagoras())
     //Box::new(VoronoiBuilder::manhattan())
-    Box::new(PrefabBuilder::new())
+    //Box::new(PrefabBuilder::new())
+    //this one is sectional
+    Box::new(
+        PrefabBuilder::new(
+            Some(Box::new(CellularAutomataBuilder::new()))
+        )
+    )
 }
