@@ -17,9 +17,9 @@ pub enum TileType {
 //Default is to create an empty instance
 #[derive(Default, Clone)]
 pub struct Map {
-    pub tiles : Vec<TileType>,
     pub width : i32,
     pub height : i32,
+    pub tiles : Vec<TileType>,
     pub revealed_tiles : Vec<bool>,
     pub visible_tiles : Vec<bool>
 }
@@ -29,23 +29,26 @@ impl Map {
     // a tile. Each row is stored sequentially (so 0..80, 81..160, etc.). This takes an x/y and returns
     // the array index.
     pub fn xy_idx(&self, x: i32, y: i32) -> usize {
-        (y as usize * 80) + x as usize
+        (y as usize * self.width as usize) + x as usize
     }
 
     // It's a great idea to have a reverse mapping for these coordinates. This is as simple as
-    // index % 80 (mod 80), and index / 80
+    // index % self.width (mod self.width), and index / self.width
     pub fn idx_xy(&self, idx: usize) -> (i32, i32) {
-        (idx as i32 % 80, idx as i32 / 80)
+        (idx as i32 % self.width, idx as i32 / self.width)
     }
 
     /// Generates an empty map, consisting entirely of solid walls
     pub fn new() -> Map {
+        let map_w = 80;
+        let map_h = 50;
+        let map_count = map_w*map_h as usize;
         Map{
-            tiles : vec![TileType::Wall; 80*50],
-            width : 80,
-            height: 50,
-            revealed_tiles : vec![false; 80*50],
-            visible_tiles : vec![false; 80*50],
+            width : map_w as i32,
+            height : map_h as i32,
+            tiles : vec![TileType::Wall; map_count],
+            revealed_tiles : vec![false; map_count],
+            visible_tiles : vec![false; map_count],
         }
     }
 
@@ -183,7 +186,7 @@ pub fn draw_map(map : &Map, ctx : &mut Rltk) {
 
         // Move the coordinates
         x += 1;
-        if x > 79 {
+        if x > map.width-1 {
             x = 0;
             y += 1;
         }
