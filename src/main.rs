@@ -24,13 +24,8 @@ mod spawner;
 pub mod map_builders;
 
 use rltk::{Console, GameState, Rltk, VirtualKeyCode, RGB, Point };
-
-// A macro to provide `println!(..)`-style syntax for `console.log` logging.
-macro_rules! log {
-    ( $( $t:tt )* ) => {
-        web_sys::console::log_1(&format!( $( $t )* ).into());
-    }
-}
+//console is RLTK's wrapper around either println or the web console macro
+use rltk::{console};
 
 
 // This the code for a roguelike game
@@ -114,6 +109,42 @@ impl State {
     }
 }
 
+impl State {
+    fn generate_world(&mut self) {
+        self.mapgen_index = 0;
+        self.mapgen_timer = 0.0;
+        self.mapgen_history.clear();
+        let mut rng = self.ecs.write_resource::<rltk::RandomNumberGenerator>();
+        let mut builder = map_builders::random_builder(&mut rng);
+        console::log("Generating world...");
+        builder.build_map(&mut rng);
+
+        //prevent borrow checker errors
+        std::mem::drop(rng);
+        //mapgen visualizer data
+        self.mapgen_history = builder.build_data.history.clone();
+        //key stuff
+        self.runstate = RunState::MapGeneration;
+
+        let player_start;
+        {
+            //fills in map placeholder
+            let mut map = self.ecs.write_resource::<Map>();
+            *map = builder.build_data.map.clone();
+            player_start = builder.build_data.starting_position.as_mut().unwrap().clone();
+        }
+
+        //spawn monsters
+        builder.spawn_entities(&mut self.ecs);
+        //spawn player
+        let (player_x, player_y) = (player_start.x, player_start.y);
+        let player_entity = spawner::player(&mut self.ecs, player_x, player_y);
+        //special treatment for player location
+        self.ecs.insert(Point::new(player_x, player_y));
+
+    }
+}
+
 // Auto-starts on page load
 //start section of the executable may not literally point to main
 //#[wasm_bindgen(start)]
@@ -140,28 +171,11 @@ pub fn main() {
     gs.ecs.register::<Name>();
     gs.ecs.register::<Player>();
 
-    //the builder object is now kept
-    let mut builder = map_builders::random_builder();
-    builder.build_map();
-    let mut map = builder.get_map();
-    //mapgen visualizer data
-    gs.mapgen_history = builder.get_snapshot_history();
-
-    gs.runstate = RunState::MapGeneration;
-
-    gs.ecs.insert(map);
-
-    let start = builder.get_starting_position();
-    let (player_x, player_y) = (start.x, start.y);
-
+    //placeholders so that generate_world has stuff to fill
+    gs.ecs.insert(Map::new());
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
-    //spawn monsters
-    builder.spawn_entities(&mut gs.ecs);
 
-    let player_entity = spawner::player(&mut gs.ecs, player_x, player_y);
-
-    //special treatment for player location
-    gs.ecs.insert(Point::new(player_x, player_y));
+    gs.generate_world();
 
     //register html buttons
     rltk::register_html_button("go_nw");
