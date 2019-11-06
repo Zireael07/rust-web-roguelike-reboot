@@ -110,32 +110,13 @@ impl BuilderChain {
     }
 }
 
+//Rust's interfaces - unfortunately, no variables allowed here!
 pub trait InitialMapBuilder {
     fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data : &mut BuilderMap);
 }
 
 pub trait MetaMapBuilder {    
     fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data : &mut BuilderMap);
-}
-
-
-//Rust's interface - unfortunately, no variables allowed here!
-pub trait MapBuilder {
-    fn build_map(&mut self);
-    fn get_map(&mut self) -> Map;
-    fn get_starting_position(&self) -> Position;
-    //mapgen visualizer
-    fn get_snapshot_history(&self) -> Vec<Map>;
-    fn take_snapshot(&mut self);
-    //for spawning with multiple layers
-    fn get_list_spawns(&self) -> &Vec<(usize, String)>;
-    //default implementation
-    fn spawn_entities(&mut self, ecs : &mut World) {
-        for entity in self.get_list_spawns().iter() {
-            spawner::spawn_entity(ecs, &(&entity.0, &entity.1));
-        }
-    }
-
 }
 
 

@@ -27,13 +27,15 @@ impl VoronoiBuilder {
     }
 
     //premade constructors
+    #[allow(dead_code)]
     pub fn pythagoras() -> Box<VoronoiBuilder> {
         Box::new(VoronoiBuilder{
             n_seeds: 64,
             distance_algorithm: DistanceAlgorithm::Pythagoras,
         })
     }
-
+    
+    #[allow(dead_code)]
     pub fn manhattan() -> Box<VoronoiBuilder> {
         Box::new(VoronoiBuilder{
             n_seeds: 64,
