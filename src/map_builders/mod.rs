@@ -17,7 +17,7 @@ use dla::*;
 mod voronoi;
 use voronoi::*;
 mod prefab_builders;
-use prefab_builders::PrefabBuilder;
+use prefab_builders::*;
 
 //postprocessing stuff
 mod room_based_spawner;
@@ -141,7 +141,7 @@ pub trait MapBuilder {
 
 //Factory function for builder
 pub fn random_builder(rng: &mut rltk::RandomNumberGenerator) -> BuilderChain {
-    let mut builder = BuilderChain::new();
+    //let mut builder = BuilderChain::new();
     // //simple map
     // //builder.start_with(SimpleMapBuilder::new());
     // builder.start_with(BSPDungeonBuilder::new());
@@ -154,10 +154,20 @@ pub fn random_builder(rng: &mut rltk::RandomNumberGenerator) -> BuilderChain {
     //builder.start_with(DrunkardsWalkBuilder::fearful_symmetry());
     //builder.start_with(DLABuilder::insectoid());
     //builder.start_with(MazeBuilder::new());
+    // builder.start_with(VoronoiBuilder::pythagoras());
+    // builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
+    // //builder.with(CullUnreachable::new()); culling not implemented yet
+    // builder.with(VoronoiSpawning::new());
+    // builder
+
+    //show off
+    let mut builder = BuilderChain::new();
     builder.start_with(VoronoiBuilder::pythagoras());
+    //builder.with(PrefabBuilder::vaults());
     builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
     //builder.with(CullUnreachable::new()); culling not implemented yet
     builder.with(VoronoiSpawning::new());
+    builder.with(PrefabBuilder::sectional(prefab_builders::prefab_sections::UNDERGROUND_FORT));
     builder
 }
 
