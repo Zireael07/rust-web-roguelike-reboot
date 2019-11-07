@@ -7,6 +7,8 @@ use specs::prelude::*;
 extern crate specs_derive;
 use std::cmp::{min, max};
 
+pub mod camera;
+
 mod components;
 pub use components::*;
 mod map;
@@ -83,18 +85,9 @@ impl GameState for State {
             self.runstate = player_input(self, ctx);
         }
 
-        //normal map drawing
-        let map = self.ecs.fetch::<Map>();
-        draw_map(&map, ctx);
+        //draw
+        camera::render_camera(&self.ecs, ctx);
 
-        let positions = self.ecs.read_storage::<Position>();
-        let renderables = self.ecs.read_storage::<Renderable>();
-
-        // Render the player @ symbol
-        for (pos, render) in (&positions, &renderables).join() {
-            let idx = map.xy_idx(pos.x, pos.y);
-            if map.visible_tiles[idx] { ctx.set(pos.x, pos.y, render.fg, render.bg, render.glyph); }
-        }
     }
 }
 
