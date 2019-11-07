@@ -145,14 +145,26 @@ pub fn random_builder(rng: &mut rltk::RandomNumberGenerator, width: i32, height:
     // builder.with(VoronoiSpawning::new());
     // builder
 
-    //show off
+    //another example
     let mut builder = BuilderChain::new(width, height);
-    builder.start_with(NoiseMapBuilder::new());
-    //builder.start_with(VoronoiBuilder::pythagoras());
-    //builder.with(PrefabBuilder::vaults());
+    builder.start_with(SimpleMapBuilder::new());
+    //builder.with(DrunkardsWalkBuilder::winding_passages());
+    builder.with(DLABuilder::heavy_erosion());
     builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
     //builder.with(CullUnreachable::new()); culling not implemented yet
     builder.with(VoronoiSpawning::new());
-    builder.with(PrefabBuilder::sectional(prefab_builders::prefab_sections::UNDERGROUND_FORT));
     builder
+
+
+    //show off
+    // let mut builder = BuilderChain::new(width, height);
+    // //builder.start_with(NoiseMapBuilder::new());
+    // builder.start_with(VoronoiBuilder::pythagoras());
+    // builder.with(CellularAutomataBuilder::new());
+    // //builder.with(PrefabBuilder::vaults());
+    // builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
+    // //builder.with(CullUnreachable::new()); culling not implemented yet
+    // builder.with(VoronoiSpawning::new());
+    // //builder.with(PrefabBuilder::sectional(prefab_builders::prefab_sections::UNDERGROUND_FORT));
+    // builder
 }

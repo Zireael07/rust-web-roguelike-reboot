@@ -1,4 +1,4 @@
-use super::{InitialMapBuilder, BuilderMap, TileType, Position, paint, Symmetry};
+use super::{InitialMapBuilder, MetaMapBuilder, BuilderMap, TileType, Position, paint, Symmetry};
 use rltk::RandomNumberGenerator;
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{console};
@@ -20,6 +20,13 @@ pub struct DrunkardsWalkBuilder {
 }
 
 impl InitialMapBuilder for DrunkardsWalkBuilder {
+    #[allow(dead_code)]
+    fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data : &mut BuilderMap) {
+        self.build(rng, build_data);
+    }
+}
+
+impl MetaMapBuilder for DrunkardsWalkBuilder {
     #[allow(dead_code)]
     fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data : &mut BuilderMap) {
         self.build(rng, build_data);
