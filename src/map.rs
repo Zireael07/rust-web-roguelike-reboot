@@ -92,7 +92,14 @@ impl Map {
 //implementing RLTK traits
 impl BaseMap for Map {
     fn is_opaque(&self, idx:i32) -> bool {
-        self.tiles[idx as usize] == TileType::Wall
+        if idx > 0 {
+            let ret = self.tiles[idx as usize] == TileType::Wall;
+            return ret;
+        }
+        //paranoia just in case
+        else {
+            return true;
+        }
     }
 
     fn get_available_exits(&self, _idx:i32) -> Vec<(i32, f32)> {

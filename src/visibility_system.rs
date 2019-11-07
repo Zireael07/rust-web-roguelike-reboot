@@ -31,9 +31,12 @@ impl<'a> System<'a> for VisibilitySystem {
                     for t in map.visible_tiles.iter_mut() { *t = false };
                     // mark as revealed & visible
                     for vis in viewshed.visible_tiles.iter() {
-                        let idx = map.xy_idx(vis.x, vis.y);
-                        map.revealed_tiles[idx] = true;
-                        map.visible_tiles[idx] = true;
+                        //crash fix
+                        if vis.x > 0 && vis.x < map.width-1 && vis.y > 0 && vis.y < map.height-1 {
+                            let idx = map.xy_idx(vis.x, vis.y);
+                            map.revealed_tiles[idx] = true;
+                            map.visible_tiles[idx] = true;
+                        }
                     }
                 }
             }
