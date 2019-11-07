@@ -19,18 +19,23 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let map = ecs.fetch::<Map>();
 
     for (_player, pos, viewshed) in (&mut players, &mut positions, &mut viewsheds).join() {
-        let destination_idx = map.xy_idx(pos.x + delta_x, pos.y + delta_y);
-        if map.tiles[destination_idx] != TileType::Wall {
-            pos.x = min(79 , max(0, pos.x + delta_x));
-            pos.y = min(49, max(0, pos.y + delta_y));
+        //paranoia
+        if (pos.x + delta_x) > 0 && (pos.y + delta_y) > 0 {
+            let destination_idx = map.xy_idx(pos.x + delta_x, pos.y + delta_y);
+            if destination_idx > 0 && destination_idx < map.tiles.len() {
+                if map.tiles[destination_idx] != TileType::Wall {
+                    pos.x = min(map.width-1, max(0, pos.x + delta_x));
+                    pos.y = min(map.height-1, max(0, pos.y + delta_y));
 
-            //mark our FoV as dirty after a move
-            viewshed.dirty = true;
+                    //mark our FoV as dirty after a move
+                    viewshed.dirty = true;
 
-            //update player location data
-            let mut ppos = ecs.write_resource::<Point>();
-            ppos.x = pos.x;
-            ppos.y = pos.y;
+                    //update player location data
+                    let mut ppos = ecs.write_resource::<Point>();
+                    ppos.x = pos.x;
+                    ppos.y = pos.y;
+                }
+            }
         }
     }
 }

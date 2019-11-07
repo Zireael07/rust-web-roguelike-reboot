@@ -39,13 +39,11 @@ impl Map {
     }
 
     /// Generates an empty map, consisting entirely of solid walls
-    pub fn new() -> Map {
-        let map_w = 80;
-        let map_h = 50;
-        let map_count = map_w*map_h as usize;
+    pub fn new(width: i32, height: i32) -> Map {
+        let map_count = (width*height) as usize;
         Map{
-            width : map_w as i32,
-            height : map_h as i32,
+            width,
+            height,
             tiles : vec![TileType::Wall; map_count],
             revealed_tiles : vec![false; map_count],
             visible_tiles : vec![false; map_count],
@@ -120,82 +118,5 @@ impl Algorithm2D for Map {
 
     fn index_to_point2d(&self, idx:i32) -> Point {
         Point{ x: idx % self.width, y: idx / self.width }
-    }
-}
-
-//the tutorial checked for revealed also, but that led to pillars mysteriously transforming
-fn is_wall(map: &Map, x: i32, y: i32) -> bool {
-    let idx = map.xy_idx(x, y);
-    map.tiles[idx] == TileType::Wall //&& map.revealed_tiles[idx]
-}
-
-fn wall_glyph(map : &Map, x: i32, y:i32) -> u8 {
-    if x < 1 || x > map.width-2 || y < 1 || y > map.height-2 as i32 { return 35; }
-    let mut mask : u8 = 0;
-
-    
-    //bitmask is here
-    if is_wall(map, x, y - 1) { mask +=1; }
-    if is_wall(map, x, y + 1) { mask +=2; }
-    if is_wall(map, x - 1, y) { mask +=4; }
-    if is_wall(map, x + 1, y) { mask +=8; }
-
-    match mask {
-        0 => { 9 } // Pillar because no neighbors
-        1 => { 186 } // Wall only to the north
-        2 => { 186 } // Wall only to the south
-        3 => { 186 } // Wall to the north and south
-        4 => { 205 } // Wall only to the west
-        5 => { 188 } // Wall to the north and west
-        6 => { 187 } // Wall to the south and west
-        7 => { 185 } // Wall to the north, south and west
-        8 => { 205 } // Wall only to the east
-        9 => { 200 } // Wall to the north and east
-        10 => { 201 } // Wall to the south and east
-        11 => { 204 } // Wall to the north, south and east
-        12 => { 205 } // Wall to the east and west
-        13 => { 202 } // Wall to the east, west, and south
-        14 => { 203 } // Wall to the east, west, and north
-        _ => { 35 } // We missed one?
-    }
-}
-
-pub fn draw_map(map : &Map, ctx : &mut Rltk) {
-    // Iterate the map array, incrementing coordinates as we go.
-    let mut y = 0;
-    let mut x = 0;
-    for (idx,tile) in map.tiles.iter().enumerate() {
-        // Render only revealed tiles
-        if map.revealed_tiles[idx] {
-            let glyph;
-            let mut fg;
-            // Render a tile depending upon the tile type
-            match tile {
-                TileType::Floor => {
-                    glyph = rltk::to_cp437('.');
-                    fg = RGB::from_f32(0.0, 0.5, 0.5);
-                }
-                TileType::DownStairs => {
-                    glyph = rltk::to_cp437('>');
-                    fg = RGB::from_f32(0.0, 0.5, 0.5);
-                }
-                TileType::Wall => {
-                    //glyph = rltk::to_cp437('#');
-                    glyph = wall_glyph(&*map, x, y);
-                    fg = RGB::from_f32(0., 1.0, 0.);
-                }
-            }
-            //grayscale out of FOV
-            if !map.visible_tiles[idx] { fg = fg.to_greyscale() }
-            // draw
-            ctx.set(x, y, fg, RGB::from_f32(0., 0., 0.), glyph);
-        }
-
-        // Move the coordinates
-        x += 1;
-        if x > map.width-1 {
-            x = 0;
-            y += 1;
-        }
     }
 }

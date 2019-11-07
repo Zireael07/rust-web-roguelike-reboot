@@ -65,7 +65,8 @@ impl GameState for State {
                 self.runstate = self.mapgen_next_state.unwrap();
             }
             ctx.cls();                
-            draw_map(&self.mapgen_history[self.mapgen_index], ctx);
+            //draw mapgen
+            camera::render_debug_map(&self.mapgen_history[self.mapgen_index], ctx);
 
             self.mapgen_timer += ctx.frame_time_ms;
             if self.mapgen_timer > 300.0 {
@@ -108,7 +109,7 @@ impl State {
         self.mapgen_timer = 0.0;
         self.mapgen_history.clear();
         let mut rng = self.ecs.write_resource::<rltk::RandomNumberGenerator>();
-        let mut builder = map_builders::random_builder(&mut rng);
+        let mut builder = map_builders::random_builder(&mut rng, 80, 60);
         console::log("Generating world...");
         builder.build_map(&mut rng);
 
@@ -165,7 +166,7 @@ pub fn main() {
     gs.ecs.register::<Player>();
 
     //placeholders so that generate_world has stuff to fill
-    gs.ecs.insert(Map::new());
+    gs.ecs.insert(Map::new(80,50));
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
 
     gs.generate_world();

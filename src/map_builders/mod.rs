@@ -40,7 +40,9 @@ pub struct BuilderMap {
     pub map : Map,
     pub starting_position : Option<Position>,
     pub rooms: Option<Vec<Rect>>,
-    pub history : Vec<Map>
+    pub history : Vec<Map>,
+    pub width: i32,
+    pub height: i32
 }
 
 impl BuilderMap {
@@ -62,16 +64,18 @@ pub struct BuilderChain {
 }
 
 impl BuilderChain {
-    pub fn new() -> BuilderChain {
+    pub fn new(width: i32, height: i32) -> BuilderChain {
         BuilderChain{
             starter: None,
             builders: Vec::new(),
             build_data : BuilderMap {
                 list_spawns: Vec::new(),
-                map: Map::new(),
+                map: Map::new(width, height),
                 starting_position: None,
                 rooms: None,
-                history : Vec::new()
+                history : Vec::new(),
+                width,
+                height
             }
         }
     }
@@ -121,8 +125,8 @@ pub trait MetaMapBuilder {
 
 
 //Factory function for builder
-pub fn random_builder(rng: &mut rltk::RandomNumberGenerator) -> BuilderChain {
-    //let mut builder = BuilderChain::new();
+pub fn random_builder(rng: &mut rltk::RandomNumberGenerator, width: i32, height: i32) -> BuilderChain {
+    //let mut builder = BuilderChain::new(width, height);
     // //simple map
     // //builder.start_with(SimpleMapBuilder::new());
     // builder.start_with(BSPDungeonBuilder::new());
@@ -142,8 +146,9 @@ pub fn random_builder(rng: &mut rltk::RandomNumberGenerator) -> BuilderChain {
     // builder
 
     //show off
-    let mut builder = BuilderChain::new();
-    builder.start_with(VoronoiBuilder::pythagoras());
+    let mut builder = BuilderChain::new(width, height);
+    builder.start_with(NoiseMapBuilder::new());
+    //builder.start_with(VoronoiBuilder::pythagoras());
     //builder.with(PrefabBuilder::vaults());
     builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
     //builder.with(CullUnreachable::new()); culling not implemented yet
@@ -151,34 +156,3 @@ pub fn random_builder(rng: &mut rltk::RandomNumberGenerator) -> BuilderChain {
     builder.with(PrefabBuilder::sectional(prefab_builders::prefab_sections::UNDERGROUND_FORT));
     builder
 }
-
-
- //Box::new(SimpleMapBuilder::new())
-    //Box::new(BSPDungeonBuilder::new())
-    //Box::new(CellularAutomataBuilder::new())
-    // three variants of the drunkard walk algo
-    //Box::new(DrunkardsWalkBuilder::open_area())
-    //Box::new(DrunkardsWalkBuilder::open_halls())
-    //Box::new(DrunkardsWalkBuilder::winding_passages())
-    // //custom one
-    // Box::new(DrunkardsWalkBuilder::new(DrunkardSettings{ 
-    //     spawn_mode: DrunkSpawnMode::Random,
-    //     drunken_lifetime: 100,
-    //     floor_percent: 0.4,
-    //     brush_size: 1,
-    //     symmetry: Symmetry::None
-    //     }))
-    //Box::new(MazeBuilder::new())
-    //Box::new(DLABuilder::walk_outwards())
-    //Box::new(DLABuilder::insectoid())
-    //Box::new(DrunkardsWalkBuilder::fat_passages())
-    //Box::new(DrunkardsWalkBuilder::fearful_symmetry())
-    //Box::new(VoronoiBuilder::pythagoras())
-    //Box::new(VoronoiBuilder::manhattan())
-    //Box::new(PrefabBuilder::new())
-    //this one is sectional
-    // Box::new(
-    //     PrefabBuilder::new(
-    //         Some(Box::new(CellularAutomataBuilder::new()))
-    //     )
-    // )
