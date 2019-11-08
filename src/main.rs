@@ -7,6 +7,10 @@ use specs::prelude::*;
 extern crate specs_derive;
 use std::cmp::{min, max};
 
+//better panics
+extern crate console_error_panic_hook;
+use std::panic;
+
 pub mod camera;
 
 mod components;
@@ -144,6 +148,8 @@ impl State {
 //#[wasm_bindgen(start)]
 //can't use wasm_bindgen(start) because RLTK-rs uses it
 pub fn main() {
+
+    panic::set_hook(Box::new(console_error_panic_hook::hook));
     
     let context = Rltk::init_simple8x8(80, 50, "RLTK Web roguelike", "resources");
     //let gs = State::new();
