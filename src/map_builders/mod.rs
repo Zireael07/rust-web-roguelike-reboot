@@ -20,6 +20,12 @@ mod prefab_builders;
 use prefab_builders::*;
 
 //postprocessing stuff
+mod rooms_corridors_dogleg;
+use rooms_corridors_dogleg::DoglegCorridors;
+mod room_corridors_bsp;
+use room_corridors_bsp::BSPCorridors;
+mod room_sorter;
+use room_sorter::RoomSorter;
 mod room_based_spawner;
 use room_based_spawner::RoomBasedSpawner;
 mod room_based_starting;
@@ -130,13 +136,16 @@ pub trait MetaMapBuilder {
 
 //Factory function for builder
 pub fn random_builder(rng: &mut rltk::RandomNumberGenerator, width: i32, height: i32) -> BuilderChain {
-    //let mut builder = BuilderChain::new(width, height);
-    // //simple map
-    // //builder.start_with(SimpleMapBuilder::new());
-    // builder.start_with(BSPDungeonBuilder::new());
-    // builder.with(RoomBasedSpawner::new());
-    // builder.with(RoomBasedStartingPosition::new());
-    // builder
+    let mut builder = BuilderChain::new(width, height);
+    //simple map
+    //builder.start_with(SimpleMapBuilder::new());
+    //builder.with(DoglegCorridors::new());
+    builder.start_with(BSPDungeonBuilder::new());
+    builder.with(RoomSorter::new());
+    builder.with(BSPCorridors::new());
+    builder.with(RoomBasedSpawner::new());
+    builder.with(RoomBasedStartingPosition::new());
+    builder
 
     // cellular
     //builder.start_with(CellularAutomataBuilder::new());
@@ -150,16 +159,16 @@ pub fn random_builder(rng: &mut rltk::RandomNumberGenerator, width: i32, height:
     // builder
 
     //another example
-    let mut builder = BuilderChain::new(width, height);
-    builder.start_with(SimpleMapBuilder::new());
-    //builder.with(DrunkardsWalkBuilder::winding_passages());
-    //builder.with(DLABuilder::heavy_erosion());
-    //builder.with(RoomEroder::new());
-    builder.with(RoomCornerRounder::new());
-    builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
-    //builder.with(CullUnreachable::new()); culling not implemented yet
-    builder.with(VoronoiSpawning::new());
-    builder
+    // let mut builder = BuilderChain::new(width, height);
+    // builder.start_with(SimpleMapBuilder::new());
+    // //builder.with(DrunkardsWalkBuilder::winding_passages());
+    // //builder.with(DLABuilder::heavy_erosion());
+    // //builder.with(RoomEroder::new());
+    // builder.with(RoomCornerRounder::new());
+    // builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
+    // //builder.with(CullUnreachable::new()); culling not implemented yet
+    // builder.with(VoronoiSpawning::new());
+    // builder
 
 
     //show off
