@@ -24,6 +24,10 @@ mod room_based_spawner;
 use room_based_spawner::RoomBasedSpawner;
 mod room_based_starting;
 use room_based_starting::RoomBasedStartingPosition;
+mod room_eroder;
+use room_eroder::RoomEroder;
+mod room_corner_rounding;
+use room_corner_rounding::RoomCornerRounder;
 mod area_starting_points;
 use area_starting_points::*;
 mod voronoi_spawning;
@@ -149,7 +153,9 @@ pub fn random_builder(rng: &mut rltk::RandomNumberGenerator, width: i32, height:
     let mut builder = BuilderChain::new(width, height);
     builder.start_with(SimpleMapBuilder::new());
     //builder.with(DrunkardsWalkBuilder::winding_passages());
-    builder.with(DLABuilder::heavy_erosion());
+    //builder.with(DLABuilder::heavy_erosion());
+    //builder.with(RoomEroder::new());
+    builder.with(RoomCornerRounder::new());
     builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
     //builder.with(CullUnreachable::new()); culling not implemented yet
     builder.with(VoronoiSpawning::new());
@@ -158,13 +164,13 @@ pub fn random_builder(rng: &mut rltk::RandomNumberGenerator, width: i32, height:
 
     //show off
     // let mut builder = BuilderChain::new(width, height);
-    // //builder.start_with(NoiseMapBuilder::new());
-    // builder.start_with(VoronoiBuilder::pythagoras());
-    // builder.with(CellularAutomataBuilder::new());
+    // builder.start_with(NoiseMapBuilder::new());
+    // //builder.start_with(VoronoiBuilder::pythagoras());
+    // //builder.with(CellularAutomataBuilder::new());
     // //builder.with(PrefabBuilder::vaults());
     // builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
     // //builder.with(CullUnreachable::new()); culling not implemented yet
     // builder.with(VoronoiSpawning::new());
-    // //builder.with(PrefabBuilder::sectional(prefab_builders::prefab_sections::UNDERGROUND_FORT));
-    // builder
+    // builder.with(PrefabBuilder::sectional(prefab_builders::prefab_sections::UNDERGROUND_FORT));
+    //builder
 }
