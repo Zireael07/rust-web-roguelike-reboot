@@ -79,6 +79,12 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
                     VirtualKeyCode::Numpad1 => try_move_player(-1, 1, &mut gs.ecs),
                     VirtualKeyCode::Numpad3 => try_move_player(1, 1, &mut gs.ecs),
 
+                    //vi keys
+                    VirtualKeyCode::Y => try_move_player(-1, -1, &mut gs.ecs),
+                    VirtualKeyCode::U => try_move_player(1, -1, &mut gs.ecs),
+                    VirtualKeyCode::B => try_move_player(-1, 1, &mut gs.ecs),
+                    VirtualKeyCode::N => try_move_player(1, 1, &mut gs.ecs),
+
                     // Cursors
                     VirtualKeyCode::Up => try_move_player(0, -1, &mut gs.ecs),
                     VirtualKeyCode::Down => try_move_player(0, 1, &mut gs.ecs),
