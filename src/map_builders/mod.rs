@@ -26,6 +26,10 @@ mod room_corridors_bsp;
 use room_corridors_bsp::BSPCorridors;
 mod room_draw;
 use room_draw::RoomDrawer;
+mod rooms_corridors_nearest;
+use rooms_corridors_nearest::NearestCorridors;
+mod rooms_corridors_nearest_line;
+use rooms_corridors_nearest_line::StraightLineCorridors;
 mod room_sorter;
 use room_sorter::*;
 mod room_based_spawner;
@@ -145,7 +149,8 @@ pub fn random_builder(rng: &mut rltk::RandomNumberGenerator, width: i32, height:
     //builder.with(DoglegCorridors::new());
     //builder.start_with(BSPDungeonBuilder::new());
     builder.with(RoomSorter::new(RoomSort::CENTRAL));
-    builder.with(BSPCorridors::new());
+    builder.with(NearestCorridors::new());
+    //builder.with(BSPCorridors::new());
     builder.with(RoomBasedSpawner::new());
     builder.with(RoomBasedStartingPosition::new());
     builder
