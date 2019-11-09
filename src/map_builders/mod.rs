@@ -22,8 +22,8 @@ use prefab_builders::*;
 //postprocessing stuff
 mod rooms_corridors_dogleg;
 use rooms_corridors_dogleg::DoglegCorridors;
-mod room_corridors_bsp;
-use room_corridors_bsp::BSPCorridors;
+mod rooms_corridors_bsp;
+use rooms_corridors_bsp::BSPCorridors;
 mod room_draw;
 use room_draw::RoomDrawer;
 mod rooms_corridors_nearest;
@@ -34,6 +34,8 @@ mod room_sorter;
 use room_sorter::*;
 mod room_based_spawner;
 use room_based_spawner::RoomBasedSpawner;
+mod room_corridor_spawner;
+use room_corridor_spawner::CorridorSpawner;
 mod room_based_starting;
 use room_based_starting::RoomBasedStartingPosition;
 mod room_eroder;
@@ -56,6 +58,7 @@ pub struct BuilderMap {
     pub map : Map,
     pub starting_position : Option<Position>,
     pub rooms: Option<Vec<Rect>>,
+    pub corridors: Option<Vec<Vec<usize>>>,
     pub history : Vec<Map>,
     pub width: i32,
     pub height: i32
@@ -89,6 +92,7 @@ impl BuilderChain {
                 map: Map::new(width, height),
                 starting_position: None,
                 rooms: None,
+                corridors: None,
                 history : Vec::new(),
                 width,
                 height
@@ -152,6 +156,7 @@ pub fn random_builder(rng: &mut rltk::RandomNumberGenerator, width: i32, height:
     builder.with(NearestCorridors::new());
     //builder.with(BSPCorridors::new());
     builder.with(RoomBasedSpawner::new());
+    builder.with(CorridorSpawner::new());
     builder.with(RoomBasedStartingPosition::new());
     builder
 
