@@ -34,7 +34,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
                     let target = combat_stats.get(*potential_target);
                     if let Some(_target) = target {
                         wants_to_melee.insert(entity, WantsToMelee{ target: *potential_target }).expect("Add target failed");
-                        console::log(&format!("We want to melee: {:?}", target));
+                        //console::log(&format!("We want to melee: {:?}", target));
                         return;
                     }
                 }
@@ -71,13 +71,13 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
             "go_sw" => try_move_player(-1, 1, &mut gs.ecs),
             "go_s" => try_move_player(0, 1, &mut gs.ecs),
             "go_se" => try_move_player(1, 1, &mut gs.ecs),
-            _ => { return RunState::Paused } //Nothing happened
+            _ => { return RunState::AwaitingInput } //Nothing happened
         }
     }
     else {
         // New: handle keyboard inputs.
         match ctx.key {
-            None => { return RunState::Paused } // Nothing happened
+            None => { return RunState::AwaitingInput } // Nothing happened
             Some(key) => {
                 // A key is pressed or held
                 match key {
@@ -108,11 +108,11 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
                     VirtualKeyCode::Left => try_move_player(-1, 0, &mut gs.ecs),
                     VirtualKeyCode::Right => try_move_player(1, 0, &mut gs.ecs),
 
-                    _ => { return RunState::Paused } // Nothing happened, ignore all the other possibilities
+                    _ => { return RunState::AwaitingInput } // Nothing happened, ignore all the other possibilities
                 }
             }
         }
     }
 
-    RunState::Running
+    RunState::PlayerTurn
 }

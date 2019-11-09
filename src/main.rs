@@ -47,16 +47,17 @@ rltk::add_wasm_support!();
 const SHOW_MAPGEN_VISUALIZER : bool = true;
 
 #[derive(PartialEq, Copy, Clone)]
-pub enum RunState { Paused, 
-    Running,
+pub enum RunState { 
+    AwaitingInput, 
+    PreRun, 
+    PlayerTurn, 
+    MonsterTurn,
     MapGeneration
 }
 
 // We're extending State to include the ECS world.
 pub struct State {
     pub ecs: World,
-    //necessary for turn-basedness
-    pub runstate : RunState,
     //mapgen visualizer stuff that has nowhere else to go
     mapgen_next_state : Option<RunState>,
     mapgen_history : Vec<Map>,
@@ -69,35 +70,54 @@ impl GameState for State {
         // Clear the screen
         ctx.cls();
 
-        //mapgen visualization
-        if self.runstate == RunState::MapGeneration {
-            if !SHOW_MAPGEN_VISUALIZER {
-                self.runstate = self.mapgen_next_state.unwrap();
+        let mut newrunstate;
+        {
+            let runstate = self.ecs.fetch::<RunState>();
+            newrunstate = *runstate;
+        }
+        
+        match newrunstate {
+            RunState::PreRun => {
+                self.run_systems();
+                newrunstate = RunState::AwaitingInput;
             }
-            ctx.cls();                
-
-            //paranoia
-            if self.mapgen_history.len() > 0 {
-                //draw mapgen
-                camera::render_debug_map(&self.mapgen_history[self.mapgen_index], ctx);
-
-                self.mapgen_timer += ctx.frame_time_ms;
-                if self.mapgen_timer > 300.0 {
-                    self.mapgen_timer = 0.0;
-                    self.mapgen_index += 1;
-                    if self.mapgen_index == self.mapgen_history.len() {
-                        self.runstate = self.mapgen_next_state.unwrap();
+            RunState::AwaitingInput => {
+                newrunstate = player_input(self, ctx);
+            }
+            RunState::PlayerTurn => {
+                self.run_systems();
+                newrunstate = RunState::MonsterTurn;
+            }
+            RunState::MonsterTurn => {
+                self.run_systems();
+                newrunstate = RunState::AwaitingInput;
+            }
+            RunState::MapGeneration => {
+                if !SHOW_MAPGEN_VISUALIZER {
+                    newrunstate = self.mapgen_next_state.unwrap();
+                }
+                ctx.cls();                
+    
+                //paranoia
+                if self.mapgen_history.len() > 0 {
+                    //draw mapgen
+                    camera::render_debug_map(&self.mapgen_history[self.mapgen_index], ctx);
+    
+                    self.mapgen_timer += ctx.frame_time_ms;
+                    if self.mapgen_timer > 300.0 {
+                        self.mapgen_timer = 0.0;
+                        self.mapgen_index += 1;
+                        if self.mapgen_index == self.mapgen_history.len() {
+                            newrunstate = self.mapgen_next_state.unwrap();
+                        }
                     }
                 }
             }
         }
 
-        //turn-basedness
-        if self.runstate == RunState::Running {
-            self.run_systems();
-            self.runstate = RunState::Paused;
-        } else if self.runstate != RunState::MapGeneration {
-            self.runstate = player_input(self, ctx);
+        {
+            let mut runwriter = self.ecs.write_resource::<RunState>();
+            *runwriter = newrunstate;
         }
 
         damage_system::delete_the_dead(&mut self.ecs);
@@ -140,7 +160,8 @@ impl State {
         //mapgen visualizer data
         self.mapgen_history = builder.build_data.history.clone();
         //key stuff
-        self.runstate = RunState::MapGeneration;
+        self.ecs.insert(RunState::MapGeneration);
+        //self.runstate = RunState::MapGeneration;
 
         let player_start;
         {
@@ -176,9 +197,8 @@ pub fn main() {
     //ECS takes more lines to set up
     let mut gs = State {
         ecs: World::new(),
-        runstate : RunState::Running,
         //same as actual game starting state
-        mapgen_next_state : Some(RunState::Running),
+        mapgen_next_state : Some(RunState::PreRun),
         mapgen_index : 0,
         mapgen_history: Vec::new(),
         mapgen_timer: 0.0
