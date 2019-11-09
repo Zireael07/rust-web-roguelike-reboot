@@ -3,7 +3,7 @@ use rltk::{ RGB, RandomNumberGenerator };
 extern crate specs;
 use specs::prelude::*;
 use super::{Player, Renderable, Name, Position, Viewshed, Monster, 
-Rect, Map, TileType, BlocksTile};
+Rect, Map, TileType, BlocksTile, CombatStats};
 use std::collections::HashMap; //for region spawning
 
 /// Spawns the player and returns his/her entity object.
@@ -17,6 +17,9 @@ pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
             bg: RGB::named(rltk::BLACK),
         })
         .with(Viewshed{ visible_tiles : Vec::new(), range : 8, dirty: true })
+        //the player absolutely needs this as without it, combat doesn't work
+        .with(Name{ name : "Player".to_string() })
+        .with(CombatStats{ max_hp: 30, hp: 30, defense: 2, power: 5 })
         .with(Player{})
         .build()
 }
@@ -120,5 +123,6 @@ fn monster<S : ToString>(ecs: &mut World, x: i32, y: i32, glyph : u8, name : S) 
         .with(Monster{})
         .with(Name{ name : name.to_string() })
         .with(BlocksTile{})
+        .with(CombatStats{ max_hp: 16, hp: 16, defense: 1, power: 4 })
         .build();
 }

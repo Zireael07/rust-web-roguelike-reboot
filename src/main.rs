@@ -30,6 +30,10 @@ mod spawner;
 pub mod map_builders;
 mod map_indexing_system;
 use map_indexing_system::MapIndexingSystem;
+mod melee_combat_system;
+use melee_combat_system::MeleeCombatSystem;
+mod damage_system;
+use damage_system::DamageSystem;
 
 use rltk::{Console, GameState, Rltk, VirtualKeyCode, RGB, Point };
 //console is RLTK's wrapper around either println or the web console macro
@@ -96,6 +100,8 @@ impl GameState for State {
             self.runstate = player_input(self, ctx);
         }
 
+        damage_system::delete_the_dead(&mut self.ecs);
+
         //draw
         camera::render_camera(&self.ecs, ctx);
 
@@ -111,6 +117,10 @@ impl State {
         vis.run_now(&self.ecs);
         let mut mob = NPCAI{};
         mob.run_now(&self.ecs);
+        let mut melee = MeleeCombatSystem{};
+        melee.run_now(&self.ecs);
+        let mut damage = DamageSystem{};
+        damage.run_now(&self.ecs);
         self.ecs.maintain();
     }
 }
@@ -145,6 +155,7 @@ impl State {
         //spawn player
         let (player_x, player_y) = (player_start.x, player_start.y);
         let player_entity = spawner::player(&mut self.ecs, player_x, player_y);
+        self.ecs.insert(player_entity);
         //special treatment for player location
         self.ecs.insert(Point::new(player_x, player_y));
 
@@ -178,6 +189,9 @@ pub fn main() {
     gs.ecs.register::<Monster>();
     gs.ecs.register::<Name>();
     gs.ecs.register::<BlocksTile>();
+    gs.ecs.register::<CombatStats>();
+    gs.ecs.register::<WantsToMelee>();
+    gs.ecs.register::<SufferDamage>();
     gs.ecs.register::<Player>();
 
     //placeholders so that generate_world has stuff to fill

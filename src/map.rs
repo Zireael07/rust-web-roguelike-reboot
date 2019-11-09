@@ -22,7 +22,8 @@ pub struct Map {
     pub tiles : Vec<TileType>,
     pub revealed_tiles : Vec<bool>,
     pub visible_tiles : Vec<bool>,
-    pub blocked : Vec<bool>
+    pub blocked : Vec<bool>,
+    pub tile_content : Vec<Vec<Entity>>
 }
 
 impl Map {
@@ -49,6 +50,14 @@ impl Map {
             revealed_tiles : vec![false; map_count],
             visible_tiles : vec![false; map_count],
             blocked : vec![false; map_count],
+            tile_content : vec![Vec::new(); map_count],
+        }
+    }
+
+    //for indexing
+    pub fn clear_content_index(&mut self) {
+        for content in self.tile_content.iter_mut() {
+            content.clear();
         }
     }
 
