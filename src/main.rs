@@ -69,15 +69,19 @@ impl GameState for State {
                 self.runstate = self.mapgen_next_state.unwrap();
             }
             ctx.cls();                
-            //draw mapgen
-            camera::render_debug_map(&self.mapgen_history[self.mapgen_index], ctx);
 
-            self.mapgen_timer += ctx.frame_time_ms;
-            if self.mapgen_timer > 300.0 {
-                self.mapgen_timer = 0.0;
-                self.mapgen_index += 1;
-                if self.mapgen_index == self.mapgen_history.len() {
-                    self.runstate = self.mapgen_next_state.unwrap();
+            //paranoia
+            if self.mapgen_history.len() > 0 {
+                //draw mapgen
+                camera::render_debug_map(&self.mapgen_history[self.mapgen_index], ctx);
+
+                self.mapgen_timer += ctx.frame_time_ms;
+                if self.mapgen_timer > 300.0 {
+                    self.mapgen_timer = 0.0;
+                    self.mapgen_index += 1;
+                    if self.mapgen_index == self.mapgen_history.len() {
+                        self.runstate = self.mapgen_next_state.unwrap();
+                    }
                 }
             }
         }
