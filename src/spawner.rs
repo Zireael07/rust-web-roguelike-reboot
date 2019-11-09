@@ -3,7 +3,7 @@ use rltk::{ RGB, RandomNumberGenerator };
 extern crate specs;
 use specs::prelude::*;
 use super::{Player, Renderable, Name, Position, Viewshed, Monster, 
-Rect, Map, TileType};
+Rect, Map, TileType, BlocksTile};
 use std::collections::HashMap; //for region spawning
 
 /// Spawns the player and returns his/her entity object.
@@ -119,5 +119,6 @@ fn monster<S : ToString>(ecs: &mut World, x: i32, y: i32, glyph : u8, name : S) 
         .with(Viewshed{ visible_tiles : Vec::new(), range: 8, dirty: true })
         .with(Monster{})
         .with(Name{ name : name.to_string() })
+        .with(BlocksTile{})
         .build();
 }

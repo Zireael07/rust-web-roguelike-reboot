@@ -21,7 +21,8 @@ pub struct Map {
     pub height : i32,
     pub tiles : Vec<TileType>,
     pub revealed_tiles : Vec<bool>,
-    pub visible_tiles : Vec<bool>
+    pub visible_tiles : Vec<bool>,
+    pub blocked : Vec<bool>
 }
 
 impl Map {
@@ -47,7 +48,22 @@ impl Map {
             tiles : vec![TileType::Wall; map_count],
             revealed_tiles : vec![false; map_count],
             visible_tiles : vec![false; map_count],
+            blocked : vec![false; map_count],
         }
+    }
+
+    pub fn populate_blocked(&mut self) {
+        for (i,tile) in self.tiles.iter_mut().enumerate() {
+            self.blocked[i] = *tile == TileType::Wall;
+        }
+    }
+
+    //used by pathfinding
+    fn is_exit_valid(&self, x:i32, y:i32) -> bool {
+        //bounds check
+        if x < 1 || x > self.width-1 || y < 1 || y > self.height-1 { return false; }
+        let idx = (y * self.width) + x;
+        !self.blocked[idx as usize]
     }
 
 }
@@ -100,8 +116,19 @@ impl BaseMap for Map {
         }
     }
 
-    fn get_available_exits(&self, _idx:i32) -> Vec<(i32, f32)> {
-        Vec::new()
+    //for pathfinding
+    fn get_available_exits(&self, idx:i32) -> Vec<(i32, f32)> {
+        let mut exits : Vec<(i32, f32)> = Vec::new();
+        let x = idx % self.width;
+        let y = idx / self.width;
+    
+        // Cardinal directions
+        if self.is_exit_valid(x-1, y) { exits.push((idx-1, 1.0)) };
+        if self.is_exit_valid(x+1, y) { exits.push((idx+1, 1.0)) };
+        if self.is_exit_valid(x, y-1) { exits.push((idx-self.width, 1.0)) };
+        if self.is_exit_valid(x, y+1) { exits.push((idx+self.width, 1.0)) };
+    
+        exits
     }
 
     fn get_pathing_distance(&self, idx1:i32, idx2:i32) -> f32 {

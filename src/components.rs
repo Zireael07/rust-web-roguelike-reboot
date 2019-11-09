@@ -32,4 +32,7 @@ pub struct Name {
 }
 
 #[derive(Component, Debug)]
+pub struct BlocksTile {}
+
+#[derive(Component, Debug)]
 pub struct Player {}

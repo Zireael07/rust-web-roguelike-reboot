@@ -28,6 +28,8 @@ mod NPC_ai_system;
 use NPC_ai_system::NPCAI;
 mod spawner;
 pub mod map_builders;
+mod map_indexing_system;
+use map_indexing_system::MapIndexingSystem;
 
 use rltk::{Console, GameState, Rltk, VirtualKeyCode, RGB, Point };
 //console is RLTK's wrapper around either println or the web console macro
@@ -103,6 +105,8 @@ impl GameState for State {
 //the meat of the EC*S*
 impl State {
     fn run_systems(&mut self) {
+        let mut mapindex = MapIndexingSystem{};
+        mapindex.run_now(&self.ecs);
         let mut vis = VisibilitySystem{};
         vis.run_now(&self.ecs);
         let mut mob = NPCAI{};
@@ -173,6 +177,7 @@ pub fn main() {
     gs.ecs.register::<Viewshed>();
     gs.ecs.register::<Monster>();
     gs.ecs.register::<Name>();
+    gs.ecs.register::<BlocksTile>();
     gs.ecs.register::<Player>();
 
     //placeholders so that generate_world has stuff to fill

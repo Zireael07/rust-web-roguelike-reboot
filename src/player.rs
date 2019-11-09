@@ -23,7 +23,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
         if (pos.x + delta_x) > 0 && (pos.y + delta_y) > 0 {
             let destination_idx = map.xy_idx(pos.x + delta_x, pos.y + delta_y);
             if destination_idx > 0 && destination_idx < map.tiles.len() {
-                if map.tiles[destination_idx] != TileType::Wall {
+                if !map.blocked[destination_idx] {
                     pos.x = min(map.width-1, max(0, pos.x + delta_x));
                     pos.y = min(map.height-1, max(0, pos.y + delta_y));
 
