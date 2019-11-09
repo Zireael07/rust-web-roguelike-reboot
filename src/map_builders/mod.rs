@@ -24,6 +24,8 @@ mod rooms_corridors_dogleg;
 use rooms_corridors_dogleg::DoglegCorridors;
 mod room_corridors_bsp;
 use room_corridors_bsp::BSPCorridors;
+mod room_draw;
+use room_draw::RoomDrawer;
 mod room_sorter;
 use room_sorter::*;
 mod room_based_spawner;
@@ -138,9 +140,10 @@ pub trait MetaMapBuilder {
 pub fn random_builder(rng: &mut rltk::RandomNumberGenerator, width: i32, height: i32) -> BuilderChain {
     let mut builder = BuilderChain::new(width, height);
     //simple map
-    //builder.start_with(SimpleMapBuilder::new());
+    builder.start_with(SimpleMapBuilder::new());
+    builder.with(RoomDrawer::new());
     //builder.with(DoglegCorridors::new());
-    builder.start_with(BSPDungeonBuilder::new());
+    //builder.start_with(BSPDungeonBuilder::new());
     builder.with(RoomSorter::new(RoomSort::CENTRAL));
     builder.with(BSPCorridors::new());
     builder.with(RoomBasedSpawner::new());
