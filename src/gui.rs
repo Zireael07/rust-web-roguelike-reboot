@@ -20,8 +20,18 @@ pub fn draw_ui(ecs: &World, ctx : &mut Rltk) {
     let log = ecs.fetch::<GameLog>();
 
     let mut y = 44;
-    for s in log.entries.iter() {
-        if y < 49 { ctx.print(2, y, &s.to_string()); }
-        y += 1;
+    //slice to get last five
+    if log.entries.len() > 5 {
+        let slice = log.entries[log.entries.len()-5 .. log.entries.len()].to_vec();
+        for s in slice.iter() {
+            if y < 49 { ctx.print(2, y, &s.to_string()); }
+            y += 1;
+        }
+    }
+    else {
+        for s in log.entries.iter() {
+            if y < 49 { ctx.print(2, y, &s.to_string()); }
+            y += 1;
+        }
     }
 }
