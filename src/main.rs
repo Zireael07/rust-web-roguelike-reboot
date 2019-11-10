@@ -195,8 +195,8 @@ pub fn main() {
 
     panic::set_hook(Box::new(console_error_panic_hook::hook));
     
-    let context = Rltk::init_simple8x8(80, 50, "RLTK Web roguelike", "resources");
-    //let gs = State::new();
+    let mut context = Rltk::init_simple8x8(80, 50, "RLTK Web roguelike", "resources");
+    context.with_post_scanlines(true);
 
     //ECS takes more lines to set up
     let mut gs = State {
