@@ -3,7 +3,7 @@ use rltk::{ RGB, RandomNumberGenerator };
 extern crate specs;
 use specs::prelude::*;
 use super::{Player, Renderable, Name, Position, Viewshed, Monster, 
-Rect, Map, TileType, BlocksTile, CombatStats};
+Rect, Map, TileType, BlocksTile, CombatStats, Item, MedItem};
 use std::collections::HashMap; //for region spawning
 
 /// Spawns the player and returns his/her entity object.
@@ -55,9 +55,21 @@ pub fn spawn_region(map: &Map, rng: &mut RandomNumberGenerator, area : &[usize],
             spawn_points.insert(map_idx, random_select_roll(rng));
             areas.remove(array_index);
         }
+
+        //Spawn an item per room
+        //paranoia
+        if areas.len() > 0 {
+            let array_index = if areas.len() == 1 { 0usize } else { (rng.roll_dice(1, areas.len() as i32)-1) as usize };
+            let map_idx = areas[array_index];
+            spawn_points.insert(map_idx, "Medkit".to_string());
+            areas.remove(array_index);
+        }
     }
 
-    // Prepare to spawn the monsters
+
+
+
+    // Prepare to spawn
     for spawn in spawn_points.iter() {
         list_spawns.push((*spawn.0, spawn.1.to_string()));
         //spawn_entity(ecs, &spawn);
@@ -75,6 +87,7 @@ pub fn spawn_entity(ecs: &mut World, spawn : &(&usize, &String)) {
     match spawn.1.as_ref() {
         "Human" => human(ecs, x, y),
         "Cop" => cop(ecs, x, y),
+        "Medkit" => medkit(ecs, x, y),
         _ => {}
     }
 }
@@ -124,5 +137,19 @@ fn monster<S : ToString>(ecs: &mut World, x: i32, y: i32, glyph : u8, name : S) 
         .with(Name{ name : name.to_string() })
         .with(BlocksTile{})
         .with(CombatStats{ max_hp: 16, hp: 16, defense: 1, power: 4 })
+        .build();
+}
+
+fn medkit(ecs: &mut World, x: i32, y: i32) {
+    ecs.create_entity()
+        .with(Position{ x, y })
+        .with(Renderable{
+            glyph: rltk::to_cp437('!'), //looks like an injector
+            fg: RGB::named(rltk::MAGENTA),
+            bg: RGB::named(rltk::BLACK),
+        })
+        .with(Name{ name : "Medkit".to_string() })
+        .with(Item{})
+        .with(MedItem{ heal_amount: 8 })
         .build();
 }
