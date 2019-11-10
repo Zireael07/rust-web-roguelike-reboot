@@ -12,6 +12,8 @@ extern crate console_error_panic_hook;
 use std::panic;
 
 pub mod camera;
+mod gui;
+mod gamelog;
 
 mod components;
 pub use components::*;
@@ -125,6 +127,8 @@ impl GameState for State {
         //draw
         camera::render_camera(&self.ecs, ctx);
 
+        gui::draw_ui(&self.ecs, ctx);
+
     }
 }
 
@@ -219,6 +223,8 @@ pub fn main() {
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
 
     gs.generate_world();
+
+    gs.ecs.insert(gamelog::GameLog{ entries : vec!["Welcome to Rusty Roguelike".to_string()] });
 
     //register html buttons
     rltk::register_html_button("go_nw");
