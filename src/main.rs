@@ -37,7 +37,7 @@ use melee_combat_system::MeleeCombatSystem;
 mod damage_system;
 use damage_system::DamageSystem;
 mod inventory_system;
-use inventory_system::ItemCollectionSystem;
+use inventory_system::*;
 
 use rltk::{Console, GameState, Rltk, VirtualKeyCode, RGB, Point };
 //console is RLTK's wrapper around either println or the web console macro
@@ -56,6 +56,7 @@ pub enum RunState {
     PreRun, 
     PlayerTurn, 
     MonsterTurn,
+    ShowInventory,
     MapGeneration
 }
 
@@ -83,6 +84,8 @@ impl GameState for State {
         match newrunstate {
             RunState::PreRun => {
                 self.run_systems();
+                //makes sure used items are removed
+                self.ecs.maintain();
                 newrunstate = RunState::AwaitingInput;
             }
             RunState::AwaitingInput => {
@@ -90,11 +93,32 @@ impl GameState for State {
             }
             RunState::PlayerTurn => {
                 self.run_systems();
+                //makes sure used items are removed
+                self.ecs.maintain();
                 newrunstate = RunState::MonsterTurn;
             }
             RunState::MonsterTurn => {
                 self.run_systems();
+                //makes sure used items are removed
+                self.ecs.maintain();
                 newrunstate = RunState::AwaitingInput;
+            }
+            RunState::ShowInventory => {
+                let result = gui::show_inventory(self, ctx);
+                match result.0 {
+                    gui::ItemMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
+                    gui::ItemMenuResult::NoResponse => {}
+                    gui::ItemMenuResult::Selected => {
+                        let item_entity = result.1.unwrap();
+                        let names = self.ecs.read_storage::<Name>();
+                        let mut gamelog = self.ecs.fetch_mut::<gamelog::GameLog>();
+                        // the tutorial inserts at 0, so the latest is at the top. we do what is more usual, append, so the latest is at bottom
+                        //gamelog.entries.push(format!("You try to use {}, but it isn't written yet", names.get(item_entity)         .unwrap().name));
+                        let mut intent = self.ecs.write_storage::<WantsToUseMedkit>();
+                        intent.insert(*self.ecs.fetch::<Entity>(), WantsToUseMedkit{ medkit: item_entity }).expect("Unable to insert intent");
+                        newrunstate = RunState::PlayerTurn;
+                    }
+                }
             }
             RunState::MapGeneration => {
                 if !SHOW_MAPGEN_VISUALIZER {
@@ -150,6 +174,8 @@ impl State {
         //items
         let mut pickup = ItemCollectionSystem{};
         pickup.run_now(&self.ecs);
+        let mut medkits = MedkitUseSystem{};
+        medkits.run_now(&self.ecs);
         self.ecs.maintain();
     }
 }
@@ -225,6 +251,7 @@ pub fn main() {
     gs.ecs.register::<MedItem>();
     gs.ecs.register::<InBackpack>();
     gs.ecs.register::<WantsToPickupItem>();
+    gs.ecs.register::<WantsToUseMedkit>();
     gs.ecs.register::<Player>();
 
     //placeholders so that generate_world has stuff to fill

@@ -1,6 +1,7 @@
 extern crate specs;
 use specs::prelude::*;
-use super::{WantsToPickupItem, Name, InBackpack, Position, gamelog::GameLog};
+use super::{WantsToPickupItem, Name, InBackpack, Position, gamelog::GameLog, 
+    WantsToUseMedkit, MedItem, CombatStats};
 
 pub struct ItemCollectionSystem {}
 
@@ -28,5 +29,39 @@ impl<'a> System<'a> for ItemCollectionSystem {
         }
 
         wants_pickup.clear();
+    }
+}
+
+pub struct MedkitUseSystem {}
+
+impl<'a> System<'a> for MedkitUseSystem {
+    #[allow(clippy::type_complexity)]
+    type SystemData = ( ReadExpect<'a, Entity>,
+                        WriteExpect<'a, GameLog>,
+                        Entities<'a>,
+                        WriteStorage<'a, WantsToUseMedkit>,
+                        ReadStorage<'a, Name>,
+                        ReadStorage<'a, MedItem>,
+                        WriteStorage<'a, CombatStats>
+                      );
+
+    fn run(&mut self, data : Self::SystemData) {
+        let (player_entity, mut gamelog, entities, mut wants_medkit, names, medkits, mut combat_stats) = data;
+
+        for (entity, medkit, stats) in (&entities, &wants_medkit, &mut combat_stats).join() {
+            let meditem = medkits.get(medkit.medkit);
+            match meditem {
+                None => {}
+                Some(meditem) => {
+                    stats.hp = i32::max(stats.max_hp, stats.hp + meditem.heal_amount);
+                    if entity == *player_entity {
+                        gamelog.entries.push(format!("You use the {}, healing {} hp.", names.get(medkit.medkit).unwrap().name, meditem.heal_amount));
+                    }
+                    entities.delete(medkit.medkit).expect("Delete failed");
+                }
+            }
+        }
+
+        wants_medkit.clear();
     }
 }

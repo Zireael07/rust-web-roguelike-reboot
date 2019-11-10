@@ -135,6 +135,7 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
                     VirtualKeyCode::Right => try_move_player(1, 0, &mut gs.ecs),
 
                     VirtualKeyCode::G => get_item(&mut gs.ecs),
+                    VirtualKeyCode::I => return RunState::ShowInventory,
 
                     _ => { return RunState::AwaitingInput } // Nothing happened, ignore all the other possibilities
                 }

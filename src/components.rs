@@ -72,4 +72,9 @@ pub struct WantsToPickupItem {
 }
 
 #[derive(Component, Debug)]
+pub struct WantsToUseMedkit {
+    pub medkit : Entity
+}
+
+#[derive(Component, Debug)]
 pub struct Player {}
