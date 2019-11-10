@@ -77,4 +77,9 @@ pub struct WantsToUseMedkit {
 }
 
 #[derive(Component, Debug)]
+pub struct WantsToDropItem {
+    pub item : Entity
+}
+
+#[derive(Component, Debug)]
 pub struct Player {}

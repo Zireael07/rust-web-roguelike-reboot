@@ -57,6 +57,7 @@ pub enum RunState {
     PlayerTurn, 
     MonsterTurn,
     ShowInventory,
+    ShowDropItem,
     MapGeneration
 }
 
@@ -120,6 +121,19 @@ impl GameState for State {
                     }
                 }
             }
+            RunState::ShowDropItem => {
+                let result = gui::drop_item_menu(self, ctx);
+                match result.0 {
+                    gui::ItemMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
+                    gui::ItemMenuResult::NoResponse => {}
+                    gui::ItemMenuResult::Selected => {
+                        let item_entity = result.1.unwrap();
+                        let mut intent = self.ecs.write_storage::<WantsToDropItem>();
+                        intent.insert(*self.ecs.fetch::<Entity>(), WantsToDropItem{ item: item_entity }).expect("Unable to insert intent");
+                        newrunstate = RunState::PlayerTurn;
+                    }
+                }
+            }
             RunState::MapGeneration => {
                 if !SHOW_MAPGEN_VISUALIZER {
                     newrunstate = self.mapgen_next_state.unwrap();
@@ -176,6 +190,8 @@ impl State {
         pickup.run_now(&self.ecs);
         let mut medkits = MedkitUseSystem{};
         medkits.run_now(&self.ecs);
+        let mut drop_items = ItemDropSystem{};
+        drop_items.run_now(&self.ecs);
         self.ecs.maintain();
     }
 }
@@ -252,6 +268,7 @@ pub fn main() {
     gs.ecs.register::<InBackpack>();
     gs.ecs.register::<WantsToPickupItem>();
     gs.ecs.register::<WantsToUseMedkit>();
+    gs.ecs.register::<WantsToDropItem>();
     gs.ecs.register::<Player>();
 
     //placeholders so that generate_world has stuff to fill
