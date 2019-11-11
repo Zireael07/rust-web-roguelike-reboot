@@ -175,12 +175,13 @@ impl GameState for State {
 //the meat of the EC*S*
 impl State {
     fn run_systems(&mut self) {
-        let mut mapindex = MapIndexingSystem{};
-        mapindex.run_now(&self.ecs);
         let mut vis = VisibilitySystem{};
         vis.run_now(&self.ecs);
         let mut mob = NPCAI{};
         mob.run_now(&self.ecs);
+        //indexing needs to run after AI and before combat, so that combat knows the new positions
+        let mut mapindex = MapIndexingSystem{};
+        mapindex.run_now(&self.ecs);
         let mut melee = MeleeCombatSystem{};
         melee.run_now(&self.ecs);
         let mut damage = DamageSystem{};
