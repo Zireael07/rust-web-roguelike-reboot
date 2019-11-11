@@ -78,6 +78,11 @@ pub struct InflictsDamage {
     pub damage : i32
 }
 
+#[derive(Component, Debug)]
+pub struct AreaOfEffect {
+    pub radius : i32
+}
+
 //components representing intent
 #[derive(Component, Debug)]
 pub struct WantsToPickupItem {

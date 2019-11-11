@@ -1,7 +1,7 @@
 extern crate specs;
 use specs::prelude::*;
 use super::{WantsToPickupItem, Name, InBackpack, Position, gamelog::GameLog, Map,
-    WantsToUseItem, MedItem, CombatStats, WantsToDropItem, Consumable, InflictsDamage, SufferDamage};
+    WantsToUseItem, MedItem, CombatStats, WantsToDropItem, Consumable, InflictsDamage, SufferDamage, AreaOfEffect};
 
 pub struct ItemCollectionSystem {}
 
@@ -82,11 +82,12 @@ impl<'a> System<'a> for ItemUseSystem {
                         ReadStorage<'a, MedItem>,
                         WriteStorage<'a, CombatStats>,
                         WriteStorage<'a, SufferDamage>,
+                        ReadStorage<'a, AreaOfEffect>,
                       );
 
     fn run(&mut self, data : Self::SystemData) {
         let (player_entity, mut gamelog, map, entities, mut wants_use, names, 
-            consumables, inflict_damage, meditems, mut combat_stats, mut suffer_damage) = data;
+            consumables, inflict_damage, meditems, mut combat_stats, mut suffer_damage, aoe) = data;
 
         for (entity, useitem) in (&entities, &wants_use).join() {
 
@@ -95,16 +96,31 @@ impl<'a> System<'a> for ItemUseSystem {
             match useitem.target {
                 None => { targets.push( *player_entity ); }
                 Some(target) => { 
-                     // Single target in tile
-                     let idx = map.xy_idx(target.x, target.y);
-                     for mob in map.tile_content[idx].iter() {
-                         targets.push(*mob);
-                     }
+                    let area_effect = aoe.get(useitem.item);
+                    match area_effect {
+                        None => {
+                            // Single target in tile
+                            let idx = map.xy_idx(target.x, target.y);
+                            for mob in map.tile_content[idx].iter() {
+                                targets.push(*mob);
+                            }
+                        }
+                        Some(area_effect) => {
+                            // AoE
+                            let mut blast_tiles = rltk::field_of_view(target, area_effect.radius, &*map);
+                            blast_tiles.retain(|p| p.x > 0 && p.x < map.width-1 && p.y > 0 && p.y < map.height-1 );
+                            for tile_idx in blast_tiles.iter() {
+                                let idx = map.xy_idx(tile_idx.x, tile_idx.y);
+                                for mob in map.tile_content[idx].iter() {
+                                    targets.push(*mob);
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
 
-        //for (entity, medkit, stats) in (&entities, &wants_use, &mut combat_stats).join() {
             //if it's a medkit, heal
             let meditem = meditems.get(useitem.item);
             match meditem {
@@ -144,7 +160,7 @@ impl<'a> System<'a> for ItemUseSystem {
                         if entity == *player_entity {
                             let mob_name = names.get(*mob).unwrap();
                             let item_name = names.get(useitem.item).unwrap();
-                            gamelog.entries.push(format!("You use {} on {}, inflicting {} hp.", item_name.name, mob_name.name, damage.damage));
+                            gamelog.entries.push(format!("You shoot {} at {}, inflicting {} damage.", item_name.name, mob_name.name, damage.damage));
                         }
 
                         //destroy if consumable
