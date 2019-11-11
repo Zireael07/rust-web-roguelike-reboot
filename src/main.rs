@@ -313,6 +313,7 @@ pub fn main() {
     rltk::register_html_button("go_sw");
     rltk::register_html_button("go_s");
     rltk::register_html_button("go_se");
+    rltk::register_html_button("go_wait");
 
     rltk::main_loop(context, gs);
 } 

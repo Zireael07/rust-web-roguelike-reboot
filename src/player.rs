@@ -97,6 +97,8 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
             "go_sw" => try_move_player(-1, 1, &mut gs.ecs),
             "go_s" => try_move_player(0, 1, &mut gs.ecs),
             "go_se" => try_move_player(1, 1, &mut gs.ecs),
+            //skip turn
+            "go_wait" => return RunState::PlayerTurn,
             _ => { return RunState::AwaitingInput } //Nothing happened
         }
     }
@@ -134,9 +136,14 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
                     VirtualKeyCode::Left => try_move_player(-1, 0, &mut gs.ecs),
                     VirtualKeyCode::Right => try_move_player(1, 0, &mut gs.ecs),
 
+                    // Skip turn
+                    VirtualKeyCode::Numpad5 => return RunState::PlayerTurn,
+                    VirtualKeyCode::Space => return RunState::PlayerTurn,
+
                     VirtualKeyCode::G => get_item(&mut gs.ecs),
                     VirtualKeyCode::I => return RunState::ShowInventory,
                     VirtualKeyCode::D => return RunState::ShowDropItem,
+
 
                     _ => { return RunState::AwaitingInput } // Nothing happened, ignore all the other possibilities
                 }
