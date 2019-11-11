@@ -3,7 +3,7 @@ use rltk::{ RGB, RandomNumberGenerator };
 extern crate specs;
 use specs::prelude::*;
 use super::{Player, Renderable, Name, Position, Viewshed, Monster, Rect, Map, TileType, 
-BlocksTile, CombatStats, Item, MedItem, Consumable, Ranged, InflictsDamage, AreaOfEffect};
+BlocksTile, CombatStats, Item, MedItem, Consumable, Ranged, InflictsDamage, AreaOfEffect, Confusion};
 use std::collections::HashMap; //for region spawning
 
 /// Spawns the player and returns his/her entity object.
@@ -90,6 +90,7 @@ pub fn spawn_entity(ecs: &mut World, spawn : &(&usize, &String)) {
         "Medkit" => medkit(ecs, x, y),
         "Pistol" => pistol(ecs, x, y),
         "Grenade" => grenade(ecs, x, y),
+        "Concussion Grenade" => concussion_grenade(ecs, x, y),
         _ => {}
     }
 }
@@ -109,6 +110,7 @@ pub fn random_select_roll(rng: &mut RandomNumberGenerator) -> String {
 }
 
 /// Spawns a random monster at a given location
+#[allow(dead_code)]
 pub fn random_monster(ecs: &mut World, x: i32, y: i32) {
     let roll :i32;
     {
@@ -145,24 +147,27 @@ pub fn random_select_item_roll(rng: &mut RandomNumberGenerator) -> String {
     let roll :i32;
     {
         //random selection
-        roll = rng.roll_dice(1, 2);
+        roll = rng.roll_dice(1, 4);
     }
     match roll {
         1 => "Medkit".to_string(),
         2 => "Grenade".to_string(),
+        3 => "Concussion Grenade".to_string(),
         _ => "Pistol".to_string(),
     }
 }
 
+#[allow(dead_code)]
 fn random_item(ecs: &mut World, x: i32, y: i32) {
     let roll :i32;
     {
         let mut rng = ecs.write_resource::<RandomNumberGenerator>();
-        roll = rng.roll_dice(1, 3);
+        roll = rng.roll_dice(1, 4);
     }
     match roll {
         1 => { medkit(ecs, x, y) }
         2 => { grenade(ecs,x, y) }
+        3 => { concussion_grenade(ecs, x, y) }
         _ => { pistol(ecs, x, y) }
     }
 }
@@ -214,5 +219,22 @@ fn grenade(ecs: &mut World, x: i32, y: i32) {
         .with(Ranged{ range: 6 })
         .with(InflictsDamage{ damage: 20 })
         .with(AreaOfEffect{ radius: 3 })
+        .build();
+}
+
+//refluffed confusion scroll
+fn concussion_grenade(ecs: &mut World, x: i32, y: i32) {
+    ecs.create_entity()
+        .with(Position{ x, y })
+        .with(Renderable{
+            glyph: rltk::to_cp437('*'),
+            fg: RGB::named(rltk::PINK),
+            bg: RGB::named(rltk::BLACK),
+        })
+        .with(Name{ name : "Concussion Grenade".to_string() })
+        .with(Item{})
+        .with(Consumable{})
+        .with(Ranged{ range: 6 })
+        .with(Confusion{ turns: 4 })
         .build();
 }

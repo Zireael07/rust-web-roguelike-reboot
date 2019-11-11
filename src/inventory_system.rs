@@ -1,7 +1,7 @@
 extern crate specs;
 use specs::prelude::*;
 use super::{WantsToPickupItem, Name, InBackpack, Position, gamelog::GameLog, Map,
-    WantsToUseItem, MedItem, CombatStats, WantsToDropItem, Consumable, InflictsDamage, SufferDamage, AreaOfEffect};
+    WantsToUseItem, MedItem, CombatStats, WantsToDropItem, Consumable, InflictsDamage, SufferDamage, AreaOfEffect, Confusion};
 
 pub struct ItemCollectionSystem {}
 
@@ -83,11 +83,12 @@ impl<'a> System<'a> for ItemUseSystem {
                         WriteStorage<'a, CombatStats>,
                         WriteStorage<'a, SufferDamage>,
                         ReadStorage<'a, AreaOfEffect>,
+                        WriteStorage<'a, Confusion>
                       );
 
     fn run(&mut self, data : Self::SystemData) {
         let (player_entity, mut gamelog, map, entities, mut wants_use, names, 
-            consumables, inflict_damage, meditems, mut combat_stats, mut suffer_damage, aoe) = data;
+            consumables, inflict_damage, meditems, mut combat_stats, mut suffer_damage, aoe, mut confused) = data;
 
         for (entity, useitem) in (&entities, &wants_use).join() {
 
@@ -173,6 +174,39 @@ impl<'a> System<'a> for ItemUseSystem {
                         }
                     }
                 }
+            }
+
+            //confusion
+            let mut add_confusion = Vec::new();
+            //keep borrow checker happy
+            {
+                let causes_confusion = confused.get(useitem.item);
+                match causes_confusion {
+                    None => {}
+                    Some(confusion) => {
+                        for mob in targets.iter() {
+                            add_confusion.push((*mob, confusion.turns ));
+                            if entity == *player_entity {
+                                let mob_name = names.get(*mob).unwrap();
+                                let item_name = names.get(useitem.item).unwrap();
+                                gamelog.entries.push(format!("You use {} on {}, confusing them.", item_name.name, mob_name.name));
+                            }
+
+                            //destroy if consumable
+                            let consumable = consumables.get(useitem.item);
+                            match consumable {
+                                None => {}
+                                Some(_) => {
+                                    entities.delete(useitem.item).expect("Delete failed");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            //make targets confused!
+            for mob in add_confusion.iter() {
+                confused.insert(mob.0, Confusion{ turns: mob.1 }).expect("Unable to insert status");
             }
 
         }

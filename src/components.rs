@@ -83,6 +83,11 @@ pub struct AreaOfEffect {
     pub radius : i32
 }
 
+#[derive(Component, Debug)]
+pub struct Confusion {
+    pub turns : i32
+}
+
 //components representing intent
 #[derive(Component, Debug)]
 pub struct WantsToPickupItem {

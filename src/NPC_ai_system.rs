@@ -1,6 +1,6 @@
 extern crate specs;
 use specs::prelude::*;
-use super::{Viewshed, Position, Map, Monster, Name, WantsToMelee, RunState};
+use super::{RunState, Viewshed, Position, Map, Monster, Name, WantsToMelee, Confusion};
 extern crate rltk;
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{field_of_view, Point, console};
@@ -18,34 +18,51 @@ impl<'a> System<'a> for NPCAI {
                         ReadStorage<'a, Monster>,
                         //ReadStorage<'a, Name>,
                         WriteStorage<'a, Position>,
-                        WriteStorage<'a, WantsToMelee>);
+                        WriteStorage<'a, WantsToMelee>,
+                        WriteStorage<'a, Confusion>
+                    );
 
     fn run(&mut self, data : Self::SystemData) {
-        let (mut map, player_pos, player_entity, runstate, entities, mut viewshed, monster, mut position, mut wants_to_melee) = data;
+        let (mut map, player_pos, player_entity, runstate, entities, mut viewshed, monster, mut position, mut wants_to_melee, mut confused) = data;
 
         //do nothing if not our turn
         if *runstate != RunState::MonsterTurn { return; }
 
         for (entity, mut viewshed,_monster, mut pos) in (&entities, &mut viewshed, &monster, &mut position).join() {
-            let distance = rltk::DistanceAlg::Pythagoras.distance2d(Point::new(pos.x, pos.y), *player_pos);
-            if distance < 1.5 {
-                // Attack goes here
-                wants_to_melee.insert(entity, WantsToMelee{ target: *player_entity }).expect("Unable to insert attack");
-                // console::log(&format!("{} shouts insults!", name.name));
-                // return
+            let mut can_act = true;
+
+            //count down confusion turns if applicable
+            let is_confused = confused.get_mut(entity);
+            if let Some(i_am_confused) = is_confused {
+                i_am_confused.turns -= 1;
+                if i_am_confused.turns < 1 {
+                    confused.remove(entity);
+                }
+                can_act = false;
             }
-            else if viewshed.visible_tiles.contains(&*player_pos){
-                //A*
-                let path = rltk::a_star_search(
-                    map.xy_idx(pos.x, pos.y) as i32, 
-                    map.xy_idx(player_pos.x, player_pos.y) as i32, 
-                    &mut *map
-                );
-                //step 0 is always the current location
-                if path.success && path.steps.len()>1 {
-                    pos.x = path.steps[1] % map.width;
-                    pos.y = path.steps[1] / map.width;
-                    viewshed.dirty = true;
+
+            //normal logic
+            if can_act {
+                let distance = rltk::DistanceAlg::Pythagoras.distance2d(Point::new(pos.x, pos.y), *player_pos);
+                if distance < 1.5 {
+                    // Attack goes here
+                    wants_to_melee.insert(entity, WantsToMelee{ target: *player_entity }).expect("Unable to insert attack");
+                    // console::log(&format!("{} shouts insults!", name.name));
+                    // return
+                }
+                else if viewshed.visible_tiles.contains(&*player_pos){
+                    //A*
+                    let path = rltk::a_star_search(
+                        map.xy_idx(pos.x, pos.y) as i32, 
+                        map.xy_idx(player_pos.x, player_pos.y) as i32, 
+                        &mut *map
+                    );
+                    //step 0 is always the current location
+                    if path.success && path.steps.len()>1 {
+                        pos.x = path.steps[1] % map.width;
+                        pos.y = path.steps[1] / map.width;
+                        viewshed.dirty = true;
+                    }
                 }
             }
         }
