@@ -66,6 +66,10 @@ pub struct InBackpack {
 }
 
 #[derive(Component, Debug)]
+pub struct Consumable {}
+
+//components representing intent
+#[derive(Component, Debug)]
 pub struct WantsToPickupItem {
     pub collected_by : Entity,
     pub item : Entity
@@ -73,7 +77,7 @@ pub struct WantsToPickupItem {
 
 #[derive(Component, Debug)]
 pub struct WantsToUseMedkit {
-    pub medkit : Entity
+    pub item : Entity
 }
 
 #[derive(Component, Debug)]

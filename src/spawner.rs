@@ -3,7 +3,7 @@ use rltk::{ RGB, RandomNumberGenerator };
 extern crate specs;
 use specs::prelude::*;
 use super::{Player, Renderable, Name, Position, Viewshed, Monster, 
-Rect, Map, TileType, BlocksTile, CombatStats, Item, MedItem};
+Rect, Map, TileType, BlocksTile, CombatStats, Item, MedItem, Consumable};
 use std::collections::HashMap; //for region spawning
 
 /// Spawns the player and returns his/her entity object.
@@ -145,11 +145,12 @@ fn medkit(ecs: &mut World, x: i32, y: i32) {
         .with(Position{ x, y })
         .with(Renderable{
             glyph: rltk::to_cp437('!'), //looks like an injector
-            fg: RGB::named(rltk::MAGENTA),
+            fg: RGB::named(rltk::RED),
             bg: RGB::named(rltk::BLACK),
         })
         .with(Name{ name : "Medkit".to_string() })
         .with(Item{})
+        .with(Consumable{})
         .with(MedItem{ heal_amount: 8 })
         .build();
 }

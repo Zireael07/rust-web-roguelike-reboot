@@ -116,7 +116,7 @@ impl GameState for State {
                         // the tutorial inserts at 0, so the latest is at the top. we do what is more usual, append, so the latest is at bottom
                         //gamelog.entries.push(format!("You try to use {}, but it isn't written yet", names.get(item_entity)         .unwrap().name));
                         let mut intent = self.ecs.write_storage::<WantsToUseMedkit>();
-                        intent.insert(*self.ecs.fetch::<Entity>(), WantsToUseMedkit{ medkit: item_entity }).expect("Unable to insert intent");
+                        intent.insert(*self.ecs.fetch::<Entity>(), WantsToUseMedkit{ item: item_entity }).expect("Unable to insert intent");
                         newrunstate = RunState::PlayerTurn;
                     }
                 }
@@ -189,8 +189,8 @@ impl State {
         //items
         let mut pickup = ItemCollectionSystem{};
         pickup.run_now(&self.ecs);
-        let mut medkits = MedkitUseSystem{};
-        medkits.run_now(&self.ecs);
+        let mut items = ItemUseSystem{};
+        items.run_now(&self.ecs);
         let mut drop_items = ItemDropSystem{};
         drop_items.run_now(&self.ecs);
         self.ecs.maintain();
@@ -266,6 +266,7 @@ pub fn main() {
     gs.ecs.register::<SufferDamage>();
     gs.ecs.register::<Item>();
     gs.ecs.register::<MedItem>();
+    gs.ecs.register::<Consumable>();
     gs.ecs.register::<InBackpack>();
     gs.ecs.register::<WantsToPickupItem>();
     gs.ecs.register::<WantsToUseMedkit>();

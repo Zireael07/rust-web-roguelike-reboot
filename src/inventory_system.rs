@@ -1,7 +1,7 @@
 extern crate specs;
 use specs::prelude::*;
 use super::{WantsToPickupItem, Name, InBackpack, Position, gamelog::GameLog, 
-    WantsToUseMedkit, MedItem, CombatStats, WantsToDropItem};
+    WantsToUseMedkit, MedItem, CombatStats, WantsToDropItem, Consumable};
 
 pub struct ItemCollectionSystem {}
 
@@ -67,36 +67,44 @@ impl<'a> System<'a> for ItemDropSystem {
     }
 }
 
-pub struct MedkitUseSystem {}
+pub struct ItemUseSystem {}
 
-impl<'a> System<'a> for MedkitUseSystem {
+impl<'a> System<'a> for ItemUseSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = ( ReadExpect<'a, Entity>,
                         WriteExpect<'a, GameLog>,
                         Entities<'a>,
                         WriteStorage<'a, WantsToUseMedkit>,
                         ReadStorage<'a, Name>,
+                        ReadStorage<'a, Consumable>,
                         ReadStorage<'a, MedItem>,
                         WriteStorage<'a, CombatStats>
                       );
 
     fn run(&mut self, data : Self::SystemData) {
-        let (player_entity, mut gamelog, entities, mut wants_medkit, names, medkits, mut combat_stats) = data;
+        let (player_entity, mut gamelog, entities, mut wants_use, names, consumables, meditems, mut combat_stats) = data;
 
-        for (entity, medkit, stats) in (&entities, &wants_medkit, &mut combat_stats).join() {
-            let meditem = medkits.get(medkit.medkit);
-            match meditem {
+        for (entity, medkit, stats) in (&entities, &wants_use, &mut combat_stats).join() {
+            let useitem = meditems.get(medkit.item);
+            match useitem {
                 None => {}
-                Some(meditem) => {
-                    stats.hp = i32::min(stats.max_hp, stats.hp + meditem.heal_amount);
+                Some(useitem) => {
+                    stats.hp = i32::min(stats.max_hp, stats.hp + useitem.heal_amount);
                     if entity == *player_entity {
-                        gamelog.entries.push(format!("You use the {}, healing {} hp.", names.get(medkit.medkit).unwrap().name, meditem.heal_amount));
+                        gamelog.entries.push(format!("You use the {}, healing {} hp.", names.get(medkit.item).unwrap().name, useitem.heal_amount));
                     }
-                    entities.delete(medkit.medkit).expect("Delete failed");
+                    //entities.delete(medkit.item).expect("Delete failed");
+                    let consumable = consumables.get(medkit.item);
+                    match consumable {
+                        None => {}
+                        Some(_) => {
+                            entities.delete(medkit.item).expect("Delete failed");
+                        }
+                    }
                 }
             }
         }
 
-        wants_medkit.clear();
+        wants_use.clear();
     }
 }
