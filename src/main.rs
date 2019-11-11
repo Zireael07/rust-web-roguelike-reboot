@@ -81,6 +81,15 @@ impl GameState for State {
             let runstate = self.ecs.fetch::<RunState>();
             newrunstate = *runstate;
         }
+
+        //draw
+        match newrunstate {
+            _ => {
+                //draw
+                camera::render_camera(&self.ecs, ctx);
+                gui::draw_ui(&self.ecs, ctx);
+            }
+        }
         
         match newrunstate {
             RunState::PreRun => {
@@ -163,12 +172,6 @@ impl GameState for State {
         }
 
         damage_system::delete_the_dead(&mut self.ecs);
-
-        //draw
-        camera::render_camera(&self.ecs, ctx);
-
-        gui::draw_ui(&self.ecs, ctx);
-
     }
 }
 
