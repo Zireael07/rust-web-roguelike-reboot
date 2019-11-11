@@ -1,7 +1,7 @@
 extern crate specs;
 use specs::prelude::*;
-use super::{WantsToPickupItem, Name, InBackpack, Position, gamelog::GameLog, 
-    WantsToUseMedkit, MedItem, CombatStats, WantsToDropItem, Consumable};
+use super::{WantsToPickupItem, Name, InBackpack, Position, gamelog::GameLog, Map,
+    WantsToUseItem, MedItem, CombatStats, WantsToDropItem, Consumable, InflictsDamage, SufferDamage};
 
 pub struct ItemCollectionSystem {}
 
@@ -73,36 +73,92 @@ impl<'a> System<'a> for ItemUseSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = ( ReadExpect<'a, Entity>,
                         WriteExpect<'a, GameLog>,
+                        ReadExpect<'a, Map>, //necessary for inflicting damage
                         Entities<'a>,
-                        WriteStorage<'a, WantsToUseMedkit>,
+                        WriteStorage<'a, WantsToUseItem>,
                         ReadStorage<'a, Name>,
                         ReadStorage<'a, Consumable>,
+                        ReadStorage<'a, InflictsDamage>,
                         ReadStorage<'a, MedItem>,
-                        WriteStorage<'a, CombatStats>
+                        WriteStorage<'a, CombatStats>,
+                        WriteStorage<'a, SufferDamage>,
                       );
 
     fn run(&mut self, data : Self::SystemData) {
-        let (player_entity, mut gamelog, entities, mut wants_use, names, consumables, meditems, mut combat_stats) = data;
+        let (player_entity, mut gamelog, map, entities, mut wants_use, names, 
+            consumables, inflict_damage, meditems, mut combat_stats, mut suffer_damage) = data;
 
-        for (entity, medkit, stats) in (&entities, &wants_use, &mut combat_stats).join() {
-            let useitem = meditems.get(medkit.item);
-            match useitem {
+        for (entity, useitem) in (&entities, &wants_use).join() {
+
+            // Targeting
+            let mut targets : Vec<Entity> = Vec::new();
+            match useitem.target {
+                None => { targets.push( *player_entity ); }
+                Some(target) => { 
+                     // Single target in tile
+                     let idx = map.xy_idx(target.x, target.y);
+                     for mob in map.tile_content[idx].iter() {
+                         targets.push(*mob);
+                     }
+                }
+            }
+
+
+        //for (entity, medkit, stats) in (&entities, &wants_use, &mut combat_stats).join() {
+            //if it's a medkit, heal
+            let meditem = meditems.get(useitem.item);
+            match meditem {
                 None => {}
-                Some(useitem) => {
-                    stats.hp = i32::min(stats.max_hp, stats.hp + useitem.heal_amount);
-                    if entity == *player_entity {
-                        gamelog.entries.push(format!("You use the {}, healing {} hp.", names.get(medkit.item).unwrap().name, useitem.heal_amount));
-                    }
-                    //entities.delete(medkit.item).expect("Delete failed");
-                    let consumable = consumables.get(medkit.item);
-                    match consumable {
-                        None => {}
-                        Some(_) => {
-                            entities.delete(medkit.item).expect("Delete failed");
+                Some(meditem) => {
+                    for target in targets.iter() {
+                        let stats = combat_stats.get_mut(*target);
+                        if let Some(stats) = stats {
+                            stats.hp = i32::min(stats.max_hp, stats.hp + meditem.heal_amount);
+                            if entity == *player_entity {
+                                gamelog.entries.push(format!("You use the {}, healing {} hp.", names.get(useitem.item).unwrap().name, meditem.heal_amount));
+                            }
+                            //entities.delete(useitem.item).expect("Delete failed");
+                            //destroy if consumable
+                            let consumable = consumables.get(useitem.item);
+                            match consumable {
+                                None => {}
+                                Some(_) => {
+                                    entities.delete(useitem.item).expect("Delete failed");
+                                }
+                            }
                         }
                     }
                 }
             }
+
+            // If it inflicts damage, apply it to the target cell
+            let item_damages = inflict_damage.get(useitem.item);
+            match item_damages {
+                None => {}
+                Some(damage) => {
+                    let target_point = useitem.target.unwrap();
+                    let idx = map.xy_idx(target_point.x, target_point.y);
+
+                    for mob in map.tile_content[idx].iter() {
+                        suffer_damage.insert(*mob, SufferDamage{ amount : damage.damage }).expect("Unable to insert");
+                        if entity == *player_entity {
+                            let mob_name = names.get(*mob).unwrap();
+                            let item_name = names.get(useitem.item).unwrap();
+                            gamelog.entries.push(format!("You use {} on {}, inflicting {} hp.", item_name.name, mob_name.name, damage.damage));
+                        }
+
+                        //destroy if consumable
+                        let consumable = consumables.get(useitem.item);
+                        match consumable {
+                            None => {}
+                            Some(_) => {
+                                entities.delete(useitem.item).expect("Delete failed");
+                            }
+                        }
+                    }
+                }
+            }
+
         }
 
         wants_use.clear();

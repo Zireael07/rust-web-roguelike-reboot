@@ -58,6 +58,7 @@ pub enum RunState {
     MonsterTurn,
     ShowInventory,
     ShowDropItem,
+    ShowTargeting { range : i32, item : Entity},
     MapGeneration
 }
 
@@ -120,13 +121,16 @@ impl GameState for State {
                     gui::ItemMenuResult::NoResponse => {}
                     gui::ItemMenuResult::Selected => {
                         let item_entity = result.1.unwrap();
-                        let names = self.ecs.read_storage::<Name>();
-                        let mut gamelog = self.ecs.fetch_mut::<gamelog::GameLog>();
-                        // the tutorial inserts at 0, so the latest is at the top. we do what is more usual, append, so the latest is at bottom
-                        //gamelog.entries.push(format!("You try to use {}, but it isn't written yet", names.get(item_entity)         .unwrap().name));
-                        let mut intent = self.ecs.write_storage::<WantsToUseMedkit>();
-                        intent.insert(*self.ecs.fetch::<Entity>(), WantsToUseMedkit{ item: item_entity }).expect("Unable to insert intent");
-                        newrunstate = RunState::PlayerTurn;
+
+                        let is_ranged = self.ecs.read_storage::<Ranged>();
+                        let is_item_ranged = is_ranged.get(item_entity);
+                        if let Some(is_item_ranged) = is_item_ranged {
+                            newrunstate = RunState::ShowTargeting{ range: is_item_ranged.range, item: item_entity };
+                        } else {
+                            let mut intent = self.ecs.write_storage::<WantsToUseItem>();
+                            intent.insert(*self.ecs.fetch::<Entity>(), WantsToUseItem{ item: item_entity, target: None }).expect("Unable to insert intent");
+                            newrunstate = RunState::PlayerTurn;
+                        }
                     }
                 }
             }
@@ -139,6 +143,18 @@ impl GameState for State {
                         let item_entity = result.1.unwrap();
                         let mut intent = self.ecs.write_storage::<WantsToDropItem>();
                         intent.insert(*self.ecs.fetch::<Entity>(), WantsToDropItem{ item: item_entity }).expect("Unable to insert intent");
+                        newrunstate = RunState::PlayerTurn;
+                    }
+                }
+            }
+            RunState::ShowTargeting{range, item} => {
+                let result = gui::ranged_target(self, ctx, range);
+                match result.0 {
+                    gui::ItemMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
+                    gui::ItemMenuResult::NoResponse => {}
+                    gui::ItemMenuResult::Selected => {
+                        let mut intent = self.ecs.write_storage::<WantsToUseItem>();
+                        intent.insert(*self.ecs.fetch::<Entity>(), WantsToUseItem{ item, target: result.1 }).expect("Unable to insert intent");
                         newrunstate = RunState::PlayerTurn;
                     }
                 }
@@ -271,8 +287,10 @@ pub fn main() {
     gs.ecs.register::<MedItem>();
     gs.ecs.register::<Consumable>();
     gs.ecs.register::<InBackpack>();
+    gs.ecs.register::<Ranged>();
+    gs.ecs.register::<InflictsDamage>();
     gs.ecs.register::<WantsToPickupItem>();
-    gs.ecs.register::<WantsToUseMedkit>();
+    gs.ecs.register::<WantsToUseItem>();
     gs.ecs.register::<WantsToDropItem>();
     gs.ecs.register::<Player>();
 

@@ -68,6 +68,16 @@ pub struct InBackpack {
 #[derive(Component, Debug)]
 pub struct Consumable {}
 
+#[derive(Component, Debug)]
+pub struct Ranged {
+    pub range : i32
+}
+
+#[derive(Component, Debug)]
+pub struct InflictsDamage {
+    pub damage : i32
+}
+
 //components representing intent
 #[derive(Component, Debug)]
 pub struct WantsToPickupItem {
@@ -76,8 +86,9 @@ pub struct WantsToPickupItem {
 }
 
 #[derive(Component, Debug)]
-pub struct WantsToUseMedkit {
-    pub item : Entity
+pub struct WantsToUseItem {
+    pub item : Entity,
+    pub target : Option<rltk::Point>
 }
 
 #[derive(Component, Debug)]
