@@ -88,6 +88,21 @@ pub struct Confusion {
     pub turns : i32
 }
 
+#[derive(PartialEq, Copy, Clone)]
+pub enum EquipmentSlot { Melee, Shield }
+
+#[derive(Component, Clone)]
+pub struct Equippable {
+    pub slot : EquipmentSlot
+}
+
+// See wrapper below for serialization
+#[derive(Component)]
+pub struct Equipped {
+    pub owner : Entity,
+    pub slot : EquipmentSlot
+}
+
 //components representing intent
 #[derive(Component, Debug)]
 pub struct WantsToPickupItem {

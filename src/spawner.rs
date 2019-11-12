@@ -3,7 +3,7 @@ use rltk::{ RGB, RandomNumberGenerator };
 extern crate specs;
 use specs::prelude::*;
 use super::{Player, Renderable, Name, Position, Viewshed, Monster, Rect, Map, TileType,
-BlocksTile, CombatStats, Item, MedItem, Consumable, Ranged, InflictsDamage, AreaOfEffect, Confusion,
+BlocksTile, CombatStats, Item, MedItem, Consumable, Ranged, InflictsDamage, AreaOfEffect, Confusion, Equippable, EquipmentSlot,
 random_table::RandomTable};
 use std::collections::HashMap; //for region spawning
 
@@ -34,6 +34,8 @@ fn room_table() -> RandomTable {
         .add("Pistol", 4)
         .add("Concussion Grenade", 2)
         .add("Grenade", 3)
+        .add("Combat Knife", 6)
+        .add("Riot Shield", 3)
 }
 
 pub fn spawn_room(map: &Map, rng: &mut RandomNumberGenerator, room : &Rect, list_spawns : &mut Vec<(usize, String)>) {
@@ -104,6 +106,8 @@ pub fn spawn_entity(ecs: &mut World, spawn : &(&usize, &String)) {
         "Pistol" => pistol(ecs, x, y),
         "Grenade" => grenade(ecs, x, y),
         "Concussion Grenade" => concussion_grenade(ecs, x, y),
+        "Combat Knife" => combat_knife(ecs, x, y),
+        "Riot Shield" => riot_shield(ecs, x, y),
         _ => {}
     }
 }
@@ -249,5 +253,33 @@ fn concussion_grenade(ecs: &mut World, x: i32, y: i32) {
         .with(Consumable{})
         .with(Ranged{ range: 6 })
         .with(Confusion{ turns: 4 })
+        .build();
+}
+
+fn combat_knife(ecs: &mut World, x: i32, y: i32) {
+    ecs.create_entity()
+        .with(Position{ x, y })
+        .with(Renderable{
+            glyph: rltk::to_cp437('/'),
+            fg: RGB::named(rltk::CYAN),
+            bg: RGB::named(rltk::BLACK),
+        })
+        .with(Name{ name : "Combat Knife".to_string() })
+        .with(Item{})
+        .with(Equippable{ slot: EquipmentSlot::Melee })
+        .build();
+}
+
+fn riot_shield(ecs: &mut World, x: i32, y: i32) {
+    ecs.create_entity()
+        .with(Position{ x, y })
+        .with(Renderable{
+            glyph: rltk::to_cp437('('),
+            fg: RGB::named(rltk::CYAN),
+            bg: RGB::named(rltk::BLACK),
+        })
+        .with(Name{ name : "Riot Shield".to_string() })
+        .with(Item{})
+        .with(Equippable{ slot: EquipmentSlot::Shield })
         .build();
 }

@@ -295,6 +295,8 @@ pub fn main() {
     gs.ecs.register::<WantsToPickupItem>();
     gs.ecs.register::<WantsToUseItem>();
     gs.ecs.register::<WantsToDropItem>();
+    gs.ecs.register::<Equippable>();
+    gs.ecs.register::<Equipped>();
     gs.ecs.register::<Player>();
 
     //placeholders so that generate_world has stuff to fill
