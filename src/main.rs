@@ -38,6 +38,7 @@ mod damage_system;
 use damage_system::DamageSystem;
 mod inventory_system;
 use inventory_system::*;
+pub mod random_table;
 
 use rltk::{Console, GameState, Rltk, VirtualKeyCode, RGB, Point };
 //console is RLTK's wrapper around either println or the web console macro

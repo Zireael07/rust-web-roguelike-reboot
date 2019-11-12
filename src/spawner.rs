@@ -2,8 +2,9 @@ extern crate rltk;
 use rltk::{ RGB, RandomNumberGenerator };
 extern crate specs;
 use specs::prelude::*;
-use super::{Player, Renderable, Name, Position, Viewshed, Monster, Rect, Map, TileType, 
-BlocksTile, CombatStats, Item, MedItem, Consumable, Ranged, InflictsDamage, AreaOfEffect, Confusion};
+use super::{Player, Renderable, Name, Position, Viewshed, Monster, Rect, Map, TileType,
+BlocksTile, CombatStats, Item, MedItem, Consumable, Ranged, InflictsDamage, AreaOfEffect, Confusion,
+random_table::RandomTable};
 use std::collections::HashMap; //for region spawning
 
 /// Spawns the player and returns his/her entity object.
@@ -22,6 +23,17 @@ pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
         .with(CombatStats{ max_hp: 30, hp: 30, defense: 2, power: 5 })
         .with(Player{})
         .build()
+}
+
+
+fn room_table() -> RandomTable {
+    RandomTable::new()
+        .add("Human", 10)
+        .add("Cop", 5)
+        .add("Medkit", 7)
+        .add("Pistol", 4)
+        .add("Concussion Grenade", 2)
+        .add("Grenade", 3)
 }
 
 pub fn spawn_room(map: &Map, rng: &mut RandomNumberGenerator, room : &Rect, list_spawns : &mut Vec<(usize, String)>) {
@@ -52,18 +64,19 @@ pub fn spawn_region(map: &Map, rng: &mut RandomNumberGenerator, area : &[usize],
         for _i in 0 .. num_spawns {
             let array_index = if areas.len() == 1 { 0usize } else { (rng.roll_dice(1, areas.len() as i32)-1) as usize };
             let map_idx = areas[array_index];
-            spawn_points.insert(map_idx, random_select_roll(rng));
+            
+            spawn_points.insert(map_idx, room_table().roll(rng));
             areas.remove(array_index);
         }
 
-        //Spawn an item per room
-        //paranoia
-        if areas.len() > 0 {
-            let array_index = if areas.len() == 1 { 0usize } else { (rng.roll_dice(1, areas.len() as i32)-1) as usize };
-            let map_idx = areas[array_index];
-            spawn_points.insert(map_idx, random_select_item_roll(rng));
-            areas.remove(array_index);
-        }
+        // //Spawn an item per room
+        // //paranoia
+        // if areas.len() > 0 {
+        //     let array_index = if areas.len() == 1 { 0usize } else { (rng.roll_dice(1, areas.len() as i32)-1) as usize };
+        //     let map_idx = areas[array_index];
+        //     spawn_points.insert(map_idx, random_select_item_roll(rng));
+        //     areas.remove(array_index);
+        // }
     }
 
 
