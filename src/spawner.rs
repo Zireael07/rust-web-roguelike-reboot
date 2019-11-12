@@ -3,8 +3,8 @@ use rltk::{ RGB, RandomNumberGenerator };
 extern crate specs;
 use specs::prelude::*;
 use super::{Player, Renderable, Name, Position, Viewshed, Monster, Rect, Map, TileType,
-BlocksTile, CombatStats, Item, MedItem, Consumable, Ranged, InflictsDamage, AreaOfEffect, Confusion, Equippable, EquipmentSlot,
-random_table::RandomTable};
+BlocksTile, CombatStats, Item, MedItem, Consumable, Ranged, InflictsDamage, AreaOfEffect, Confusion, 
+Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus, random_table::RandomTable};
 use std::collections::HashMap; //for region spawning
 
 /// Spawns the player and returns his/her entity object.
@@ -267,6 +267,7 @@ fn combat_knife(ecs: &mut World, x: i32, y: i32) {
         .with(Name{ name : "Combat Knife".to_string() })
         .with(Item{})
         .with(Equippable{ slot: EquipmentSlot::Melee })
+        .with(MeleePowerBonus{ power: 2 })
         .build();
 }
 
@@ -281,5 +282,6 @@ fn riot_shield(ecs: &mut World, x: i32, y: i32) {
         .with(Name{ name : "Riot Shield".to_string() })
         .with(Item{})
         .with(Equippable{ slot: EquipmentSlot::Shield })
+        .with(DefenseBonus{ defense: 2 })
         .build();
 }

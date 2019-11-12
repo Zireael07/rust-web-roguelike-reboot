@@ -103,6 +103,16 @@ pub struct Equipped {
     pub slot : EquipmentSlot
 }
 
+#[derive(Component, Clone)]
+pub struct MeleePowerBonus {
+    pub power : i32
+}
+
+#[derive(Component, Clone)]
+pub struct DefenseBonus {
+    pub defense : i32
+}
+
 //components representing intent
 #[derive(Component, Debug)]
 pub struct WantsToPickupItem {
@@ -118,6 +128,11 @@ pub struct WantsToUseItem {
 
 #[derive(Component, Debug)]
 pub struct WantsToDropItem {
+    pub item : Entity
+}
+
+#[derive(Component, Debug)]
+pub struct WantsToRemoveItem {
     pub item : Entity
 }
 

@@ -60,6 +60,7 @@ pub enum RunState {
     ShowInventory,
     ShowDropItem,
     ShowTargeting { range : i32, item : Entity},
+    ShowRemoveItem,
     MapGeneration
 }
 
@@ -160,6 +161,19 @@ impl GameState for State {
                     }
                 }
             }
+            RunState::ShowRemoveItem => {
+                let result = gui::remove_item_menu(self, ctx);
+                match result.0 {
+                    gui::ItemMenuResult::Cancel => newrunstate = RunState::AwaitingInput,
+                    gui::ItemMenuResult::NoResponse => {}
+                    gui::ItemMenuResult::Selected => {
+                        let item_entity = result.1.unwrap();
+                        let mut intent = self.ecs.write_storage::<WantsToRemoveItem>();
+                        intent.insert(*self.ecs.fetch::<Entity>(), WantsToRemoveItem{ item: item_entity }).expect("Unable to insert intent");
+                        newrunstate = RunState::PlayerTurn;
+                    }
+                }
+            }
             RunState::MapGeneration => {
                 if !SHOW_MAPGEN_VISUALIZER {
                     newrunstate = self.mapgen_next_state.unwrap();
@@ -213,6 +227,8 @@ impl State {
         items.run_now(&self.ecs);
         let mut drop_items = ItemDropSystem{};
         drop_items.run_now(&self.ecs);
+        let mut item_remove = ItemRemoveSystem{};
+        item_remove.run_now(&self.ecs);
         self.ecs.maintain();
     }
 }
@@ -295,8 +311,11 @@ pub fn main() {
     gs.ecs.register::<WantsToPickupItem>();
     gs.ecs.register::<WantsToUseItem>();
     gs.ecs.register::<WantsToDropItem>();
+    gs.ecs.register::<WantsToRemoveItem>();
     gs.ecs.register::<Equippable>();
     gs.ecs.register::<Equipped>();
+    gs.ecs.register::<MeleePowerBonus>();
+    gs.ecs.register::<DefenseBonus>();
     gs.ecs.register::<Player>();
 
     //placeholders so that generate_world has stuff to fill
