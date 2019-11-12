@@ -1,6 +1,6 @@
 extern crate specs;
 use specs::prelude::*;
-use super::{CombatStats, SufferDamage, Player, Name, gamelog::GameLog};
+use super::{CombatStats, SufferDamage, Player, Name, gamelog::GameLog, RunState};
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{console};
 
@@ -41,7 +41,11 @@ pub fn delete_the_dead(ecs : &mut World) {
                         }
                         dead.push(entity);
                     },
-                    Some(_) => log.entries.push("You are dead".to_string())
+                    Some(_) => {
+                        let mut runstate = ecs.write_resource::<RunState>();
+                        *runstate = RunState::GameOver;
+                        //log.entries.push("You are dead".to_string())
+                    }
                 }
             }
         }

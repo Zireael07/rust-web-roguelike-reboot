@@ -62,6 +62,7 @@ pub enum RunState {
     ShowTargeting { range : i32, item : Entity},
     ShowRemoveItem,
     MainMenu { menu_selection : gui::MainMenuSelection },
+    GameOver,
     MapGeneration
 }
 
@@ -107,6 +108,16 @@ impl GameState for State {
                             //gui::MainMenuSelection::LoadGame => newrunstate = RunState::PreRun,
                             gui::MainMenuSelection::Quit => { ::std::process::exit(0); }
                         }
+                    }
+                }
+            }
+            RunState::GameOver => {
+                let result = gui::game_over(ctx);
+                match result {
+                    gui::GameOverResult::NoSelection => {}
+                    gui::GameOverResult::QuitToMenu => {
+                        self.game_over_cleanup();
+                        newrunstate = RunState::MainMenu{ menu_selection: gui::MainMenuSelection::NewGame };
                     }
                 }
             }
@@ -284,6 +295,27 @@ impl State {
         //special treatment for player location
         self.ecs.insert(Point::new(player_x, player_y));
 
+    }
+
+    fn game_over_cleanup(&mut self) {
+        // Delete everything
+        let mut to_delete = Vec::new();
+        for e in self.ecs.entities().join() {
+            to_delete.push(e);
+        }
+        for del in to_delete.iter() {
+            self.ecs.delete_entity(*del).expect("Deletion failed");
+        }
+    
+        // Spawn a new player
+        {
+            let player_entity = spawner::player(&mut self.ecs, 0, 0);
+            let mut player_entity_writer = self.ecs.write_resource::<Entity>();
+            *player_entity_writer = player_entity;
+        }
+    
+        // Build a new map and place the player
+        self.generate_world();                                          
     }
 }
 
