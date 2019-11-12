@@ -61,6 +61,7 @@ pub enum RunState {
     ShowDropItem,
     ShowTargeting { range : i32, item : Entity},
     ShowRemoveItem,
+    MainMenu { menu_selection : gui::MainMenuSelection },
     MapGeneration
 }
 
@@ -87,6 +88,7 @@ impl GameState for State {
 
         //draw
         match newrunstate {
+            RunState::MainMenu{..} => {}
             _ => {
                 //draw
                 camera::render_camera(&self.ecs, ctx);
@@ -95,6 +97,19 @@ impl GameState for State {
         }
         
         match newrunstate {
+            RunState::MainMenu{ .. } => {
+                let result = gui::main_menu(self, ctx);
+                match result {
+                    gui::MainMenuResult::NoSelection{ selected } => newrunstate = RunState::MainMenu{ menu_selection: selected },
+                    gui::MainMenuResult::Selected{ selected } => {
+                        match selected {
+                            gui::MainMenuSelection::NewGame => newrunstate = RunState::PreRun,
+                            //gui::MainMenuSelection::LoadGame => newrunstate = RunState::PreRun,
+                            gui::MainMenuSelection::Quit => { ::std::process::exit(0); }
+                        }
+                    }
+                }
+            }
             RunState::PreRun => {
                 self.run_systems();
                 //makes sure used items are removed
@@ -249,6 +264,7 @@ impl State {
         self.mapgen_history = builder.build_data.history.clone();
         //key stuff
         self.ecs.insert(RunState::MapGeneration);
+        //self.ecs.insert(RunState::MainMenu{ menu_selection: gui::MainMenuSelection::NewGame});
         //self.runstate = RunState::MapGeneration;
 
         let player_start;
@@ -285,8 +301,8 @@ pub fn main() {
     //ECS takes more lines to set up
     let mut gs = State {
         ecs: World::new(),
-        //same as actual game starting state
-        mapgen_next_state : Some(RunState::PreRun),
+        //show main menu
+        mapgen_next_state : Some(RunState::MainMenu{ menu_selection: gui::MainMenuSelection::NewGame}),
         mapgen_index : 0,
         mapgen_history: Vec::new(),
         mapgen_timer: 0.0
