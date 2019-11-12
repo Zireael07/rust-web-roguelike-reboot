@@ -6,6 +6,8 @@ use super::{Player, Renderable, Name, Position, Viewshed, Monster, Rect, Map, Ti
 BlocksTile, CombatStats, Item, MedItem, Consumable, Ranged, InflictsDamage, AreaOfEffect, Confusion, 
 Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus, random_table::RandomTable};
 use std::collections::HashMap; //for region spawning
+//console is RLTK's wrapper around either println or the web console macro
+use rltk::{console};
 
 /// Spawns the player and returns his/her entity object.
 pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
@@ -64,6 +66,12 @@ pub fn spawn_region(map: &Map, rng: &mut RandomNumberGenerator, area : &[usize],
         if num_spawns == 0 { return; }
 
         for _i in 0 .. num_spawns {
+            //paranoia
+            if areas.len() as i32-1 < 0 {
+                console::log(&format!("Roll {:?} ", areas.len() as i32-1));
+                return
+            }
+            
             let array_index = if areas.len() == 1 { 0usize } else { (rng.roll_dice(1, areas.len() as i32)-1) as usize };
             let map_idx = areas[array_index];
             
