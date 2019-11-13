@@ -6,6 +6,8 @@ mod item_structs;
 use item_structs::*;
 mod mob_structs;
 use mob_structs::*;
+mod spawn_table_structs;
+use spawn_table_structs::*;
 use serde::{Deserialize};
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{console};
@@ -19,7 +21,8 @@ lazy_static! {
 #[derive(Deserialize, Debug)]
 pub struct Raws {
     pub items : Vec<Item>,
-    pub mobs : Vec<Mob>
+    pub mobs : Vec<Mob>,
+    pub spawn_table : Vec<SpawnTableEntry>
 }
 
 pub fn load_raws() {
@@ -33,7 +36,7 @@ pub fn load_raws() {
     .unwrap();
     let raw_string = std::str::from_utf8(&raw_data).expect("Unable to convert to a valid UTF-8 string.");
     let decoder : Raws = serde_json::from_str(&raw_string).expect("Unable to parse JSON");
-    console::log(&format!("{:?}", decoder));
+    //console::log(&format!("{:?}", decoder));
     //store it
     RAWS.lock().unwrap().load(decoder);
 }

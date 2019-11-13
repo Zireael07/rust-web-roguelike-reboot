@@ -29,15 +29,8 @@ pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
 
 
 fn room_table() -> RandomTable {
-    RandomTable::new()
-        .add("Human", 10)
-        .add("Cop", 5)
-        .add("Medkit", 7)
-        .add("Pistol", 4)
-        .add("Concussion Grenade", 2)
-        .add("Grenade", 3)
-        .add("Combat Knife", 6)
-        .add("Riot Shield", 3)
+    //the spawn table has been JSONized
+    get_spawn_table(&RAWS.lock().unwrap())
 }
 
 pub fn spawn_room(map: &Map, rng: &mut RandomNumberGenerator, room : &Rect, list_spawns : &mut Vec<(usize, String)>) {

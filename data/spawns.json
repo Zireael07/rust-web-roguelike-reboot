@@ -1,4 +1,14 @@
 {
+    "spawn_table" : [
+        { "name" : "Human", "weight" : 10 },
+        { "name" : "Cop", "weight" : 5 },
+        { "name" : "Medkit", "weight" : 7 },
+        { "name" : "Pistol", "weight" : 4 },
+        { "name" : "Concussion Grenade", "weight" : 2 },
+        { "name" : "Grenade", "weight" : 3 },
+        { "name" : "Combat Knife", "weight" : 6 },
+        { "name" : "Riot Shield", "weight" : 3 }
+    ],
     "items" : [
         {
             "name" : "Medkit",
