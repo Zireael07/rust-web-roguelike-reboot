@@ -56,6 +56,32 @@
                     "confusion" : "4"
                 }
             }
+        },
+
+        {
+            "name" : "Combat Knife",
+            "renderable": {
+                "glyph" : "/",
+                "fg" : "#FFAAAA",
+                "bg" : "#000000"
+            },
+            "weapon" : {
+                "range" : "melee",
+                "power_bonus" : 2
+            }
+        },
+
+        {
+            "name" : "Riot Shield",
+            "renderable": {
+                "glyph" : "[",
+                "fg" : "#00AAFF",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "shield" : {
+                "defense_bonus" : 1
+            }
         }
     ]
 }
