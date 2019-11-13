@@ -1,0 +1,30 @@
+{
+    "items" : [
+        {
+            "name" : "Medkit",
+            "renderable": {
+                "glyph" : "!",
+                "fg" : "#FF00FF",
+                "bg" : "#000000"
+            },
+            "consumable" : {
+                "effects" : { "med_item" : "8" }
+            }
+        },
+    
+        {
+            "name" : "Grenade",
+            "renderable": {
+                "glyph" : ")",
+                "fg" : "#00FFFF",
+                "bg" : "#000000"
+            },
+            "consumable" : {
+                "effects" : { 
+                    "ranged" : "6",
+                    "damage" : "10"
+                }
+            }
+        }
+    ]
+}

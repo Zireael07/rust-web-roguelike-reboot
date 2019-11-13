@@ -15,6 +15,8 @@ pub mod camera;
 mod gui;
 mod gamelog;
 
+
+pub mod raws;
 mod components;
 pub use components::*;
 mod map;
@@ -372,6 +374,9 @@ pub fn main() {
     gs.ecs.register::<DefenseBonus>();
     gs.ecs.register::<ParticleLifetime>();
     gs.ecs.register::<Player>();
+
+    //load JSON data
+    raws::load_raws();
 
     //placeholders so that generate_world has stuff to fill
     gs.ecs.insert(Map::new(80,50));
