@@ -1,6 +1,6 @@
 extern crate specs;
 use specs::prelude::*;
-use super::{RunState, Viewshed, Position, Map, Monster, Name, WantsToMelee, Confusion};
+use super::{RunState, Viewshed, Position, Map, Monster, Name, WantsToMelee, Confusion, particle_system::ParticleBuilder};
 extern crate rltk;
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{field_of_view, Point, console};
@@ -19,11 +19,13 @@ impl<'a> System<'a> for NPCAI {
                         //ReadStorage<'a, Name>,
                         WriteStorage<'a, Position>,
                         WriteStorage<'a, WantsToMelee>,
-                        WriteStorage<'a, Confusion>
+                        WriteStorage<'a, Confusion>,
+                        WriteExpect<'a, ParticleBuilder>
                     );
 
     fn run(&mut self, data : Self::SystemData) {
-        let (mut map, player_pos, player_entity, runstate, entities, mut viewshed, monster, mut position, mut wants_to_melee, mut confused) = data;
+        let (mut map, player_pos, player_entity, runstate, entities, mut viewshed, monster, mut position, mut wants_to_melee, 
+            mut confused, mut particle_builder) = data;
 
         //do nothing if not our turn
         if *runstate != RunState::MonsterTurn { return; }
@@ -39,6 +41,10 @@ impl<'a> System<'a> for NPCAI {
                     confused.remove(entity);
                 }
                 can_act = false;
+
+                //particle
+                particle_builder.request(pos.x, pos.y, rltk::RGB::named(rltk::PINK), 
+                    rltk::RGB::named(rltk::BLACK), rltk::to_cp437('?'), 200.0);
             }
 
             //normal logic

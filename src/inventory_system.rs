@@ -2,7 +2,7 @@ extern crate specs;
 use specs::prelude::*;
 use super::{WantsToPickupItem, Name, InBackpack, Position, gamelog::GameLog, Map,
     WantsToUseItem, MedItem, CombatStats, WantsToDropItem, Consumable, InflictsDamage, SufferDamage, AreaOfEffect, Confusion,
-    Equippable, Equipped, WantsToRemoveItem};
+    Equippable, Equipped, WantsToRemoveItem, particle_system::ParticleBuilder};
 
 pub struct ItemCollectionSystem {}
 
@@ -111,13 +111,16 @@ impl<'a> System<'a> for ItemUseSystem {
                         //for equipment
                         ReadStorage<'a, Equippable>,
                         WriteStorage<'a, Equipped>,
-                        WriteStorage<'a, InBackpack>
+                        WriteStorage<'a, InBackpack>,
+                        //particles
+                        WriteExpect<'a, ParticleBuilder>,
+                        ReadStorage<'a, Position>
                       );
 
     fn run(&mut self, data : Self::SystemData) {
         let (player_entity, mut gamelog, map, entities, mut wants_use, names, 
             consumables, inflict_damage, meditems, mut combat_stats, mut suffer_damage, aoe, mut confused,
-            equippable, mut equipped, mut backpack) = data;
+            equippable, mut equipped, mut backpack, mut particle_builder, positions) = data;
 
         for (entity, useitem) in (&entities, &wants_use).join() {
 
@@ -144,6 +147,8 @@ impl<'a> System<'a> for ItemUseSystem {
                                 for mob in map.tile_content[idx].iter() {
                                     targets.push(*mob);
                                 }
+                                //particles in the whole area
+                                particle_builder.request(tile_idx.x, tile_idx.y, rltk::RGB::named(rltk::ORANGE), rltk::RGB::named(rltk::BLACK), rltk::to_cp437('░'), 200.0);
                             }
                         }
                     }
@@ -195,6 +200,12 @@ impl<'a> System<'a> for ItemUseSystem {
                             if entity == *player_entity {
                                 gamelog.entries.push(format!("You use the {}, healing {} hp.", names.get(useitem.item).unwrap().name, meditem.heal_amount));
                             }
+                            //particles
+                            let pos = positions.get(*target);
+                            if let Some(pos) = pos {
+                                particle_builder.request(pos.x, pos.y, rltk::RGB::named(rltk::GREEN), rltk::RGB::named(rltk::BLACK), rltk::to_cp437('♥'), 200.0);
+                            }
+
                             //entities.delete(useitem.item).expect("Delete failed");
                             //destroy if consumable
                             let consumable = consumables.get(useitem.item);
@@ -224,6 +235,11 @@ impl<'a> System<'a> for ItemUseSystem {
                             let item_name = names.get(useitem.item).unwrap();
                             gamelog.entries.push(format!("You shoot {} at {}, inflicting {} damage.", item_name.name, mob_name.name, damage.damage));
                         }
+                        //particles
+                        let pos = positions.get(*mob);
+                        if let Some(pos) = pos {
+                            particle_builder.request(pos.x, pos.y, rltk::RGB::named(rltk::RED), rltk::RGB::named(rltk::BLACK), rltk::to_cp437('‼'), 200.0);
+                        }
 
                         //destroy if consumable
                         let consumable = consumables.get(useitem.item);
@@ -251,6 +267,11 @@ impl<'a> System<'a> for ItemUseSystem {
                                 let mob_name = names.get(*mob).unwrap();
                                 let item_name = names.get(useitem.item).unwrap();
                                 gamelog.entries.push(format!("You use {} on {}, confusing them.", item_name.name, mob_name.name));
+                            }
+                            //particles
+                            let pos = positions.get(*mob);
+                            if let Some(pos) = pos {
+                                particle_builder.request(pos.x, pos.y, rltk::RGB::named(rltk::PINK), rltk::RGB::named(rltk::BLACK), rltk::to_cp437('?'), 200.0);
                             }
 
                             //destroy if consumable
