@@ -4,6 +4,8 @@ use std::sync::Mutex;
 
 mod item_structs;
 use item_structs::*;
+mod mob_structs;
+use mob_structs::*;
 use serde::{Deserialize};
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{console};
@@ -16,7 +18,8 @@ lazy_static! {
 
 #[derive(Deserialize, Debug)]
 pub struct Raws {
-    pub items : Vec<Item>
+    pub items : Vec<Item>,
+    pub mobs : Vec<Mob>
 }
 
 pub fn load_raws() {

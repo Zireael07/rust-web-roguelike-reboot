@@ -108,16 +108,12 @@ pub fn spawn_entity(ecs: &mut World, spawn : &(&usize, &String)) {
     std::mem::drop(map);
 
     //spawn from data
-    let item_result = spawn_named_item(&RAWS.lock().unwrap(), ecs.create_entity(), &spawn.1, SpawnType::AtPosition{ x, y});
-    if item_result.is_some() {
+    let spawn_result = spawn_named_entity(&RAWS.lock().unwrap(), ecs.create_entity(), &spawn.1, SpawnType::AtPosition{ x, y});
+    if spawn_result.is_some() {
         return;
     }
 
-    match spawn.1.as_ref() {
-        "Human" => human(ecs, x, y),
-        "Cop" => cop(ecs, x, y),
-        _ => {}
-    }
+    console::log(&format!("WARNING: We don't know how to spawn [{}]!", spawn.1));
 }
 
 ///Random selection
@@ -134,39 +130,6 @@ pub fn random_select_roll(rng: &mut RandomNumberGenerator) -> String {
     }
 }
 
-/// Spawns a random monster at a given location
-#[allow(dead_code)]
-pub fn random_monster(ecs: &mut World, x: i32, y: i32) {
-    let roll :i32;
-    {
-        //random selection
-        let mut rng = ecs.write_resource::<RandomNumberGenerator>();
-        roll = rng.roll_dice(1, 2);
-    }
-    match roll {
-        1 => { human(ecs, x, y) }
-        _ => { cop(ecs, x, y) }
-    }
-}
-
-fn human(ecs: &mut World, x: i32, y: i32) { monster(ecs, x, y, rltk::to_cp437('h'), "Human"); }
-fn cop(ecs: &mut World, x: i32, y: i32) { monster(ecs, x, y, rltk::to_cp437('c'), "Cop"); }
-
-fn monster<S : ToString>(ecs: &mut World, x: i32, y: i32, glyph : u8, name : S) {
-    ecs.create_entity()
-        .with(Position{ x, y })
-        .with(Renderable{
-            glyph,
-            fg: RGB::named(rltk::RED),
-            bg: RGB::named(rltk::BLACK),
-        })
-        .with(Viewshed{ visible_tiles : Vec::new(), range: 8, dirty: true })
-        .with(Monster{})
-        .with(Name{ name : name.to_string() })
-        .with(BlocksTile{})
-        .with(CombatStats{ max_hp: 16, hp: 16, defense: 1, power: 4 })
-        .build();
-}
 
 pub fn random_select_item_roll(rng: &mut RandomNumberGenerator) -> String {
     let roll :i32;
@@ -182,4 +145,4 @@ pub fn random_select_item_roll(rng: &mut RandomNumberGenerator) -> String {
     }
 }
 
-//items are now spawned from JSON data
+//items and monsters are now spawned from JSON data

@@ -83,5 +83,40 @@
                 "defense_bonus" : 1
             }
         }
+    ],
+    "mobs" : [
+        {
+            "name" : "Cop",
+            "renderable": {
+                "glyph" : "c",
+                "fg" : "#FF0000",
+                "bg" : "#000000"
+            },
+            "blocks_tile" : true,
+            "stats" : {
+                "max_hp" : 16,
+                "hp" : 16,
+                "defense" : 1,
+                "power" : 4
+            },
+            "vision_range" : 8
+        },
+    
+        {
+            "name" : "Human",
+            "renderable": {
+                "glyph" : "h",
+                "fg" : "#FF0000",
+                "bg" : "#000000"
+            },
+            "blocks_tile" : true,
+            "stats" : {
+                "max_hp" : 8,
+                "hp" : 8,
+                "defense" : 1,
+                "power" : 3
+            },
+            "vision_range" : 8
+        }
     ]
 }

@@ -1,10 +1,6 @@
 use serde::{Deserialize};
 use std::collections::HashMap;
 
-#[derive(Deserialize, Debug)]
-pub struct Raws {
-    pub items : Vec<Item>
-}
 
 #[derive(Deserialize, Debug)]
 pub struct Item {
