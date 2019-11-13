@@ -136,5 +136,11 @@ pub struct WantsToRemoveItem {
     pub item : Entity
 }
 
+//graphical
+#[derive(Component, Clone)]
+pub struct ParticleLifetime {
+    pub lifetime_ms : f32
+}
+
 #[derive(Component, Debug)]
 pub struct Player {}

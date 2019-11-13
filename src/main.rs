@@ -39,6 +39,7 @@ use damage_system::DamageSystem;
 mod inventory_system;
 use inventory_system::*;
 pub mod random_table;
+pub mod particle_system;
 
 use rltk::{Console, GameState, Rltk, VirtualKeyCode, RGB, Point };
 //console is RLTK's wrapper around either println or the web console macro
@@ -80,6 +81,8 @@ impl GameState for State {
     fn tick(&mut self, ctx: &mut Rltk) {
         // Clear the screen
         ctx.cls();
+        //Kill particles
+        particle_system::cull_dead_particles(&mut self.ecs, ctx);
 
         let mut newrunstate;
         {
@@ -255,6 +258,9 @@ impl State {
         drop_items.run_now(&self.ecs);
         let mut item_remove = ItemRemoveSystem{};
         item_remove.run_now(&self.ecs);
+        //goes last because nearly anything can in theory produce one of those
+        let mut particles = particle_system::ParticleSpawnSystem{};
+        particles.run_now(&self.ecs);
         self.ecs.maintain();
     }
 }
@@ -364,6 +370,7 @@ pub fn main() {
     gs.ecs.register::<Equipped>();
     gs.ecs.register::<MeleePowerBonus>();
     gs.ecs.register::<DefenseBonus>();
+    gs.ecs.register::<ParticleLifetime>();
     gs.ecs.register::<Player>();
 
     //placeholders so that generate_world has stuff to fill
@@ -373,6 +380,7 @@ pub fn main() {
     gs.generate_world();
 
     gs.ecs.insert(gamelog::GameLog{ entries : vec!["Welcome to Rusty Roguelike".to_string()] });
+    gs.ecs.insert(particle_system::ParticleBuilder::new());
 
     //register html buttons
     rltk::register_html_button("go_nw");
