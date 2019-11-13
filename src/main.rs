@@ -15,8 +15,6 @@ pub mod camera;
 mod gui;
 mod gamelog;
 
-
-pub mod raws;
 mod components;
 pub use components::*;
 mod map;
@@ -42,6 +40,11 @@ mod inventory_system;
 use inventory_system::*;
 pub mod random_table;
 pub mod particle_system;
+
+//load json data
+pub mod raws;
+#[macro_use]
+extern crate lazy_static;
 
 use rltk::{Console, GameState, Rltk, VirtualKeyCode, RGB, Point };
 //console is RLTK's wrapper around either println or the web console macro

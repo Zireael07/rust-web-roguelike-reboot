@@ -4,7 +4,7 @@
             "name" : "Medkit",
             "renderable": {
                 "glyph" : "!",
-                "fg" : "#FF00FF",
+                "fg" : "#FF0000",
                 "bg" : "#000000"
             },
             "consumable" : {
@@ -13,7 +13,7 @@
         },
     
         {
-            "name" : "Grenade",
+            "name" : "Pistol",
             "renderable": {
                 "glyph" : ")",
                 "fg" : "#00FFFF",
@@ -22,7 +22,38 @@
             "consumable" : {
                 "effects" : { 
                     "ranged" : "6",
-                    "damage" : "10"
+                    "damage" : "8"
+                }
+            }
+        },
+
+        {
+            "name" : "Grenade",
+            "renderable": {
+                "glyph" : "*",
+                "fg" : "#FFA500",
+                "bg" : "#000000"
+            },
+            "consumable" : {
+                "effects" : { 
+                    "ranged" : "6",
+                    "damage" : "10",
+                    "area_of_effect" : "3"
+                }
+            }
+        },
+    
+        {
+            "name" : "Concussion Grenade",
+            "renderable": {
+                "glyph" : "*",
+                "fg" : "#FFAAAA",
+                "bg" : "#000000"
+            },
+            "consumable" : {
+                "effects" : { 
+                    "ranged" : "6",
+                    "confusion" : "4"
                 }
             }
         }

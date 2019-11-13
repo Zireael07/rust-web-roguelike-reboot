@@ -1,3 +1,7 @@
+mod rawmaster;
+pub use rawmaster::*;
+use std::sync::Mutex;
+
 mod item_structs;
 use item_structs::*;
 use serde::{Deserialize};
@@ -5,6 +9,10 @@ use serde::{Deserialize};
 use rltk::{console};
 
 rltk::embedded_resource!(RAW_FILE, "../../data/spawns.json");
+
+lazy_static! {
+    pub static ref RAWS : Mutex<RawMaster> = Mutex::new(RawMaster::empty());
+}
 
 #[derive(Deserialize, Debug)]
 pub struct Raws {
@@ -23,4 +31,6 @@ pub fn load_raws() {
     let raw_string = std::str::from_utf8(&raw_data).expect("Unable to convert to a valid UTF-8 string.");
     let decoder : Raws = serde_json::from_str(&raw_string).expect("Unable to parse JSON");
     console::log(&format!("{:?}", decoder));
+    //store it
+    RAWS.lock().unwrap().load(decoder);
 }

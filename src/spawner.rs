@@ -4,7 +4,7 @@ extern crate specs;
 use specs::prelude::*;
 use super::{Player, Renderable, Name, Position, Viewshed, Monster, Rect, Map, TileType,
 BlocksTile, CombatStats, Item, MedItem, Consumable, Ranged, InflictsDamage, AreaOfEffect, Confusion, 
-Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus, random_table::RandomTable};
+Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus, random_table::RandomTable, raws::*};
 use std::collections::HashMap; //for region spawning
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{console};
@@ -107,13 +107,19 @@ pub fn spawn_entity(ecs: &mut World, spawn : &(&usize, &String)) {
     let y = (*spawn.0 / width) as i32;
     std::mem::drop(map);
 
+    //spawn from data
+    let item_result = spawn_named_item(&RAWS.lock().unwrap(), ecs.create_entity(), &spawn.1, SpawnType::AtPosition{ x, y});
+    if item_result.is_some() {
+        return;
+    }
+
     match spawn.1.as_ref() {
         "Human" => human(ecs, x, y),
         "Cop" => cop(ecs, x, y),
-        "Medkit" => medkit(ecs, x, y),
-        "Pistol" => pistol(ecs, x, y),
-        "Grenade" => grenade(ecs, x, y),
-        "Concussion Grenade" => concussion_grenade(ecs, x, y),
+        //"Medkit" => medkit(ecs, x, y),
+        //"Pistol" => pistol(ecs, x, y),
+        //"Grenade" => grenade(ecs, x, y),
+        //"Concussion Grenade" => concussion_grenade(ecs, x, y),
         "Combat Knife" => combat_knife(ecs, x, y),
         "Riot Shield" => riot_shield(ecs, x, y),
         _ => {}
