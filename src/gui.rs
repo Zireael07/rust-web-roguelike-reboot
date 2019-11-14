@@ -38,31 +38,58 @@ pub fn main_menu(gs : &mut State, ctx : &mut Rltk) -> MainMenuResult {
             ctx.print_color_centered(26, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), "Quit");
         }
 
-        match ctx.key {
-            None => return MainMenuResult::NoSelection{ selected: selection },
-            Some(key) => {
-                match key {
-                    VirtualKeyCode::Escape => { return MainMenuResult::NoSelection{ selected: MainMenuSelection::Quit } }
-                    VirtualKeyCode::Up => {
-                        let newselection;
-                        match selection {
-                            MainMenuSelection::NewGame => newselection = MainMenuSelection::Quit,
-                            //MainMenuSelection::LoadGame => newselection = MainMenuSelection::NewGame,
-                            MainMenuSelection::Quit => newselection = MainMenuSelection::NewGame
-                        }
-                        return MainMenuResult::NoSelection{ selected: newselection }
+        // New: Handle web buttons
+        if let Some(btn) = &ctx.web_button {
+            match btn.trim() {
+                "go_n" => {
+                    let newselection;
+                    match selection {
+                        MainMenuSelection::NewGame => newselection = MainMenuSelection::Quit,
+                        //MainMenuSelection::LoadGame => newselection = MainMenuSelection::NewGame,
+                        MainMenuSelection::Quit => newselection = MainMenuSelection::NewGame
                     }
-                    VirtualKeyCode::Down => {
-                        let newselection;
-                        match selection {
-                            MainMenuSelection::NewGame => newselection = MainMenuSelection::Quit,
-                            //MainMenuSelection::LoadGame => newselection = MainMenuSelection::Quit,
-                            MainMenuSelection::Quit => newselection = MainMenuSelection::NewGame
-                        }
-                        return MainMenuResult::NoSelection{ selected: newselection }
+                    return MainMenuResult::NoSelection{ selected: newselection }
+                }
+                "go_s" => {
+                    let newselection;
+                    match selection {
+                        MainMenuSelection::NewGame => newselection = MainMenuSelection::Quit,
+                        //MainMenuSelection::LoadGame => newselection = MainMenuSelection::Quit,
+                        MainMenuSelection::Quit => newselection = MainMenuSelection::NewGame
                     }
-                    VirtualKeyCode::Return => return MainMenuResult::Selected{ selected : selection },
-                    _ => return MainMenuResult::NoSelection{ selected: selection }
+                    return MainMenuResult::NoSelection{ selected: newselection }
+                }
+                "confirm" => return MainMenuResult::Selected{ selected : selection },
+                _ => return MainMenuResult::NoSelection{ selected: selection }
+            }
+        }
+        else {
+            match ctx.key {
+                None => return MainMenuResult::NoSelection{ selected: selection },
+                Some(key) => {
+                    match key {
+                        VirtualKeyCode::Escape => { return MainMenuResult::NoSelection{ selected: MainMenuSelection::Quit } }
+                        VirtualKeyCode::Up => {
+                            let newselection;
+                            match selection {
+                                MainMenuSelection::NewGame => newselection = MainMenuSelection::Quit,
+                                //MainMenuSelection::LoadGame => newselection = MainMenuSelection::NewGame,
+                                MainMenuSelection::Quit => newselection = MainMenuSelection::NewGame
+                            }
+                            return MainMenuResult::NoSelection{ selected: newselection }
+                        }
+                        VirtualKeyCode::Down => {
+                            let newselection;
+                            match selection {
+                                MainMenuSelection::NewGame => newselection = MainMenuSelection::Quit,
+                                //MainMenuSelection::LoadGame => newselection = MainMenuSelection::Quit,
+                                MainMenuSelection::Quit => newselection = MainMenuSelection::NewGame
+                            }
+                            return MainMenuResult::NoSelection{ selected: newselection }
+                        }
+                        VirtualKeyCode::Return => return MainMenuResult::Selected{ selected : selection },
+                        _ => return MainMenuResult::NoSelection{ selected: selection }
+                    }
                 }
             }
         }
@@ -81,9 +108,18 @@ pub fn game_over(ctx : &mut Rltk) -> GameOverResult {
 
     ctx.print_color_centered(20, RGB::named(rltk::MAGENTA), RGB::named(rltk::BLACK), "Press any key to return to the menu.");
 
-    match ctx.key {
-        None => GameOverResult::NoSelection,
-        Some(_) => GameOverResult::QuitToMenu
+    // New: Handle web buttons
+    if let Some(btn) = &ctx.web_button {
+        match btn.trim() {
+            _ => GameOverResult::NoSelection,
+            "go_n" => GameOverResult::QuitToMenu,
+        }
+    }
+    else {
+        match ctx.key {
+            None => GameOverResult::NoSelection,
+            Some(_) => GameOverResult::QuitToMenu
+        }
     }
 }
 
