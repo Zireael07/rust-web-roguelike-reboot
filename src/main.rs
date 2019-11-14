@@ -338,7 +338,7 @@ pub fn main() {
 
     panic::set_hook(Box::new(console_error_panic_hook::hook));
     
-    let mut context = Rltk::init_simple8x8(80, 50, "RLTK Web roguelike", "resources");
+    let mut context = Rltk::init_simple8x8(80, 60, "RLTK Web roguelike", "resources");
     context.with_post_scanlines(true);
 
     //ECS takes more lines to set up
@@ -400,6 +400,8 @@ pub fn main() {
     rltk::register_html_button("go_s");
     rltk::register_html_button("go_se");
     rltk::register_html_button("go_wait");
+    rltk::register_html_button("confirm");
+
 
     rltk::main_loop(context, gs);
 } 

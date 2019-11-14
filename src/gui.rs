@@ -87,33 +87,85 @@ pub fn game_over(ctx : &mut Rltk) -> GameOverResult {
     }
 }
 
-pub fn draw_ui(ecs: &World, ctx : &mut Rltk) {
-    ctx.draw_box(0, 43, 79, 6, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK));
 
+//helper
+pub fn draw_hollow_box(
+    console: &mut Rltk,
+    sx: i32,
+    sy: i32,
+    width: i32,
+    height: i32,
+    fg: RGB,
+    bg: RGB,
+) {
+    use rltk::to_cp437;
+
+    console.set(sx, sy, fg, bg, to_cp437('┌'));
+    console.set(sx + width, sy, fg, bg, to_cp437('┐'));
+    console.set(sx, sy + height, fg, bg, to_cp437('└'));
+    console.set(sx + width, sy + height, fg, bg, to_cp437('┘'));
+    for x in sx + 1..sx + width {
+        console.set(x, sy, fg, bg, to_cp437('─'));
+        console.set(x, sy + height, fg, bg, to_cp437('─'));
+    }
+    for y in sy + 1..sy + height {
+        console.set(sx, y, fg, bg, to_cp437('│'));
+        console.set(sx + width, y, fg, bg, to_cp437('│'));
+    }
+}
+
+
+pub fn draw_ui(ecs: &World, ctx : &mut Rltk) {
+    use rltk::to_cp437;
+    let box_gray : RGB = RGB::from_hex("#999999").expect("Oops");
+    let black = RGB::named(rltk::BLACK);
+
+    draw_hollow_box(ctx, 0, 0, 79, 59, box_gray, black); // Overall box
+    draw_hollow_box(ctx, 0, 0, 49, 45, box_gray, black); // Map box
+    draw_hollow_box(ctx, 0, 45, 79, 14, box_gray, black); // Log box
+    draw_hollow_box(ctx, 49, 0, 30, 8, box_gray, black); // Top-right panel
+    
+    // Draw box connectors
+    ctx.set(0, 45, box_gray, black, to_cp437('├'));
+    ctx.set(49, 8, box_gray, black, to_cp437('├'));
+    ctx.set(49, 0, box_gray, black, to_cp437('┬'));
+    ctx.set(49, 45, box_gray, black, to_cp437('┴'));
+    ctx.set(79, 8, box_gray, black, to_cp437('┤'));
+    ctx.set(79, 45, box_gray, black, to_cp437('┤'));
+
+    //draw health bar
     let combat_stats = ecs.read_storage::<CombatStats>();
     let players = ecs.read_storage::<Player>();
     for (_player, stats) in (&players, &combat_stats).join() {
         let health = format!(" HP: {} / {} ", stats.hp, stats.max_hp);
-        ctx.print_color(12, 43, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), &health);
+        ctx.print_color(50, 1, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), &health);
 
-        ctx.draw_bar_horizontal(28, 43, 51, stats.hp, stats.max_hp, RGB::named(rltk::RED), RGB::named(rltk::BLACK));
+        ctx.draw_bar_horizontal(64, 1, 14, stats.hp, stats.max_hp, RGB::named(rltk::RED), RGB::named(rltk::BLACK));
     }
+
+    //basic info
+    //let player_entity = ecs.fetch::<Entity>();
+    let player_pos = ecs.fetch::<Point>();
+    //let viewsheds = ecs.read_storage::<Viewshed>();
+
+    let pos = format!("Player: {:?} ", *player_pos);
+    ctx.print_color(50, 10, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), &pos);
 
     //log
     let log = ecs.fetch::<GameLog>();
 
-    let mut y = 44;
-    //slice to get last five
-    if log.entries.len() > 5 {
-        let slice = log.entries[log.entries.len()-5 .. log.entries.len()].to_vec();
+    let mut y = 46;
+    //slice to get last x
+    if log.entries.len() > 13 {
+        let slice = log.entries[log.entries.len()-13 .. log.entries.len()].to_vec();
         for s in slice.iter() {
-            if y < 49 { ctx.print(2, y, &s.to_string()); }
+            if y < 59 { ctx.print(2, y, &s.to_string()); }
             y += 1;
         }
     }
     else {
         for s in log.entries.iter() {
-            if y < 49 { ctx.print(2, y, &s.to_string()); }
+            if y < 59 { ctx.print(2, y, &s.to_string()); }
             y += 1;
         }
     }
