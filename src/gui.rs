@@ -187,6 +187,12 @@ pub fn draw_ui(ecs: &World, ctx : &mut Rltk) {
     let pos = format!("Player: {:?} ", *player_pos);
     ctx.print_color(50, 10, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), &pos);
 
+    let (min_x, max_x, min_y, max_y) = camera::get_screen_bounds(ecs, ctx);
+    let x_str = format!("X: {:?}-{:?}", min_x, max_x);
+    let y_str = format!("Y: {:?}-{:?}", min_y, max_y);
+    ctx.print_color(50, 11, RGB::named(rltk::LIGHT_BLUE), RGB::named(rltk::BLACK), &x_str);
+    ctx.print_color(50, 12, RGB::named(rltk::LIGHT_BLUE), RGB::named(rltk::BLACK), &y_str);
+
     //log
     let log = ecs.fetch::<GameLog>();
 
@@ -366,7 +372,7 @@ pub fn ranged_target(gs : &mut State, ctx : &mut Rltk, range : i32) -> (ItemMenu
             if distance <= range as f32 {
                 let screen_x = idx.x - min_x;
                 let screen_y = idx.y - min_y;
-                if screen_x > min_x && screen_x < max_x && screen_y > min_y && screen_y < max_y {
+                if screen_x > 1 && screen_x < (max_x - min_x)-1 && screen_y > 1 && screen_y < (max_y - min_y)-1 {
                     ctx.set_bg(screen_x, screen_y, RGB::named(rltk::BLUE));
                     available_cells.push(idx);
                 }
