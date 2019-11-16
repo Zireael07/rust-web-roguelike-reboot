@@ -18,6 +18,9 @@ mod voronoi;
 use voronoi::*;
 mod prefab_builders;
 use prefab_builders::*;
+//custom
+mod perlin_noise;
+use perlin_noise::NoiseMapBuilder;
 
 //postprocessing stuff
 mod rooms_corridors_dogleg;
@@ -148,17 +151,17 @@ pub trait MetaMapBuilder {
 pub fn random_builder(rng: &mut rltk::RandomNumberGenerator, width: i32, height: i32) -> BuilderChain {
     let mut builder = BuilderChain::new(width, height);
     //simple map
-    builder.start_with(SimpleMapBuilder::new());
-    builder.with(RoomDrawer::new());
-    //builder.with(DoglegCorridors::new());
-    //builder.start_with(BSPDungeonBuilder::new());
-    builder.with(RoomSorter::new(RoomSort::CENTRAL));
-    builder.with(NearestCorridors::new());
-    //builder.with(BSPCorridors::new());
-    builder.with(RoomBasedSpawner::new());
-    builder.with(CorridorSpawner::new());
-    builder.with(RoomBasedStartingPosition::new());
-    builder
+    // builder.start_with(SimpleMapBuilder::new());
+    // builder.with(RoomDrawer::new());
+    // //builder.with(DoglegCorridors::new());
+    // //builder.start_with(BSPDungeonBuilder::new());
+    // builder.with(RoomSorter::new(RoomSort::CENTRAL));
+    // builder.with(NearestCorridors::new());
+    // //builder.with(BSPCorridors::new());
+    // builder.with(RoomBasedSpawner::new());
+    // builder.with(CorridorSpawner::new());
+    // builder.with(RoomBasedStartingPosition::new());
+    // builder
 
     // cellular
     //builder.start_with(CellularAutomataBuilder::new());
@@ -185,14 +188,11 @@ pub fn random_builder(rng: &mut rltk::RandomNumberGenerator, width: i32, height:
 
 
     //show off
-    // let mut builder = BuilderChain::new(width, height);
-    // builder.start_with(NoiseMapBuilder::new());
-    // //builder.start_with(VoronoiBuilder::pythagoras());
-    // //builder.with(CellularAutomataBuilder::new());
-    // //builder.with(PrefabBuilder::vaults());
-    // builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
-    // //builder.with(CullUnreachable::new()); culling not implemented yet
-    // builder.with(VoronoiSpawning::new());
-    // builder.with(PrefabBuilder::sectional(prefab_builders::prefab_sections::UNDERGROUND_FORT));
-    //builder
+    let mut builder = BuilderChain::new(width, height);
+    builder.start_with(NoiseMapBuilder::new());
+    builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
+    //builder.with(CullUnreachable::new()); culling not implemented yet
+    builder.with(VoronoiSpawning::new());
+    //builder.with(PrefabBuilder::sectional(prefab_builders::prefab_sections::UNDERGROUND_FORT));
+    builder
 }
