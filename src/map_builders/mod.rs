@@ -50,6 +50,10 @@ use area_starting_points::*;
 mod voronoi_spawning;
 use voronoi_spawning::VoronoiSpawning;
 
+//custom postprocess
+mod rectangle_builder;
+use rectangle_builder::RectBuilder;
+
 mod common;
 use common::*;
 use specs::prelude::*;
@@ -193,6 +197,7 @@ pub fn random_builder(rng: &mut rltk::RandomNumberGenerator, width: i32, height:
     builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
     //builder.with(CullUnreachable::new()); culling not implemented yet
     builder.with(VoronoiSpawning::new());
+    builder.with(RectBuilder::new());
     //builder.with(PrefabBuilder::sectional(prefab_builders::prefab_sections::UNDERGROUND_FORT));
     builder
 }
