@@ -247,22 +247,65 @@ pub fn show_inventory(gs : &mut State, ctx : &mut Rltk) -> (ItemMenuResult,  Opt
         j += 1;
     }
 
-    match ctx.key {
-        None => (ItemMenuResult::NoResponse, None),
-        Some(key) => {
-            match key {
-                VirtualKeyCode::Escape => { (ItemMenuResult::Cancel, None) }
-                _ => {
-                    //select item and return it
-                    let selection = rltk::letter_to_option(key);
-                    if selection > -1 && selection < count as i32 {
-                        return (ItemMenuResult::Selected, Some(equippable[selection as usize]));
+
+    // New: Handle web buttons
+    if let Some(btn) = &ctx.web_button {
+        match btn.trim() {
+            "escape" => { (ItemMenuResult::Cancel, None) },
+            "a" => {
+                //select and return
+                let selection = 0;
+                if selection > -1 && selection < count as i32 {
+                    return (ItemMenuResult::Selected, Some(equippable[selection as usize]));
+                }
+                (ItemMenuResult::NoResponse, None)
+            },
+            "b" => {
+                //select and return
+                let selection = 1;
+                if selection > -1 && selection < count as i32 {
+                    return (ItemMenuResult::Selected, Some(equippable[selection as usize]));
+                }
+                (ItemMenuResult::NoResponse, None)
+            },
+            "c" => {
+                //select and return
+                let selection = 2;
+                if selection > -1 && selection < count as i32 {
+                    return (ItemMenuResult::Selected, Some(equippable[selection as usize]));
+                }
+                (ItemMenuResult::NoResponse, None)
+            },
+            "d" => {
+                //select and return
+                let selection = 3;
+                if selection > -1 && selection < count as i32 {
+                    return (ItemMenuResult::Selected, Some(equippable[selection as usize]));
+                }
+                (ItemMenuResult::NoResponse, None)
+            },
+            _ => (ItemMenuResult::NoResponse, None),
+        }
+    }
+    else {
+        match ctx.key {
+            None => (ItemMenuResult::NoResponse, None),
+            Some(key) => {
+                match key {
+                    VirtualKeyCode::Escape => { (ItemMenuResult::Cancel, None) }
+                    _ => {
+                        //select item and return it
+                        let selection = rltk::letter_to_option(key);
+                        if selection > -1 && selection < count as i32 {
+                            return (ItemMenuResult::Selected, Some(equippable[selection as usize]));
+                        }
+                        (ItemMenuResult::NoResponse, None)
                     }
-                    (ItemMenuResult::NoResponse, None)
                 }
             }
         }
     }
+
 }
 
 pub fn drop_item_menu(gs : &mut State, ctx : &mut Rltk) -> (ItemMenuResult, Option<Entity>) {

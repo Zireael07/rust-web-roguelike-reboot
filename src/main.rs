@@ -406,6 +406,12 @@ pub fn main() {
     rltk::register_html_button("inven");
     rltk::register_html_button("drop");
     rltk::register_html_button("remove");
+    //inventory
+    rltk::register_html_button("escape");
+    rltk::register_html_button("a");
+    rltk::register_html_button("b");
+    rltk::register_html_button("c");
+    rltk::register_html_button("d");
 
 
     rltk::main_loop(context, gs);

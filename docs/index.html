@@ -15,7 +15,7 @@
     <div class="wrapper">
     <canvas id="canvas" height="600" width="800"/></canvas>
     <div id="keypad" class="keypad">
-      <table>
+      <table id="main">
       <tbody>
       <tr>
         <!-- button tag can be buggy so we use input type=button -->
@@ -48,12 +48,24 @@
           <td><input id="inven" type="button" value="(i)nven"></td>
         </tr>
         <tr>
-          <td><input id="remove" type="button" value="(r)emove"</td>
+          <td><input id="remove" type="button" value="(r)emove"></td>
           <td><input id="get" type="button" value="(g)et"></td>
           <td><input id="drop" type="button" value="(d)rop"></td>
-          
         </tr>
       </tbody>
+      </table>
+      <table id="inventory">
+      <tbody>
+        <tr>
+          <td><input id="escape" type="button" value="ESC"></td>
+        </tr>
+        <tr>
+          <td><input id="a" type="button" value="a"></td>
+          <td><input id="b" type="button" value="b"></td>
+          <td><input id="c" type="button" value="c"></td>
+          <td><input id="d" type="button" value="d"></td>
+        </tr>
+      </tbody>  
       </table>
     </div> 
     </div>
