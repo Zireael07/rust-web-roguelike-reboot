@@ -99,6 +99,11 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
             "go_se" => try_move_player(1, 1, &mut gs.ecs),
             //skip turn
             "go_wait" => return RunState::PlayerTurn,
+            //others
+            "get" => get_item(&mut gs.ecs),
+            "inven" => return RunState::ShowInventory,
+            "drop" => return RunState::ShowDropItem,
+            "remove" => return RunState::ShowRemoveItem,
             _ => { return RunState::AwaitingInput } //Nothing happened
         }
     }
