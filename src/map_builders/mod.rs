@@ -21,6 +21,8 @@ use prefab_builders::*;
 //custom
 mod perlin_noise;
 use perlin_noise::NoiseMapBuilder;
+mod bsp_town;
+use bsp_town::BSPTownBuilder;
 
 //postprocessing stuff
 mod rooms_corridors_dogleg;
@@ -192,12 +194,19 @@ pub fn random_builder(rng: &mut rltk::RandomNumberGenerator, width: i32, height:
 
 
     //show off
+    // let mut builder = BuilderChain::new(width, height);
+    // builder.start_with(NoiseMapBuilder::new());
+    // builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
+    // //builder.with(CullUnreachable::new()); culling not implemented yet
+    // builder.with(VoronoiSpawning::new());
+    // builder.with(RectBuilder::new());
+    // //builder.with(PrefabBuilder::sectional(prefab_builders::prefab_sections::UNDERGROUND_FORT));
+    // builder
+
     let mut builder = BuilderChain::new(width, height);
-    builder.start_with(NoiseMapBuilder::new());
+    builder.start_with(BSPTownBuilder::new());
     builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
-    //builder.with(CullUnreachable::new()); culling not implemented yet
     builder.with(VoronoiSpawning::new());
-    builder.with(RectBuilder::new());
-    //builder.with(PrefabBuilder::sectional(prefab_builders::prefab_sections::UNDERGROUND_FORT));
     builder
+
 }
