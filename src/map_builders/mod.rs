@@ -202,6 +202,7 @@ pub fn random_builder(rng: &mut rltk::RandomNumberGenerator, width: i32, height:
     //builder.with(CullUnreachable::new()); culling not implemented yet
     builder.with(VoronoiSpawning::new());
     builder.with(RectBuilder::new());
+    builder.with(BSPTownBuilder::new());
     //builder.with(PrefabBuilder::sectional(prefab_builders::prefab_sections::UNDERGROUND_FORT));
     builder
 

@@ -1,4 +1,4 @@
-use super::{InitialMapBuilder, BuilderMap, Rect, TileType };
+use super::{InitialMapBuilder, MetaMapBuilder, BuilderMap, Rect, TileType };
 use rltk::RandomNumberGenerator;
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{console};
@@ -16,6 +16,21 @@ impl InitialMapBuilder for BSPTownBuilder {
     }
 }
 
+impl MetaMapBuilder for BSPTownBuilder {
+    #[allow(dead_code)]
+    fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data : &mut BuilderMap) {
+        //meta version panics if no submaps
+        let submaps : Vec<Rect>;
+        if let Some(submaps_builder) = &build_data.submaps {
+            submaps = submaps_builder.clone();
+        } else {
+            panic!("Using BSP town as meta requires a builder with submap structures");
+        }
+
+        self.build(rng, build_data);
+    }
+}
+
 impl BSPTownBuilder {
     #[allow(dead_code)]
     pub fn new() -> Box<BSPTownBuilder> {
@@ -27,9 +42,28 @@ impl BSPTownBuilder {
     fn build(&mut self, rng : &mut RandomNumberGenerator, build_data : &mut BuilderMap) {
         let mut rooms : Vec<Rect> = Vec::new();
 
+        //we work with submap bounds if we have them, else we work with the whole map
+        let mut submaps : Vec<Rect> = Vec::new();
+        if let Some(submaps_builder) = &build_data.submaps {
+            submaps = submaps_builder.clone();
+        }
+
+        let mut sx = 1;
+        let mut sy = 1;
+        let mut endx = build_data.map.width-1;
+        let mut endy = build_data.map.height-1;
+
+        if submaps.len() > 0{
+            sx = submaps[0].x1;
+            sy = submaps[0].y1;
+            endx = submaps[0].x2;
+            endy = submaps[0].y2;
+
+        }
+
         //fill with floors
-        for y in 1..build_data.map.height-1 {
-            for x in 1..build_data.map.width-1 {
+        for y in sy .. endy {
+            for x in sx .. endx {
                 let idx = build_data.map.xy_idx(x, y);
                 build_data.map.tiles[idx] = TileType::Floor;
             }
@@ -39,24 +73,24 @@ impl BSPTownBuilder {
 
         //place walls around
         //Rust is weird, ranges are inclusive at the beginning but exclusive at the end
-        for x in 0 ..build_data.map.width{
-            let mut idx = build_data.map.xy_idx(x, 1);
-            build_data.map.tiles[idx] = TileType::Wall;
-            idx = build_data.map.xy_idx(x, build_data.map.height-2);
-            build_data.map.tiles[idx] = TileType::Wall;
-        }
-        for y in 0 ..build_data.map.height{
-            let mut idx = build_data.map.xy_idx(1, y);
-            build_data.map.tiles[idx] = TileType::Wall;
-            idx = build_data.map.xy_idx(build_data.map.width-2, y);
-            build_data.map.tiles[idx] = TileType::Wall;
-        }
+        // for x in 0 ..build_data.map.width{
+        //     let mut idx = build_data.map.xy_idx(x, 1);
+        //     build_data.map.tiles[idx] = TileType::Wall;
+        //     idx = build_data.map.xy_idx(x, build_data.map.height-2);
+        //     build_data.map.tiles[idx] = TileType::Wall;
+        // }
+        // for y in 0 ..build_data.map.height{
+        //     let mut idx = build_data.map.xy_idx(1, y);
+        //     build_data.map.tiles[idx] = TileType::Wall;
+        //     idx = build_data.map.xy_idx(build_data.map.width-2, y);
+        //     build_data.map.tiles[idx] = TileType::Wall;
+        // }
 
-        build_data.take_snapshot();
+        // build_data.take_snapshot();
 
         //BSP now
         self.rects.clear();
-        self.rects.push( Rect::new(1, 1, build_data.map.width-2, build_data.map.height-2) ); // Start with a single map-sized rectangle
+        self.rects.push( Rect::new(sx, sy, endx-1, endy-1) ); // Start with a single map-sized rectangle
         let first_room = self.rects[0];
         self.add_subrects(first_room); // Divide the first room
 
