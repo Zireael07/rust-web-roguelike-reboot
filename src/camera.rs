@@ -114,17 +114,26 @@ fn get_tile_glyph(idx: usize, map : &Map) -> (u8, RGB, RGB) {
     match map.tiles[idx] {
         TileType::Floor => {
             glyph = rltk::to_cp437('.');
-            fg = RGB::from_f32(0.0, 0.5, 0.5);
+            //fg = RGB::named(rltk::CHOCOLATE);
+            //fg = RGB::named(rltk::BROWN4); //too red
+            //fg = RGB::named(rltk::SANDY_BROWN); //fits sand but not earth
+            //fg = RGB::named(rltk::X11_GRAY);
+            //fg = RGB::named(rltk::LIGHT_GREY);
+            //fg = RGB::from_f32(0.6, 0.6, 0.6); //nice gray
+            //fg = RGB::from_f32(0.5, 0.43, 0.41);
+            fg = RGB::from_f32(0.5, 0.47, 0.45);
         }
         TileType::Wall => {
             let x = idx as i32 % map.width;
             let y = idx as i32 / map.width;
             glyph = wall_glyph(&*map, x, y);
-            fg = RGB::from_f32(0., 1.0, 0.);
+            fg = RGB::named(rltk::LIGHT_GREY);
+            //fg = RGB::from_f32(1.0, 1.0, 1.0);
         }
         TileType::DownStairs => {
             glyph = rltk::to_cp437('>');
-            fg = RGB::from_f32(0., 1.0, 1.0);
+            fg = RGB::named(rltk::LIGHT_GREY);
+            //fg = RGB::from_f32(1.0, 1.0, 1.0);
         }
     }
     //grayscale out of FOV

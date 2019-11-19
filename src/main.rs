@@ -387,7 +387,7 @@ pub fn main() {
 
     gs.generate_world();
 
-    gs.ecs.insert(gamelog::GameLog{ entries : vec!["Welcome to Rusty Roguelike".to_string()] });
+    gs.ecs.insert(gamelog::GameLog{ entries : vec!["Welcome to Neon Twilight".to_string()] });
     gs.ecs.insert(particle_system::ParticleBuilder::new());
 
     //register html buttons
