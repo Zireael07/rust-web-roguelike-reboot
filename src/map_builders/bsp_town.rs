@@ -98,7 +98,7 @@ impl BSPTownBuilder {
                     }
                 }
             }
-            build_data.take_snapshot();
+            //build_data.take_snapshot();
 
             for y in room.y1+1 .. room.y2-1 {
                 for x in room.x1+1 .. room.x2-1 {
@@ -106,6 +106,29 @@ impl BSPTownBuilder {
                     if idx > 0 && idx < ((build_data.map.width * build_data.map.height)-1) as usize {
                         build_data.map.tiles[idx] = TileType::Floor;
                     }
+                }
+            }
+            build_data.take_snapshot();
+
+            //build doors
+            let cent = room.center();
+            let door_direction = rng.roll_dice(1, 4);
+            match door_direction {
+                1 => { 
+                    let idx = build_data.map.xy_idx(cent.0, room.y1); //north
+                    build_data.map.tiles[idx] = TileType::Floor;
+                }
+                2 => { 
+                    let idx = build_data.map.xy_idx(cent.0, room.y2-1); //south
+                    build_data.map.tiles[idx] = TileType::Floor;
+                }
+                3 => { 
+                    let idx = build_data.map.xy_idx(room.x1, cent.1); //west
+                    build_data.map.tiles[idx] = TileType::Floor;
+                }
+                _ => { 
+                    let idx = build_data.map.xy_idx(room.x2-1, cent.1); //east
+                    build_data.map.tiles[idx] = TileType::Floor;
                 }
             }
             build_data.take_snapshot();
