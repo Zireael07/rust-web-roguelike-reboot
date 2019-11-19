@@ -37,7 +37,7 @@ impl NoiseMapBuilder {
                     build_data.map.tiles[idx] = TileType::Floor;
                     //self.colors[idx] = RGB::from_f32(0.0, 0.0, 1.0 - (0.0 - n));
                 } else {
-                    build_data.map.tiles[idx] = TileType::Wall;
+                    build_data.map.tiles[idx] = TileType::Tree;
                     //self.colors[idx] = RGB::from_f32(0.0, n, 0.0);
                 }
             }

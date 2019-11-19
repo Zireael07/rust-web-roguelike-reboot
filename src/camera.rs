@@ -130,6 +130,10 @@ fn get_tile_glyph(idx: usize, map : &Map) -> (u8, RGB, RGB) {
             fg = RGB::named(rltk::LIGHT_GREY);
             //fg = RGB::from_f32(1.0, 1.0, 1.0);
         }
+        TileType::Tree => {
+            glyph = rltk::to_cp437('♣'); 
+            fg = RGB::from_f32(0.0, 0.6, 0.0);
+        }
         TileType::DownStairs => {
             glyph = rltk::to_cp437('>');
             fg = RGB::named(rltk::LIGHT_GREY);

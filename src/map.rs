@@ -8,6 +8,7 @@ use specs::prelude::*;
 #[derive(PartialEq, Copy, Clone)]
 pub enum TileType {
     Wall,
+    Tree,
     Floor,
     DownStairs,
 }
@@ -63,7 +64,7 @@ impl Map {
 
     pub fn populate_blocked(&mut self) {
         for (i,tile) in self.tiles.iter_mut().enumerate() {
-            self.blocked[i] = *tile == TileType::Wall;
+            self.blocked[i] = !tile_walkable(*tile);
         }
     }
 
@@ -116,8 +117,7 @@ impl Map {
 impl BaseMap for Map {
     fn is_opaque(&self, idx:i32) -> bool {
         if idx > 0 {
-            let ret = self.tiles[idx as usize] == TileType::Wall;
-            return ret;
+            return tile_opaque(self.tiles[idx as usize]);
         }
         //paranoia just in case
         else {
@@ -160,5 +160,22 @@ impl Algorithm2D for Map {
 
     fn index_to_point2d(&self, idx:i32) -> Point {
         Point{ x: idx % self.width, y: idx / self.width }
+    }
+}
+
+//helpers
+pub fn tile_walkable(tt : TileType) -> bool {
+    match tt {
+        TileType::Floor | TileType::DownStairs 
+            => true,
+        _ => false        
+    }
+}
+
+pub fn tile_opaque(tt : TileType) -> bool {
+    match tt {
+        TileType::Wall | TileType::Tree 
+            => true,
+        _ => false
     }
 }
