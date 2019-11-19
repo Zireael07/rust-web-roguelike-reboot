@@ -68,6 +68,7 @@ pub struct BuilderMap {
     pub starting_position : Option<Position>,
     pub rooms: Option<Vec<Rect>>,
     pub corridors: Option<Vec<Vec<usize>>>,
+    pub submaps: Option<Vec<Rect>>, //not reusing rooms because some submaps have rooms themselves...
     pub history : Vec<Map>,
     pub width: i32,
     pub height: i32
@@ -102,6 +103,7 @@ impl BuilderChain {
                 starting_position: None,
                 rooms: None,
                 corridors: None,
+                submaps: None,
                 history : Vec::new(),
                 width,
                 height
@@ -194,19 +196,19 @@ pub fn random_builder(rng: &mut rltk::RandomNumberGenerator, width: i32, height:
 
 
     //show off
-    // let mut builder = BuilderChain::new(width, height);
-    // builder.start_with(NoiseMapBuilder::new());
-    // builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
-    // //builder.with(CullUnreachable::new()); culling not implemented yet
-    // builder.with(VoronoiSpawning::new());
-    // builder.with(RectBuilder::new());
-    // //builder.with(PrefabBuilder::sectional(prefab_builders::prefab_sections::UNDERGROUND_FORT));
-    // builder
-
     let mut builder = BuilderChain::new(width, height);
-    builder.start_with(BSPTownBuilder::new());
+    builder.start_with(NoiseMapBuilder::new());
     builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
+    //builder.with(CullUnreachable::new()); culling not implemented yet
     builder.with(VoronoiSpawning::new());
+    builder.with(RectBuilder::new());
+    //builder.with(PrefabBuilder::sectional(prefab_builders::prefab_sections::UNDERGROUND_FORT));
     builder
+
+    // let mut builder = BuilderChain::new(width, height);
+    // builder.start_with(BSPTownBuilder::new());
+    // builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
+    // builder.with(VoronoiSpawning::new());
+    // builder
 
 }

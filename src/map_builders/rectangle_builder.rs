@@ -22,12 +22,14 @@ impl RectBuilder {
         let row_floors = self.unbroken_floors_per_row(floors);
         let rect = self.largest_area_rect(row_floors); // x, y, h, w
 
+        //submaps setup
+        let mut submaps : Vec<Rect> = Vec::new();
+        submaps.push(Rect::new(rect.0, rect.1, rect.3, rect.2));
+        build_data.submaps = Some(submaps);
+        console::log(format!("Submaps: {:?}", build_data.submaps));
 
         //here comes nothing...
-        console::log(format!("Y {:?}-{:?} X:{:?}-{:?}", rect.1, rect.1+rect.2, rect.0, rect.0+rect.3));
-
-        //let idx = build_data.map.xy_idx(rect.0, rect.1);
-        //build_data.map.tiles[idx] = TileType::DownStairs;
+        //console::log(format!("Y {:?}-{:?} X:{:?}-{:?}", rect.1, rect.1+rect.2, rect.0, rect.0+rect.3));
 
         //paranoia
         let max_y = if rect.1+rect.2 < build_data.map.height { rect.1 + rect.2 } else { build_data.map.height };
