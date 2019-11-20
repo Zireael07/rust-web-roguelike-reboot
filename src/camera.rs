@@ -54,8 +54,10 @@ pub fn render_camera(ecs: &World, ctx : &mut Rltk) {
     let positions = ecs.read_storage::<Position>();
     let renderables = ecs.read_storage::<Renderable>();
 
-    // Render the player @ symbol
-    for (pos, render) in (&positions, &renderables).join() {
+    let mut data = (&positions, &renderables).join().collect::<Vec<_>>();
+    //sort by render order
+    data.sort_by(|&a, &b| b.1.render_order.cmp(&a.1.render_order) );
+    for (pos, render) in data.iter() {
         let idx = map.xy_idx(pos.x, pos.y);
         if map.visible_tiles[idx] { 
             let entity_screen_x = pos.x - min_x;

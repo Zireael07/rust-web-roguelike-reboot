@@ -91,6 +91,7 @@ fn get_renderable_component(renderable : &super::item_structs::Renderable) -> cr
         glyph: rltk::to_cp437(renderable.glyph.chars().next().unwrap()),
         fg : rltk::RGB::from_hex(&renderable.fg).expect("Invalid RGB"),
         bg : rltk::RGB::from_hex(&renderable.bg).expect("Invalid RGB"),
+        render_order : renderable.order,
     }
 }
 

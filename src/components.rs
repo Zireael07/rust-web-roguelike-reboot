@@ -13,6 +13,7 @@ pub struct Renderable {
     pub glyph: u8,
     pub fg: RGB,
     pub bg: RGB,
+    pub render_order : i32
 }
 
 //the name comes from cartography, ie. 'what do I see?'

@@ -15,7 +15,8 @@ pub struct Item {
 pub struct Renderable {
     pub glyph: String,
     pub fg : String,
-    pub bg : String
+    pub bg : String,
+    pub order: i32
 }
 
 #[derive(Deserialize, Debug)]
