@@ -1,5 +1,5 @@
 use specs::prelude::*;
-use super::{Map,TileType,Position,Renderable};
+use super::{Map,TileType,Position,Renderable, Hidden};
 use rltk::{Point, Rltk, Console, RGB};
 
 const SHOW_BOUNDARIES : bool = true;
@@ -53,11 +53,13 @@ pub fn render_camera(ecs: &World, ctx : &mut Rltk) {
     //render entities
     let positions = ecs.read_storage::<Position>();
     let renderables = ecs.read_storage::<Renderable>();
+    let hidden = ecs.read_storage::<Hidden>();
 
-    let mut data = (&positions, &renderables).join().collect::<Vec<_>>();
+    //draw everything that's not hidden
+    let mut data = (&positions, &renderables, !&hidden).join().collect::<Vec<_>>();
     //sort by render order
     data.sort_by(|&a, &b| b.1.render_order.cmp(&a.1.render_order) );
-    for (pos, render) in data.iter() {
+    for (pos, render, _hidden) in data.iter() {
         let idx = map.xy_idx(pos.x, pos.y);
         if map.visible_tiles[idx] { 
             let entity_screen_x = pos.x - min_x;

@@ -1,6 +1,7 @@
 extern crate specs;
 use specs::prelude::*;
-use super::{RunState, Viewshed, Position, Map, Monster, Name, WantsToMelee, Confusion, particle_system::ParticleBuilder};
+use super::{RunState, Viewshed, Position, Map, Monster, Name, WantsToMelee, Confusion, EntityMoved,
+     particle_system::ParticleBuilder};
 extern crate rltk;
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{field_of_view, Point, console};
@@ -20,12 +21,13 @@ impl<'a> System<'a> for NPCAI {
                         WriteStorage<'a, Position>,
                         WriteStorage<'a, WantsToMelee>,
                         WriteStorage<'a, Confusion>,
-                        WriteExpect<'a, ParticleBuilder>
+                        WriteExpect<'a, ParticleBuilder>,
+                        WriteStorage<'a, EntityMoved>
                     );
 
     fn run(&mut self, data : Self::SystemData) {
         let (mut map, player_pos, player_entity, runstate, entities, mut viewshed, monster, mut position, mut wants_to_melee, 
-            mut confused, mut particle_builder) = data;
+            mut confused, mut particle_builder, mut entity_moved) = data;
 
         //do nothing if not our turn
         if *runstate != RunState::MonsterTurn { return; }
@@ -67,6 +69,7 @@ impl<'a> System<'a> for NPCAI {
                     if path.success && path.steps.len()>1 {
                         pos.x = path.steps[1] % map.width;
                         pos.y = path.steps[1] / map.width;
+                        entity_moved.insert(entity, EntityMoved{}).expect("Unable to insert marker");
                         viewshed.dirty = true;
                     }
                 }

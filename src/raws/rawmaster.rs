@@ -13,15 +13,17 @@ pub enum SpawnType {
 pub struct RawMaster {
     raws : Raws,
     item_index : HashMap<String, usize>,
-    mob_index : HashMap<String, usize>
+    mob_index : HashMap<String, usize>,
+    prop_index : HashMap<String, usize>
 }
 
 impl RawMaster {
     pub fn empty() -> RawMaster {
         RawMaster {
-            raws : Raws{ items: Vec::new(), mobs: Vec::new(), spawn_table: Vec::new() },
+            raws : Raws{ items: Vec::new(), mobs: Vec::new(), props: Vec::new(), spawn_table: Vec::new() },
             item_index : HashMap::new(),
-            mob_index : HashMap::new()
+            mob_index : HashMap::new(),
+            prop_index : HashMap::new()
         }
     }
 
@@ -42,6 +44,13 @@ impl RawMaster {
                 console::log(&format!("WARNING -  duplicate mob name in raws [{}]", mob.name));
             }
             used_names.insert(mob.name.clone());
+        }
+        for (i,prop) in self.raws.props.iter().enumerate() {
+            self.prop_index.insert(prop.name.clone(), i);
+            if used_names.contains(&prop.name) {
+                console::log(&format!("WARNING -  duplicate mob name in raws [{}]", prop.name));
+            }
+            used_names.insert(prop.name.clone());
         }
         // print error if doesn't exist
         for spawn in self.raws.spawn_table.iter() {
@@ -100,6 +109,8 @@ pub fn spawn_named_entity(raws: &RawMaster, new_entity : EntityBuilder, key : &s
         return spawn_named_item(raws, new_entity, key, pos);
     } else if raws.mob_index.contains_key(key) {
         return spawn_named_mob(raws, new_entity, key, pos);
+    } else if raws.prop_index.contains_key(key) {
+        return spawn_named_prop(raws, new_entity, key, pos);
     }
 
     None
@@ -182,6 +193,42 @@ pub fn spawn_named_mob(raws: &RawMaster, new_entity : EntityBuilder, key : &str,
             defense : mob_template.stats.defense
         });
         eb = eb.with(Viewshed{ visible_tiles : Vec::new(), range: mob_template.vision_range, dirty: true });
+
+        return Some(eb.build());
+    }
+    None
+}
+
+pub fn spawn_named_prop(raws: &RawMaster, new_entity : EntityBuilder, key : &str, pos : SpawnType) -> Option<Entity> {
+    if raws.prop_index.contains_key(key) {
+        let prop_template = &raws.raws.props[raws.prop_index[key]];
+
+        let mut eb = new_entity;
+
+        // Spawn in the specified location
+        eb = spawn_position(pos, eb);
+
+        // Renderable
+        if let Some(renderable) = &prop_template.renderable {
+            eb = eb.with(get_renderable_component(renderable));
+        }
+
+        eb = eb.with(Name{ name : prop_template.name.clone() });
+
+        if let Some(hidden) = prop_template.hidden {
+            if hidden { eb = eb.with(Hidden{}) };
+        }
+        if let Some(entry_trigger) = &prop_template.entry_trigger {
+            eb = eb.with(EntryTrigger{});
+            for effect in entry_trigger.effects.iter() {
+                match effect.0.as_str() {
+                    "damage" => { eb = eb.with(InflictsDamage{ damage : effect.1.parse::<i32>().unwrap() }) }
+                    "single_activation" => { eb = eb.with(SingleActivation{}) }
+                    _ => {}
+                }
+            }
+        }
+        
 
         return Some(eb.build());
     }

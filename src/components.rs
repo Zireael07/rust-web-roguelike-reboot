@@ -114,6 +114,18 @@ pub struct DefenseBonus {
     pub defense : i32
 }
 
+#[derive(Component, Debug, Clone)]
+pub struct Hidden {}
+
+#[derive(Component, Debug, Clone)]
+pub struct EntryTrigger {}
+
+#[derive(Component, Debug, Clone)]
+pub struct SingleActivation {}
+
+#[derive(Component, Debug, Clone)]
+pub struct EntityMoved {}
+
 //components representing intent
 #[derive(Component, Debug)]
 pub struct WantsToPickupItem {

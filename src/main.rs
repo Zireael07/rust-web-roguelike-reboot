@@ -38,6 +38,8 @@ mod damage_system;
 use damage_system::DamageSystem;
 mod inventory_system;
 use inventory_system::*;
+mod trigger_system;
+use trigger_system::TriggerSystem;
 pub mod random_table;
 pub mod particle_system;
 
@@ -250,6 +252,9 @@ impl State {
         //indexing needs to run after AI and before combat, so that combat knows the new positions
         let mut mapindex = MapIndexingSystem{};
         mapindex.run_now(&self.ecs);
+        //needs to go before combat, because it can deal damage too
+        let mut triggers = trigger_system::TriggerSystem{};
+        triggers.run_now(&self.ecs);
         let mut melee = MeleeCombatSystem{};
         melee.run_now(&self.ecs);
         let mut damage = DamageSystem{};
@@ -375,6 +380,10 @@ pub fn main() {
     gs.ecs.register::<Equipped>();
     gs.ecs.register::<MeleePowerBonus>();
     gs.ecs.register::<DefenseBonus>();
+    gs.ecs.register::<Hidden>();
+    gs.ecs.register::<EntryTrigger>();
+    gs.ecs.register::<SingleActivation>();
+    gs.ecs.register::<EntityMoved>();
     gs.ecs.register::<ParticleLifetime>();
     gs.ecs.register::<Player>();
 

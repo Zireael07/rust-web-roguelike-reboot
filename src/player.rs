@@ -1,7 +1,7 @@
 use rltk::{VirtualKeyCode, Rltk, Point};
 use specs::prelude::*;
 use super::{Position, Player, Viewshed, CombatStats, WantsToMelee, 
-    TileType, State, Map, RunState, Entity, Item, WantsToPickupItem,
+    TileType, State, Map, RunState, Entity, Item, WantsToPickupItem, EntityMoved,
     gamelog::GameLog};
 use std::cmp::{min, max};
 //console is RLTK's wrapper around either println or the web console macro
@@ -23,6 +23,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let entities = ecs.entities();
     let combat_stats = ecs.read_storage::<CombatStats>();
     let mut wants_to_melee = ecs.write_storage::<WantsToMelee>();
+    let mut entity_moved = ecs.write_storage::<EntityMoved>();
     let map = ecs.fetch::<Map>();
 
     for (entity, _player, pos, viewshed) in (&entities, &mut players, &mut positions, &mut viewsheds).join() {
@@ -45,6 +46,8 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
                     pos.x = min(map.width-1, max(0, pos.x + delta_x));
                     pos.y = min(map.height-1, max(0, pos.y + delta_y));
 
+                    entity_moved.insert(entity, EntityMoved{}).expect("Unable to insert marker");
+                    
                     //mark our FoV as dirty after a move
                     viewshed.dirty = true;
 
