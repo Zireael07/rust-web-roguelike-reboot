@@ -17,7 +17,7 @@ pub enum MainMenuResult { NoSelection{ selected : MainMenuSelection }, Selected{
 pub fn main_menu(gs : &mut State, ctx : &mut Rltk) -> MainMenuResult {
     let runstate = gs.ecs.fetch::<RunState>();
 
-    ctx.print_color_centered(15, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), "Rust Roguelike Tutorial");
+    ctx.print_color_centered(15, RGB::named(rltk::CYAN), RGB::named(rltk::BLACK), "Neon Twilight");
     
     if let RunState::MainMenu{ menu_selection : selection } = *runstate {
         if selection == MainMenuSelection::NewGame {
@@ -102,7 +102,7 @@ pub fn main_menu(gs : &mut State, ctx : &mut Rltk) -> MainMenuResult {
 pub enum GameOverResult { NoSelection, QuitToMenu }
 
 pub fn game_over(ctx : &mut Rltk) -> GameOverResult {
-    ctx.print_color_centered(15, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), "Your journey has ended!");
+    ctx.print_color_centered(15, RGB::named(rltk::CYAN), RGB::named(rltk::BLACK), "Your journey has ended!");
     ctx.print_color_centered(17, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), "One day, we'll tell you all about how you did.");
     ctx.print_color_centered(18, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), "That day, sadly, is not in this chapter..");
 
@@ -187,11 +187,11 @@ pub fn draw_ui(ecs: &World, ctx : &mut Rltk) {
     let pos = format!("Player: {:?} ", *player_pos);
     ctx.print_color(50, 10, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), &pos);
 
-    let (min_x, max_x, min_y, max_y) = camera::get_screen_bounds(ecs, ctx);
-    let x_str = format!("X: {:?}-{:?}", min_x, max_x);
-    let y_str = format!("Y: {:?}-{:?}", min_y, max_y);
-    ctx.print_color(50, 11, RGB::named(rltk::LIGHT_BLUE), RGB::named(rltk::BLACK), &x_str);
-    ctx.print_color(50, 12, RGB::named(rltk::LIGHT_BLUE), RGB::named(rltk::BLACK), &y_str);
+    // let (min_x, max_x, min_y, max_y) = camera::get_screen_bounds(ecs, ctx);
+    // let x_str = format!("X: {:?}-{:?}", min_x, max_x);
+    // let y_str = format!("Y: {:?}-{:?}", min_y, max_y);
+    // ctx.print_color(50, 11, RGB::named(rltk::LIGHT_BLUE), RGB::named(rltk::BLACK), &x_str);
+    // ctx.print_color(50, 12, RGB::named(rltk::LIGHT_BLUE), RGB::named(rltk::BLACK), &y_str);
 
     //log
     let log = ecs.fetch::<GameLog>();
@@ -229,8 +229,8 @@ pub fn show_inventory(gs : &mut State, ctx : &mut Rltk) -> (ItemMenuResult,  Opt
     let mut y = (25 - (count / 2)) as i32;
     let mut x = 15;
     ctx.draw_box(x, y-2, 31, (count+3) as i32, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK));
-    ctx.print_color(x+3, y-2, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), "Inventory");
-    ctx.print_color(x+3, y+count as i32+1, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), "ESCAPE to cancel");
+    ctx.print_color(x+3, y-2, RGB::named(rltk::CYAN), RGB::named(rltk::BLACK), "Inventory");
+    ctx.print_color(x+3, y+count as i32+1, RGB::named(rltk::CYAN), RGB::named(rltk::BLACK), "ESCAPE to cancel");
 
     let mut equippable : Vec<Entity> = Vec::new();
     let mut j = 0;
@@ -238,7 +238,7 @@ pub fn show_inventory(gs : &mut State, ctx : &mut Rltk) -> (ItemMenuResult,  Opt
     for (entity, _pack, name) in (&entities, &backpack, &names).join().filter(|item| item.1.owner == *player_entity ) {
         //draw item letter
         ctx.set(x+2, y, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), rltk::to_cp437('('));
-        ctx.set(x+3, y, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), 97+j as u8);
+        ctx.set(x+3, y, RGB::named(rltk::CYAN), RGB::named(rltk::BLACK), 97+j as u8);
         ctx.set(x+4, y, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), rltk::to_cp437(')'));
 
         ctx.print(x+6, y, &name.name.to_string());
@@ -319,14 +319,14 @@ pub fn drop_item_menu(gs : &mut State, ctx : &mut Rltk) -> (ItemMenuResult, Opti
 
     let mut y = (25 - (count / 2)) as i32;
     ctx.draw_box(15, y-2, 31, (count+3) as i32, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK));
-    ctx.print_color(18, y-2, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), "Drop Which Item?");
+    ctx.print_color(18, y-2, RGB::named(rltk::CYAN), RGB::named(rltk::BLACK), "Drop Which Item?");
     ctx.print_color(18, y+count as i32+1, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), "ESCAPE to cancel");
 
     let mut equippable : Vec<Entity> = Vec::new();
     let mut j = 0;
     for (entity, _pack, name) in (&entities, &backpack, &names).join().filter(|item| item.1.owner == *player_entity ) {
         ctx.set(17, y, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), rltk::to_cp437('('));
-        ctx.set(18, y, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), 97+j as u8);
+        ctx.set(18, y, RGB::named(rltk::CYAN), RGB::named(rltk::BLACK), 97+j as u8);
         ctx.set(19, y, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), rltk::to_cp437(')'));
 
         ctx.print(21, y, &name.name.to_string());
@@ -363,14 +363,14 @@ pub fn remove_item_menu(gs : &mut State, ctx : &mut Rltk) -> (ItemMenuResult, Op
 
     let mut y = (25 - (count / 2)) as i32;
     ctx.draw_box(15, y-2, 31, (count+3) as i32, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK));
-    ctx.print_color(18, y-2, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), "Remove Which Item?");
+    ctx.print_color(18, y-2, RGB::named(rltk::CYAN), RGB::named(rltk::BLACK), "Remove Which Item?");
     ctx.print_color(18, y+count as i32+1, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), "ESCAPE to cancel");
 
     let mut equippable : Vec<Entity> = Vec::new();
     let mut j = 0;
     for (entity, _pack, name) in (&entities, &backpack, &names).join().filter(|item| item.1.owner == *player_entity ) {
         ctx.set(17, y, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), rltk::to_cp437('('));
-        ctx.set(18, y, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), 97+j as u8);
+        ctx.set(18, y, RGB::named(rltk::CYAN), RGB::named(rltk::BLACK), 97+j as u8);
         ctx.set(19, y, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), rltk::to_cp437(')'));
 
         ctx.print(21, y, &name.name.to_string());
@@ -403,7 +403,7 @@ pub fn ranged_target(gs : &mut State, ctx : &mut Rltk, range : i32) -> (ItemMenu
     let player_pos = gs.ecs.fetch::<Point>();
     let viewsheds = gs.ecs.read_storage::<Viewshed>();
 
-    ctx.print_color(5, 1, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), "Select Target:");
+    ctx.print_color(5, 1, RGB::named(rltk::CYAN), RGB::named(rltk::BLACK), "Select Target:");
 
     // Highlight available target cells
     let mut available_cells = Vec::new();
