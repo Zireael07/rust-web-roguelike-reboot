@@ -51,6 +51,8 @@ mod area_starting_points;
 use area_starting_points::*;
 mod voronoi_spawning;
 use voronoi_spawning::VoronoiSpawning;
+mod door_placement;
+use door_placement::DoorPlacement;
 
 //custom postprocess
 mod rectangle_builder;
@@ -203,6 +205,7 @@ pub fn random_builder(rng: &mut rltk::RandomNumberGenerator, width: i32, height:
     builder.with(VoronoiSpawning::new());
     builder.with(RectBuilder::new());
     builder.with(BSPTownBuilder::new());
+    builder.with(DoorPlacement::new());
     //builder.with(PrefabBuilder::sectional(prefab_builders::prefab_sections::UNDERGROUND_FORT));
     builder
 
