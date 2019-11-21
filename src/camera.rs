@@ -127,6 +127,10 @@ fn get_tile_glyph(idx: usize, map : &Map) -> (u8, RGB, RGB) {
             //fg = RGB::from_f32(0.5, 0.43, 0.41);
             fg = RGB::from_f32(0.5, 0.47, 0.45);
         }
+        TileType::FloorIndoor => {
+            glyph = rltk::to_cp437('.');
+            fg = RGB::from_f32(0.0, 0.5, 0.5);       
+        }
         TileType::Wall => {
             let x = idx as i32 % map.width;
             let y = idx as i32 / map.width;

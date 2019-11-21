@@ -10,6 +10,7 @@ pub enum TileType {
     Wall,
     Tree,
     Floor,
+    FloorIndoor,
     DownStairs,
 }
 
@@ -166,7 +167,7 @@ impl Algorithm2D for Map {
 //helpers
 pub fn tile_walkable(tt : TileType) -> bool {
     match tt {
-        TileType::Floor | TileType::DownStairs 
+        TileType::Floor | TileType::FloorIndoor | TileType::DownStairs 
             => true,
         _ => false        
     }

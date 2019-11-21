@@ -138,7 +138,7 @@ impl BSPTownBuilder {
                 for x in room.x1+1 .. room.x2-1 {
                     let idx = build_data.map.xy_idx(x, y);
                     if idx > 0 && idx < ((build_data.map.width * build_data.map.height)-1) as usize {
-                        build_data.map.tiles[idx] = TileType::Floor;
+                        build_data.map.tiles[idx] = TileType::FloorIndoor;
                     }
                 }
             }
