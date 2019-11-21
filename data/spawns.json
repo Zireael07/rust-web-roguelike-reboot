@@ -153,6 +153,19 @@
                     "single_activation" : "1"
                 }
             }
+        },
+        {
+            "name" : "Door",
+            "renderable": {
+                "glyph" : "+",
+                "fg" : "#D3D3D3",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "hidden" : false,
+            "blocks_tile" : true,
+            "blocks_visibility" : true,
+            "door_open" : true
         }
     ]
 }

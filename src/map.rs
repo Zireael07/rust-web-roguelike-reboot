@@ -2,6 +2,7 @@ use rltk::{ RGB, Rltk, Console, BaseMap, Algorithm2D, Point };
 use std::cmp::{max, min};
 extern crate specs;
 use specs::prelude::*;
+use std::collections::HashSet;
 
 // We'll allow map tiles to be either a wall or a floor. We're deriving PartialEq so we don't
 // have to match on it every time. We'll make it a copy type because it's really just an int.
@@ -25,6 +26,7 @@ pub struct Map {
     pub revealed_tiles : Vec<bool>,
     pub visible_tiles : Vec<bool>,
     pub blocked : Vec<bool>,
+    pub view_blocked : HashSet<usize>,
     pub tile_content : Vec<Vec<Entity>>
 }
 
@@ -52,6 +54,7 @@ impl Map {
             revealed_tiles : vec![false; map_count],
             visible_tiles : vec![false; map_count],
             blocked : vec![false; map_count],
+            view_blocked : HashSet::new(),
             tile_content : vec![Vec::new(); map_count],
         }
     }
@@ -117,8 +120,9 @@ impl Map {
 //implementing RLTK traits
 impl BaseMap for Map {
     fn is_opaque(&self, idx:i32) -> bool {
+        let idx_u = idx as usize;
         if idx > 0 {
-            return tile_opaque(self.tiles[idx as usize]);
+            return tile_opaque(self.tiles[idx_u]) || self.view_blocked.contains(&idx_u);
         }
         //paranoia just in case
         else {

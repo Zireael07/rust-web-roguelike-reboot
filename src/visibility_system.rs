@@ -1,6 +1,6 @@
 extern crate specs;
 use specs::prelude::*;
-use super::{Viewshed, Position, Map, Player, Name,
+use super::{Viewshed, Position, Map, Player, Name, BlocksVisibility,
     Hidden, gamelog::GameLog};
 extern crate rltk;
 use rltk::{field_of_view, Point, RandomNumberGenerator};
@@ -17,13 +17,21 @@ impl<'a> System<'a> for VisibilitySystem {
                         WriteStorage<'a, Hidden>,
                         WriteExpect<'a, rltk::RandomNumberGenerator>,
                         WriteExpect<'a, GameLog>,
-                        ReadStorage<'a, Name>
+                        ReadStorage<'a, Name>,
+                        ReadStorage<'a, BlocksVisibility>
                     );
 
     fn run(&mut self, data : Self::SystemData) {
         let (mut map, entities, mut viewshed, pos, player,
-            mut hidden, mut rng, mut log, names) = data;
+            mut hidden, mut rng, mut log, names, blocks_visibility) = data;
 
+        //find all stuff that blocks visibility
+        map.view_blocked.clear();
+        for (block_pos, _block) in (&pos, &blocks_visibility).join() {
+            let idx = map.xy_idx(block_pos.x, block_pos.y);
+            map.view_blocked.insert(idx);
+        }
+        
         for (ent,viewshed,pos) in (&entities, &mut viewshed, &pos).join() {
             if viewshed.dirty {                
                 viewshed.dirty = false;

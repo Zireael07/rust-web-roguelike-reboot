@@ -228,6 +228,15 @@ pub fn spawn_named_prop(raws: &RawMaster, new_entity : EntityBuilder, key : &str
                 }
             }
         }
+        if let Some(blocks_tile) = prop_template.blocks_tile {
+            if blocks_tile { eb = eb.with(BlocksTile{}) };
+        }
+        if let Some(blocks_visibility) = prop_template.blocks_visibility {
+            if blocks_visibility { eb = eb.with(BlocksVisibility{}) };
+        }
+        if let Some(door_open) = prop_template.door_open {
+            eb = eb.with(Door{ open: door_open });
+        }
         
 
         return Some(eb.build());

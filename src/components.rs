@@ -124,6 +124,14 @@ pub struct EntryTrigger {}
 pub struct SingleActivation {}
 
 #[derive(Component, Debug, Clone)]
+pub struct BlocksVisibility {}
+
+#[derive(Component, Debug, Clone)]
+pub struct Door { 
+    pub open: bool 
+}
+
+#[derive(Component, Debug, Clone)]
 pub struct EntityMoved {}
 
 //components representing intent

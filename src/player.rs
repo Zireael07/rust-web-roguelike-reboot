@@ -2,7 +2,7 @@ use rltk::{VirtualKeyCode, Rltk, Point};
 use specs::prelude::*;
 use super::{Position, Player, Viewshed, CombatStats, WantsToMelee, 
     TileType, State, Map, RunState, Entity, Item, WantsToPickupItem, EntityMoved,
-    gamelog::GameLog};
+    Door, BlocksVisibility, BlocksTile, Renderable, gamelog::GameLog};
 use std::cmp::{min, max};
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{console};
@@ -11,12 +11,6 @@ use rltk::{console};
 // requested by the player. We calculate the new coordinates,
 // and if it is a floor - move the player there.
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
-    // let current_position = idx_xy(self.player_position);
-    // let new_position = (current_position.0 + delta_x, current_position.1 + delta_y);
-    // let new_idx = xy_idx(new_position.0, new_position.1);
-    // if self.map[new_idx] == TileType::Floor {
-    //     self.player_position = new_idx;
-    // }
     let mut positions = ecs.write_storage::<Position>();
     let mut players = ecs.write_storage::<Player>();
     let mut viewsheds = ecs.write_storage::<Viewshed>();
@@ -25,6 +19,11 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut wants_to_melee = ecs.write_storage::<WantsToMelee>();
     let mut entity_moved = ecs.write_storage::<EntityMoved>();
     let map = ecs.fetch::<Map>();
+    //doors
+    let mut doors = ecs.write_storage::<Door>();
+    let mut blocks_visibility = ecs.write_storage::<BlocksVisibility>();
+    let mut blocks_movement = ecs.write_storage::<BlocksTile>();
+    let mut renderables = ecs.write_storage::<Renderable>();
 
     for (entity, _player, pos, viewshed) in (&entities, &mut players, &mut positions, &mut viewsheds).join() {
         //paranoia
@@ -38,6 +37,16 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
                         wants_to_melee.insert(entity, WantsToMelee{ target: *potential_target }).expect("Add target failed");
                         //console::log(&format!("We want to melee: {:?}", target));
                         return;
+                    }
+                    let door = doors.get_mut(*potential_target);
+                    if let Some(door) = door {
+                        //unblock visibility, movement and change the glyph
+                        door.open = true;
+                        blocks_visibility.remove(*potential_target);
+                        blocks_movement.remove(*potential_target);
+                        let glyph = renderables.get_mut(*potential_target).unwrap();
+                        glyph.glyph = rltk::to_cp437('/');
+                        viewshed.dirty = true;
                     }
                 }
 

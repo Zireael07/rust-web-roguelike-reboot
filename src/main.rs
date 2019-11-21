@@ -384,6 +384,8 @@ pub fn main() {
     gs.ecs.register::<EntryTrigger>();
     gs.ecs.register::<SingleActivation>();
     gs.ecs.register::<EntityMoved>();
+    gs.ecs.register::<BlocksVisibility>();
+    gs.ecs.register::<Door>();
     gs.ecs.register::<ParticleLifetime>();
     gs.ecs.register::<Player>();
 
