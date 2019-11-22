@@ -27,6 +27,7 @@ pub struct Map {
     pub visible_tiles : Vec<bool>,
     pub blocked : Vec<bool>,
     pub view_blocked : HashSet<usize>,
+    pub light : Vec<rltk::RGB>,
     pub tile_content : Vec<Vec<Entity>>
 }
 
@@ -55,6 +56,7 @@ impl Map {
             visible_tiles : vec![false; map_count],
             blocked : vec![false; map_count],
             view_blocked : HashSet::new(),
+            light: vec![rltk::RGB::from_f32(0.0, 0.0, 0.0); map_count],
             tile_content : vec![Vec::new(); map_count],
         }
     }

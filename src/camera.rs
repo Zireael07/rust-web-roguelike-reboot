@@ -150,6 +150,11 @@ fn get_tile_glyph(idx: usize, map : &Map) -> (u8, RGB, RGB) {
     }
     //grayscale out of FOV
     if !map.visible_tiles[idx] { fg = fg.to_greyscale() }
+    else { 
+        //apply ambient lighting
+        fg = fg * map.light[idx];
+        bg = bg * map.light[idx];
+    }
     //return all the data necessary to draw
     (glyph, fg, bg)
 }

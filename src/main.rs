@@ -42,6 +42,7 @@ mod trigger_system;
 use trigger_system::TriggerSystem;
 pub mod random_table;
 pub mod particle_system;
+pub mod lighting_system;
 
 //load json data
 pub mod raws;
@@ -271,6 +272,8 @@ impl State {
         //goes last because nearly anything can in theory produce one of those
         let mut particles = particle_system::ParticleSpawnSystem{};
         particles.run_now(&self.ecs);
+        let mut lighting = lighting_system::LightingSystem{};
+        lighting.run_now(&self.ecs);
         self.ecs.maintain();
     }
 }
@@ -386,6 +389,7 @@ pub fn main() {
     gs.ecs.register::<EntityMoved>();
     gs.ecs.register::<BlocksVisibility>();
     gs.ecs.register::<Door>();
+    gs.ecs.register::<LightSource>();
     gs.ecs.register::<ParticleLifetime>();
     gs.ecs.register::<Player>();
 

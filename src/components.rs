@@ -131,6 +131,12 @@ pub struct Door {
     pub open: bool 
 }
 
+#[derive(Component, Clone)]
+pub struct LightSource {
+    pub color : RGB,
+    pub range: i32
+}
+
 #[derive(Component, Debug, Clone)]
 pub struct EntityMoved {}
 
