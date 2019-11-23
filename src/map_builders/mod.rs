@@ -200,7 +200,7 @@ pub fn random_builder(rng: &mut rltk::RandomNumberGenerator, width: i32, height:
     //show off
     let mut builder = BuilderChain::new(width, height);
     builder.start_with(NoiseMapBuilder::new());
-    builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
+    //builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
     //builder.with(CullUnreachable::new()); culling not implemented yet
     builder.with(VoronoiSpawning::new());
     builder.with(RectBuilder::new());

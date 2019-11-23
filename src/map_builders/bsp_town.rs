@@ -1,4 +1,4 @@
-use super::{InitialMapBuilder, MetaMapBuilder, BuilderMap, Rect, TileType };
+use super::{InitialMapBuilder, MetaMapBuilder, BuilderMap, Rect, TileType, Position };
 use rltk::RandomNumberGenerator;
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{console};
@@ -29,6 +29,13 @@ impl MetaMapBuilder for BSPTownBuilder {
 
         self.build(rng, build_data);
     }
+}
+
+#[derive(Debug)]
+enum BuildingTag {
+    Pub,
+    Hovel,
+    Unassigned,
 }
 
 impl BSPTownBuilder {
@@ -167,6 +174,74 @@ impl BSPTownBuilder {
             }
             build_data.take_snapshot();
         }
+
+        let building_size = self.sort_buildings(&rooms_copy);
+        console::log(format!("Buildings sorted: {:?}", building_size));
+        self.building_factory(rng, build_data, &rooms_copy, &building_size);
+    }
+
+    fn sort_buildings(&mut self, buildings: &Vec<Rect>) -> Vec<(usize, i32, BuildingTag)> 
+    {
+        let mut building_size : Vec<(usize, i32, BuildingTag)> = Vec::new();
+        for (i,building) in buildings.iter().enumerate() {
+            let rect_width = i32::abs(building.x1 - building.x2);
+            let rect_height = i32::abs(building.y1 - building.y2);
+            building_size.push((
+                i,
+                rect_height * rect_width,
+                BuildingTag::Unassigned
+            ));
+        }
+        building_size.sort_by(|a,b| b.1.cmp(&a.1));
+        building_size[0].2 = BuildingTag::Pub;
+        for b in building_size.iter_mut().skip(1) {
+            b.2 = BuildingTag::Hovel;
+        }
+
+        building_size
+    }
+
+    fn building_factory(&mut self, 
+        rng: &mut rltk::RandomNumberGenerator, 
+        build_data : &mut BuilderMap, 
+        buildings: &Vec<Rect>, 
+        building_index : &[(usize, i32, BuildingTag)]) 
+    {
+        for (i,building) in buildings.iter().enumerate() {
+            let build_type = &building_index[i].2;
+            match build_type {
+                BuildingTag::Pub => self.build_pub(&building, build_data, rng),
+                _ => {}
+            }
+        }
+    }
+
+    fn build_pub(&mut self, 
+        building: &Rect, 
+        build_data : &mut BuilderMap, 
+        rng: &mut rltk::RandomNumberGenerator) 
+    {
+        // Place the player
+        let cent = building.center();
+        build_data.starting_position = Some(Position{
+            x : cent.0,
+            y : cent.1
+        });
+        let player_idx = build_data.map.xy_idx(cent.0, cent.1);
+    
+        // Place other items
+        let mut to_place : Vec<&str> = vec!["Barkeep", "Shady Salesman", "Patron", "Patron", "Keg",
+            "Table", "Chair", "Table", "Chair"];
+        for y in building.y1 .. building.y2 {
+            for x in building.x1 .. building.x2 {
+                let idx = build_data.map.xy_idx(x, y);
+                if build_data.map.tiles[idx] == TileType::FloorIndoor && idx != player_idx && rng.roll_dice(1, 3)==1 && !to_place.is_empty() {
+                    let entity_tag = to_place[0];
+                    to_place.remove(0);
+                    build_data.list_spawns.push((idx, entity_tag.to_string()));
+                }
+            }
+        }
     }
 
     //taken from BSP dungeon...
@@ -221,7 +296,7 @@ impl BSPTownBuilder {
         for r in rooms.iter() {
             if r.intersect(&rect) { 
                 can_build = false; 
-                console::log(&format!("Candidate {:?} overlaps a room {:?}", rect, r));
+                //console::log(&format!("Candidate {:?} overlaps a room {:?}", rect, r));
             }
         }
 
@@ -234,7 +309,7 @@ impl BSPTownBuilder {
                 if can_build {
                     let idx = build_data.map.xy_idx(x, y);
                     if build_data.map.tiles[idx] != TileType::Floor { //key change
-                        console::log(&format!("Candidate {:?} failed the tile check!", rect));
+                        //console::log(&format!("Candidate {:?} failed the tile check!", rect));
                         can_build = false; 
                     }
                 }
