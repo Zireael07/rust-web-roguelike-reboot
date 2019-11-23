@@ -24,8 +24,12 @@ pub struct Viewshed {
     pub dirty : bool
 }
 
+//AI
 #[derive(Component, Debug)]
 pub struct Monster {}
+
+#[derive(Component, Debug, Clone)]
+pub struct Bystander {}
 
 #[derive(Component, Debug)]
 pub struct Name {

@@ -230,7 +230,7 @@ impl BSPTownBuilder {
         let player_idx = build_data.map.xy_idx(cent.0, cent.1);
     
         // Place other items
-        let mut to_place : Vec<&str> = vec!["Barkeep", "Shady Salesman", "Patron", "Patron", "Keg",
+        let mut to_place : Vec<&str> = vec!["Barkeep", "Shady Salesman", "Patron", "Patron",
             "Table", "Chair", "Table", "Chair"];
         for y in building.y1 .. building.y2 {
             for x in building.x1 .. building.x2 {

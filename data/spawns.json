@@ -117,7 +117,8 @@
                 "defense" : 1,
                 "power" : 4
             },
-            "vision_range" : 8
+            "vision_range" : 8,
+            "ai" : "bystander"
         },
     
         {
@@ -135,7 +136,63 @@
                 "defense" : 1,
                 "power" : 3
             },
-            "vision_range" : 8
+            "vision_range" : 8,
+            "ai" : "melee"
+        },
+        {
+            "name" : "Barkeep",
+            "renderable": {
+                "glyph" : "☺",
+                "fg" : "#EE82EE",
+                "bg" : "#000000",
+                "order" : 1
+            },
+            "blocks_tile" : true,
+            "stats" : {
+                "max_hp" : 16,
+                "hp" : 16,
+                "defense" : 1,
+                "power" : 4
+            },
+            "vision_range" : 4,
+            "ai" : "bystander"
+        },
+        {
+            "name" : "Shady Salesman",
+            "renderable": {
+                "glyph" : "v",
+                "fg" : "#EE82EE",
+                "bg" : "#000000",
+                "order" : 1
+            },
+            "blocks_tile" : true,
+            "stats" : {
+                "max_hp" : 16,
+                "hp" : 16,
+                "defense" : 1,
+                "power" : 4
+            },
+            "vision_range" : 4,
+            "ai" : "bystander"
+        },
+        
+        {
+            "name" : "Patron",
+            "renderable": {
+                "glyph" : "☺",
+                "fg" : "#AAAAAA",
+                "bg" : "#000000",
+                "order" : 1
+            },
+            "blocks_tile" : true,
+            "stats" : {
+                "max_hp" : 16,
+                "hp" : 16,
+                "defense" : 1,
+                "power" : 4
+            },
+            "vision_range" : 4,
+            "ai" : "bystander"
         }
     ],
     "props" : [
@@ -181,6 +238,27 @@
                 "range" : 6,
                 "color" : "#55FFDA"
             }
+        },
+        {
+            "name" : "Table",
+            "renderable": {
+                "glyph" : "╦",
+                "fg" : "#AAAAAA",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "hidden" : false
+        },
+        
+        {
+            "name" : "Chair",
+            "renderable": {
+                "glyph" : "└",
+                "fg" : "#AAAAAA",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "hidden" : false
         }
     ]
 }
