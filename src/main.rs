@@ -28,6 +28,8 @@ use visibility_system::VisibilitySystem;
 #[allow(non_snake_case)]
 mod NPC_ai_system;
 use NPC_ai_system::NPCAI;
+mod bystander_ai_system;
+use bystander_ai_system::BystanderAI;
 mod spawner;
 pub mod map_builders;
 mod map_indexing_system;
@@ -253,6 +255,8 @@ impl State {
         //indexing needs to run after AI and before combat, so that combat knows the new positions
         let mut mapindex = MapIndexingSystem{};
         mapindex.run_now(&self.ecs);
+        let mut bystander = BystanderAI{};
+        bystander.run_now(&self.ecs);
         //needs to go before combat, because it can deal damage too
         let mut triggers = trigger_system::TriggerSystem{};
         triggers.run_now(&self.ecs);
@@ -363,6 +367,7 @@ pub fn main() {
     gs.ecs.register::<Viewshed>();
     gs.ecs.register::<Monster>();
     gs.ecs.register::<Bystander>();
+    gs.ecs.register::<Vendor>();
     gs.ecs.register::<Name>();
     gs.ecs.register::<BlocksTile>();
     gs.ecs.register::<CombatStats>();

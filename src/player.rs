@@ -2,7 +2,7 @@ use rltk::{VirtualKeyCode, Rltk, Point};
 use specs::prelude::*;
 use super::{Position, Player, Viewshed, CombatStats, WantsToMelee, 
     TileType, State, Map, RunState, Entity, Item, WantsToPickupItem, EntityMoved,
-    Door, BlocksVisibility, BlocksTile, Renderable, Bystander, gamelog::GameLog};
+    Door, BlocksVisibility, BlocksTile, Renderable, Bystander, Vendor, gamelog::GameLog};
 use std::cmp::{min, max};
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{console};
@@ -24,7 +24,9 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut blocks_visibility = ecs.write_storage::<BlocksVisibility>();
     let mut blocks_movement = ecs.write_storage::<BlocksTile>();
     let mut renderables = ecs.write_storage::<Renderable>();
+    //non-hostile NPCs
     let bystanders = ecs.read_storage::<Bystander>();
+    let vendors = ecs.read_storage::<Vendor>();
 
     let mut swap_entities : Vec<(Entity, i32, i32)> = Vec::new();
 
@@ -37,7 +39,8 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
                 //handle move targets
                 for potential_target in map.tile_content[destination_idx].iter() {
                     let bystander = bystanders.get(*potential_target);
-                    if bystander.is_some() {
+                    let vendor = vendors.get(*potential_target);
+                    if bystander.is_some() || vendor.is_some() {
                         // Note that we want to move the bystander
                         swap_entities.push((*potential_target, pos.x, pos.y));
 

@@ -122,9 +122,9 @@
         },
     
         {
-            "name" : "Human",
+            "name" : "Thug",
             "renderable": {
-                "glyph" : "h",
+                "glyph" : "t",
                 "fg" : "#FF0000",
                 "bg" : "#000000",
                 "order" : 1
@@ -155,7 +155,7 @@
                 "power" : 4
             },
             "vision_range" : 4,
-            "ai" : "bystander"
+            "ai" : "vendor"
         },
         {
             "name" : "Shady Salesman",
@@ -173,7 +173,7 @@
                 "power" : 4
             },
             "vision_range" : 4,
-            "ai" : "bystander"
+            "ai" : "vendor"
         },
         
         {

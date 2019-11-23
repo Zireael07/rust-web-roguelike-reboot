@@ -31,6 +31,9 @@ pub struct Monster {}
 #[derive(Component, Debug, Clone)]
 pub struct Bystander {}
 
+#[derive(Component, Debug, Clone)]
+pub struct Vendor {}
+
 #[derive(Component, Debug)]
 pub struct Name {
     pub name : String
