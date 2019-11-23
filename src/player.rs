@@ -2,7 +2,7 @@ use rltk::{VirtualKeyCode, Rltk, Point};
 use specs::prelude::*;
 use super::{Position, Player, Viewshed, CombatStats, WantsToMelee, 
     TileType, State, Map, RunState, Entity, Item, WantsToPickupItem, EntityMoved,
-    Door, BlocksVisibility, BlocksTile, Renderable, gamelog::GameLog};
+    Door, BlocksVisibility, BlocksTile, Renderable, Bystander, gamelog::GameLog};
 use std::cmp::{min, max};
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{console};
@@ -24,19 +24,40 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut blocks_visibility = ecs.write_storage::<BlocksVisibility>();
     let mut blocks_movement = ecs.write_storage::<BlocksTile>();
     let mut renderables = ecs.write_storage::<Renderable>();
+    let bystanders = ecs.read_storage::<Bystander>();
+
+    let mut swap_entities : Vec<(Entity, i32, i32)> = Vec::new();
 
     for (entity, _player, pos, viewshed) in (&entities, &mut players, &mut positions, &mut viewsheds).join() {
         //paranoia
         if (pos.x + delta_x) > 0 && (pos.y + delta_y) > 0 {
             let destination_idx = map.xy_idx(pos.x + delta_x, pos.y + delta_y);
             if destination_idx > 0 && destination_idx < map.tiles.len() {
-                //handle attacking
+
+                //handle move targets
                 for potential_target in map.tile_content[destination_idx].iter() {
-                    let target = combat_stats.get(*potential_target);
-                    if let Some(_target) = target {
-                        wants_to_melee.insert(entity, WantsToMelee{ target: *potential_target }).expect("Add target failed");
-                        //console::log(&format!("We want to melee: {:?}", target));
-                        return;
+                    let bystander = bystanders.get(*potential_target);
+                    if bystander.is_some() {
+                        // Note that we want to move the bystander
+                        swap_entities.push((*potential_target, pos.x, pos.y));
+
+                        // Move the player
+                        pos.x = min(map.width-1 , max(0, pos.x + delta_x));
+                        pos.y = min(map.height-1, max(0, pos.y + delta_y));
+                        entity_moved.insert(entity, EntityMoved{}).expect("Unable to insert marker");
+
+                        viewshed.dirty = true;
+                        let mut ppos = ecs.write_resource::<Point>();
+                        ppos.x = pos.x;
+                        ppos.y = pos.y;
+                    } else {
+                        //handle attacking
+                        let target = combat_stats.get(*potential_target);
+                        if let Some(_target) = target {
+                            wants_to_melee.insert(entity, WantsToMelee{ target: *potential_target }).expect("Add target failed");
+                            //console::log(&format!("We want to melee: {:?}", target));
+                            return;
+                        }
                     }
                     let door = doors.get_mut(*potential_target);
                     if let Some(door) = door {
@@ -66,6 +87,15 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
                     ppos.y = pos.y;
                 }
             }
+        }
+    } //for loop ends here
+    
+    //new positions for swapped entities
+    for m in swap_entities.iter() {
+        let their_pos = positions.get_mut(m.0);
+        if let Some(their_pos) = their_pos {
+            their_pos.x = m.1;
+            their_pos.y = m.2;
         }
     }
 }
