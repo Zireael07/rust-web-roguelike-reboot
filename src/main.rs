@@ -396,6 +396,7 @@ pub fn main() {
     gs.ecs.register::<BlocksVisibility>();
     gs.ecs.register::<Door>();
     gs.ecs.register::<LightSource>();
+    gs.ecs.register::<Quips>();
     gs.ecs.register::<ParticleLifetime>();
     gs.ecs.register::<Player>();
 

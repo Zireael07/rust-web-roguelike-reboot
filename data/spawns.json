@@ -1,6 +1,6 @@
 {
     "spawn_table" : [
-        { "name" : "Human", "weight" : 10 },
+        { "name" : "Thug", "weight" : 10 },
         { "name" : "Cop", "weight" : 5 },
         { "name" : "Medkit", "weight" : 7 },
         { "name" : "Pistol", "weight" : 4 },
@@ -118,7 +118,8 @@
                 "power" : 4
             },
             "vision_range" : 8,
-            "ai" : "bystander"
+            "ai" : "bystander",
+            "quips" : [ "I am keeping an eye on you!", "If you step a toe out of line...", "Keeping the village safe, eh?" ]
         },
     
         {
@@ -192,7 +193,8 @@
                 "power" : 4
             },
             "vision_range" : 4,
-            "ai" : "bystander"
+            "ai" : "bystander",
+            "quips" : [ "Quiet down, it's too early!", "Oh my, I drank too much.", "Still saving the world, eh?" ]
         }
     ],
     "props" : [
