@@ -1,20 +1,20 @@
 extern crate specs;
 use specs::prelude::*;
-use super::{CombatStats, SufferDamage, Player, Name, gamelog::GameLog, RunState};
+use super::{Pools, SufferDamage, Player, Name, gamelog::GameLog, RunState};
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{console};
 
 pub struct DamageSystem {}
 
 impl<'a> System<'a> for DamageSystem {
-    type SystemData = ( WriteStorage<'a, CombatStats>,
+    type SystemData = ( WriteStorage<'a, Pools>,
                         WriteStorage<'a, SufferDamage> );
 
     fn run(&mut self, data : Self::SystemData) {
-        let (mut stats, mut damage) = data;
+        let (mut pools, mut damage) = data;
 
-        for (mut stats, damage) in (&mut stats, &damage).join() {
-            stats.hp -= damage.amount;
+        for (mut pool, damage) in (&mut pools, &damage).join() {
+            pool.hit_points.current -= damage.amount;
         }
 
         damage.clear();
@@ -25,13 +25,13 @@ pub fn delete_the_dead(ecs : &mut World) {
     let mut dead : Vec<Entity> = Vec::new();
     // Using a scope to make the borrow checker happy
     {
-        let combat_stats = ecs.read_storage::<CombatStats>();
+        let pools = ecs.read_storage::<Pools>();
         let players = ecs.read_storage::<Player>();
         let names = ecs.read_storage::<Name>();
         let entities = ecs.entities();
         let mut log = ecs.write_resource::<GameLog>();
-        for (entity, stats) in (&entities, &combat_stats).join() {
-            if stats.hp < 1 { 
+        for (entity, pools) in (&entities, &pools).join() {
+            if pools.hit_points.current < 1 { 
                 let player = players.get(entity);
                 match player {
                     None => {

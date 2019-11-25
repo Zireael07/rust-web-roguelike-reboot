@@ -1,7 +1,7 @@
 extern crate specs;
 use specs::prelude::*;
 use super::{WantsToPickupItem, Name, InBackpack, Position, gamelog::GameLog, Map,
-    WantsToUseItem, MedItem, CombatStats, WantsToDropItem, Consumable, InflictsDamage, SufferDamage, AreaOfEffect, Confusion,
+    WantsToUseItem, MedItem, Pools, WantsToDropItem, Consumable, InflictsDamage, SufferDamage, AreaOfEffect, Confusion,
     Equippable, Equipped, WantsToRemoveItem, particle_system::ParticleBuilder};
 
 pub struct ItemCollectionSystem {}
@@ -104,7 +104,7 @@ impl<'a> System<'a> for ItemUseSystem {
                         ReadStorage<'a, Consumable>,
                         ReadStorage<'a, InflictsDamage>,
                         ReadStorage<'a, MedItem>,
-                        WriteStorage<'a, CombatStats>,
+                        WriteStorage<'a, Pools>,
                         WriteStorage<'a, SufferDamage>,
                         ReadStorage<'a, AreaOfEffect>,
                         WriteStorage<'a, Confusion>,
@@ -119,7 +119,7 @@ impl<'a> System<'a> for ItemUseSystem {
 
     fn run(&mut self, data : Self::SystemData) {
         let (player_entity, mut gamelog, map, entities, mut wants_use, names, 
-            consumables, inflict_damage, meditems, mut combat_stats, mut suffer_damage, aoe, mut confused,
+            consumables, inflict_damage, meditems, mut pools, mut suffer_damage, aoe, mut confused,
             equippable, mut equipped, mut backpack, mut particle_builder, positions) = data;
 
         for (entity, useitem) in (&entities, &wants_use).join() {
@@ -194,9 +194,9 @@ impl<'a> System<'a> for ItemUseSystem {
                 None => {}
                 Some(meditem) => {
                     for target in targets.iter() {
-                        let stats = combat_stats.get_mut(*target);
-                        if let Some(stats) = stats {
-                            stats.hp = i32::min(stats.max_hp, stats.hp + meditem.heal_amount);
+                        let pool = pools.get_mut(*target);
+                        if let Some(pool) = pool {
+                            pool.hit_points.current = i32::min(pool.hit_points.max, pool.hit_points.current + meditem.heal_amount);
                             if entity == *player_entity {
                                 gamelog.entries.push(format!("You use the {}, healing {} hp.", names.get(useitem.item).unwrap().name, meditem.heal_amount));
                             }

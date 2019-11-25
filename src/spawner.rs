@@ -4,7 +4,9 @@ extern crate specs;
 use specs::prelude::*;
 use super::{Player, Renderable, Name, Position, Viewshed, Monster, Rect, Map, TileType,
 BlocksTile, CombatStats, Item, MedItem, Consumable, Ranged, InflictsDamage, AreaOfEffect, Confusion, 
-Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus, random_table::RandomTable, raws::*};
+Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus, Attributes, Attribute, Pools, Pool,
+random_table::RandomTable, raws::*};
+use crate::{attr_bonus};
 use std::collections::HashMap; //for region spawning
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{console};
@@ -24,6 +26,20 @@ pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
         //the player absolutely needs this as without it, combat doesn't work
         .with(Name{ name : "Player".to_string() })
         .with(CombatStats{ max_hp: 30, hp: 30, defense: 2, power: 5 })
+        .with(Pools{
+            hit_points : Pool{ 
+                current: 30, 
+                max: 30 
+            },
+        })
+        .with(Attributes{
+            strength: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
+            dexterity: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
+            constitution: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
+            intelligence: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
+            wisdom: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
+            charisma: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11)},
+        })
         .with(Player{})
         .build()
 }

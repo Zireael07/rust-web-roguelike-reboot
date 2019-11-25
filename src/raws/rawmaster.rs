@@ -5,6 +5,7 @@ use super::{Raws};
 use crate::random_table::{RandomTable};
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{console};
+use crate::{attr_bonus};
 
 pub enum SpawnType {
     AtPosition { x: i32, y: i32 }
@@ -204,6 +205,43 @@ pub fn spawn_named_mob(raws: &RawMaster, new_entity : EntityBuilder, key : &str,
             power : mob_template.stats.power,
             defense : mob_template.stats.defense
         });
+
+        let pools = Pools{
+            hit_points : Pool{ current: mob_template.stats.hp, max: mob_template.stats.max_hp },
+        };
+        eb = eb.with(pools);
+
+        //handle attributes (default of 11 unless specified)
+        let mut attr = Attributes{
+            strength: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
+            dexterity: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
+            constitution: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
+            intelligence: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
+            wisdom: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
+            charisma: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) }
+        };
+        if let Some(strength) = mob_template.attributes.strength { 
+            attr.strength = Attribute{ base: strength, modifiers: 0, bonus: attr_bonus(strength) }; 
+        }
+        if let Some(dexterity) = mob_template.attributes.dexterity { 
+            attr.dexterity = Attribute{ base: dexterity, modifiers: 0, bonus: attr_bonus(dexterity) }; 
+        }
+        if let Some(constitution) = mob_template.attributes.constitution { 
+            attr.constitution = Attribute{ base: constitution, modifiers: 0, bonus: attr_bonus(constitution) }; 
+        }
+        if let Some(intelligence) = mob_template.attributes.intelligence { 
+            attr.intelligence = Attribute{ base: intelligence, modifiers: 0, bonus: attr_bonus(intelligence) }; 
+        }
+        if let Some(wisdom) = mob_template.attributes.wisdom { 
+            attr.wisdom = Attribute{ base: wisdom, modifiers: 0, bonus: attr_bonus(wisdom) }; 
+        }
+        if let Some(charisma) = mob_template.attributes.charisma { 
+            attr.charisma = Attribute{ base: charisma, modifiers: 0, bonus: attr_bonus(charisma) }; 
+        }
+
+        eb = eb.with(attr);
+
+
         eb = eb.with(Viewshed{ visible_tiles : Vec::new(), range: mob_template.vision_range, dirty: true });
 
         return Some(eb.build());

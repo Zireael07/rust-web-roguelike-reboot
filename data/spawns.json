@@ -119,7 +119,8 @@
             },
             "vision_range" : 8,
             "ai" : "bystander",
-            "quips" : [ "I am keeping an eye on you!", "If you step a toe out of line...", "Keeping the village safe, eh?" ]
+            "quips" : [ "I am keeping an eye on you!", "If you step a toe out of line...", "Keeping the village safe, eh?" ],
+            "attributes" : {}
         },
     
         {
@@ -138,7 +139,8 @@
                 "power" : 3
             },
             "vision_range" : 8,
-            "ai" : "melee"
+            "ai" : "melee",
+            "attributes" : {}
         },
         {
             "name" : "Barkeep",
@@ -156,7 +158,10 @@
                 "power" : 4
             },
             "vision_range" : 4,
-            "ai" : "vendor"
+            "ai" : "vendor",
+            "attributes" : {
+                "intelligence" : 13
+            }
         },
         {
             "name" : "Shady Salesman",
@@ -174,7 +179,8 @@
                 "power" : 4
             },
             "vision_range" : 4,
-            "ai" : "vendor"
+            "ai" : "vendor",
+            "attributes" : {}
         },
         
         {
@@ -194,7 +200,8 @@
             },
             "vision_range" : 4,
             "ai" : "bystander",
-            "quips" : [ "Quiet down, it's too early!", "Oh my, I drank too much.", "Still saving the world, eh?" ]
+            "quips" : [ "Quiet down, it's too early!", "Oh my, I drank too much.", "Still saving the world, eh?" ],
+            "attributes" : {}
         }
     ],
     "props" : [

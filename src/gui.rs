@@ -1,6 +1,6 @@
 extern crate rltk;
 use rltk::{ RGB, Rltk, Console, VirtualKeyCode, Point };
-use super::{ Player, CombatStats, gamelog::GameLog, camera, RunState,
+use super::{ Player, Pools, gamelog::GameLog, camera, RunState,
     State, Entity, Name, InBackpack, Equipped, Viewshed};
 extern crate specs;
 use specs::prelude::*;
@@ -170,13 +170,13 @@ pub fn draw_ui(ecs: &World, ctx : &mut Rltk) {
     ctx.set(79, 45, box_gray, black, to_cp437('┤'));
 
     //draw health bar
-    let combat_stats = ecs.read_storage::<CombatStats>();
+    let pools = ecs.read_storage::<Pools>();
     let players = ecs.read_storage::<Player>();
-    for (_player, stats) in (&players, &combat_stats).join() {
-        let health = format!(" HP: {} / {} ", stats.hp, stats.max_hp);
+    for (_player, pool) in (&players, &pools).join() {
+        let health = format!(" HP: {} / {} ", pool.hit_points.current, pool.hit_points.max);
         ctx.print_color(50, 1, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), &health);
 
-        ctx.draw_bar_horizontal(64, 1, 14, stats.hp, stats.max_hp, RGB::named(rltk::RED), RGB::named(rltk::BLACK));
+        ctx.draw_bar_horizontal(64, 1, 14, pool.hit_points.current, pool.hit_points.max, RGB::named(rltk::RED), RGB::named(rltk::BLACK));
     }
 
     //basic info

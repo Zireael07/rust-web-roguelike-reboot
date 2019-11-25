@@ -1,6 +1,6 @@
 use rltk::{VirtualKeyCode, Rltk, Point};
 use specs::prelude::*;
-use super::{Position, Player, Viewshed, CombatStats, WantsToMelee, 
+use super::{Position, Player, Viewshed, Pools, WantsToMelee, 
     TileType, State, Map, RunState, Entity, Item, WantsToPickupItem, EntityMoved,
     Door, BlocksVisibility, BlocksTile, Renderable, Bystander, Vendor, gamelog::GameLog};
 use std::cmp::{min, max};
@@ -15,7 +15,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut players = ecs.write_storage::<Player>();
     let mut viewsheds = ecs.write_storage::<Viewshed>();
     let entities = ecs.entities();
-    let combat_stats = ecs.read_storage::<CombatStats>();
+    let pools = ecs.read_storage::<Pools>();
     let mut wants_to_melee = ecs.write_storage::<WantsToMelee>();
     let mut entity_moved = ecs.write_storage::<EntityMoved>();
     let map = ecs.fetch::<Map>();
@@ -55,7 +55,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
                         ppos.y = pos.y;
                     } else {
                         //handle attacking
-                        let target = combat_stats.get(*potential_target);
+                        let target = pools.get(*potential_target);
                         if let Some(_target) = target {
                             wants_to_melee.insert(entity, WantsToMelee{ target: *potential_target }).expect("Add target failed");
                             //console::log(&format!("We want to melee: {:?}", target));

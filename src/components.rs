@@ -55,6 +55,34 @@ pub struct CombatStats {
     pub power : i32
 }
 
+#[derive(Debug, Clone)]
+pub struct Pool {
+    pub max: i32,
+    pub current: i32
+}
+
+#[derive(Component, Debug, Clone)]
+pub struct Pools {
+    pub hit_points : Pool
+}
+
+#[derive(Debug, Clone)]
+pub struct Attribute {
+    pub base : i32,
+    pub modifiers : i32,
+    pub bonus : i32
+}
+
+#[derive(Component, Debug, Clone)]
+pub struct Attributes {
+    pub strength : Attribute,
+    pub dexterity : Attribute,
+    pub constitution : Attribute,
+    pub intelligence : Attribute,
+    pub wisdom : Attribute,
+    pub charisma : Attribute,
+}
+
 #[derive(Component, Debug)]
 pub struct WantsToMelee {
     pub target : Entity

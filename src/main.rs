@@ -45,6 +45,8 @@ use trigger_system::TriggerSystem;
 pub mod random_table;
 pub mod particle_system;
 pub mod lighting_system;
+mod gamesystem;
+pub use gamesystem::*;
 
 //load json data
 pub mod raws;
@@ -371,6 +373,8 @@ pub fn main() {
     gs.ecs.register::<Name>();
     gs.ecs.register::<BlocksTile>();
     gs.ecs.register::<CombatStats>();
+    gs.ecs.register::<Pools>();
+    gs.ecs.register::<Attributes>();
     gs.ecs.register::<WantsToMelee>();
     gs.ecs.register::<SufferDamage>();
     gs.ecs.register::<Item>();
