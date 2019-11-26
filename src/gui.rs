@@ -1,7 +1,7 @@
 extern crate rltk;
 use rltk::{ RGB, Rltk, Console, VirtualKeyCode, Point };
 use super::{ Player, Pools, gamelog::GameLog, camera, RunState,
-    State, Entity, Name, InBackpack, Equipped, Viewshed};
+    State, Entity, Name, InBackpack, Equipped, Viewshed, Attributes, Attribute};
 extern crate specs;
 use specs::prelude::*;
 
@@ -150,6 +150,18 @@ pub fn draw_hollow_box(
     }
 }
 
+fn draw_attribute(name : &str, attribute : &Attribute, y : i32, ctx: &mut Rltk) {
+    let black = RGB::named(rltk::BLACK);
+    let attr_gray : RGB = RGB::from_hex("#CCCCCC").expect("Oops");
+    ctx.print_color(50, y, attr_gray, black, name);
+    let color : RGB =
+        if attribute.modifiers < 0 { RGB::from_f32(1.0, 0.0, 0.0) }
+        else if attribute.modifiers == 0 { RGB::named(rltk::WHITE) }
+        else { RGB::from_f32(0.0, 1.0, 0.0) };
+    ctx.print_color(67, y, color, black, &format!("{}", attribute.base + attribute.modifiers));
+    ctx.print_color(73, y, color, black, &format!("{}", attribute.bonus));
+    if attribute.bonus > 0 { ctx.set(72, y, color, black, rltk::to_cp437('+')); }
+}
 
 pub fn draw_ui(ecs: &World, ctx : &mut Rltk) {
     use rltk::to_cp437;
@@ -159,17 +171,18 @@ pub fn draw_ui(ecs: &World, ctx : &mut Rltk) {
     draw_hollow_box(ctx, 0, 0, 79, 59, box_gray, black); // Overall box
     draw_hollow_box(ctx, 0, 0, 49, 45, box_gray, black); // Map box
     draw_hollow_box(ctx, 0, 45, 79, 14, box_gray, black); // Log box
-    draw_hollow_box(ctx, 49, 0, 30, 8, box_gray, black); // Top-right panel
+    draw_hollow_box(ctx, 49, 0, 30, 11, box_gray, black); // Top-right panel
     
     // Draw box connectors
     ctx.set(0, 45, box_gray, black, to_cp437('├'));
-    ctx.set(49, 8, box_gray, black, to_cp437('├'));
+    ctx.set(49, 11, box_gray, black, to_cp437('├'));
     ctx.set(49, 0, box_gray, black, to_cp437('┬'));
     ctx.set(49, 45, box_gray, black, to_cp437('┴'));
     ctx.set(79, 8, box_gray, black, to_cp437('┤'));
     ctx.set(79, 45, box_gray, black, to_cp437('┤'));
 
     //draw health bar
+    let player_entity = ecs.fetch::<Entity>();
     let pools = ecs.read_storage::<Pools>();
     let players = ecs.read_storage::<Player>();
     for (_player, pool) in (&players, &pools).join() {
@@ -179,13 +192,23 @@ pub fn draw_ui(ecs: &World, ctx : &mut Rltk) {
         ctx.draw_bar_horizontal(64, 1, 14, pool.hit_points.current, pool.hit_points.max, RGB::named(rltk::RED), RGB::named(rltk::BLACK));
     }
 
+    //draw attributes
+    let attributes = ecs.read_storage::<Attributes>();
+    let attr = attributes.get(*player_entity).unwrap();
+    draw_attribute("STR:", &attr.strength, 4, ctx);
+    draw_attribute("DEX:", &attr.dexterity, 5, ctx);
+    draw_attribute("CON:", &attr.constitution, 6, ctx);
+    draw_attribute("INT:", &attr.intelligence, 7, ctx);
+    draw_attribute("WIS:", &attr.wisdom, 8, ctx);
+    draw_attribute("CHA:", &attr.charisma, 9, ctx);
+
     //basic info
     //let player_entity = ecs.fetch::<Entity>();
     let player_pos = ecs.fetch::<Point>();
     //let viewsheds = ecs.read_storage::<Viewshed>();
 
     let pos = format!("Player: {:?} ", *player_pos);
-    ctx.print_color(50, 10, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), &pos);
+    ctx.print_color(50, 12, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), &pos);
 
     // let (min_x, max_x, min_y, max_y) = camera::get_screen_bounds(ecs, ctx);
     // let x_str = format!("X: {:?}-{:?}", min_x, max_x);
