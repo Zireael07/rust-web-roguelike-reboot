@@ -112,11 +112,11 @@ pub fn get_spawn_table(raws: &RawMaster) -> RandomTable {
 pub fn string_to_slot(slot : &str) -> EquipmentSlot {
     match slot {
         "Shield" => EquipmentSlot::Shield, 
-        // "Head" => EquipmentSlot::Head,
-        // "Torso" => EquipmentSlot::Torso, 
-        // "Legs" => EquipmentSlot::Legs, 
-        // "Feet" => EquipmentSlot::Feet, 
-        // "Hands" => EquipmentSlot::Hands,
+        "Head" => EquipmentSlot::Head,
+        "Torso" => EquipmentSlot::Torso, 
+        "Legs" => EquipmentSlot::Legs, 
+        "Feet" => EquipmentSlot::Feet, 
+        "Hands" => EquipmentSlot::Hands,
         "Melee" => EquipmentSlot::Melee,
         _ => { println!("Warning: unknown equipment slot type [{}])", slot); EquipmentSlot::Melee }
     }

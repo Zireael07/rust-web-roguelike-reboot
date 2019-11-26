@@ -114,6 +114,46 @@
                 "defense_bonus" : 1,
                 "slot" : "Shield"
             }
+        },
+
+        {
+            "name" : "T-shirt",
+            "renderable": {
+                "glyph" : "]",
+                "fg" : "#00AAFF",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "wearable" : {
+                "defense_bonus" : 0.15,
+                "slot" : "Torso"
+            }
+        },
+        {
+            "name" : "Jeans",
+            "renderable": {
+                "glyph" : "]",
+                "fg" : "#0017FF",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "wearable" : {
+                "defense_bonus" : 0.1,
+                "slot" : "Legs"
+            }
+        },
+        {
+            "name" : "Boots",
+            "renderable": {
+                "glyph" : "]",
+                "fg" : "#814D04",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "wearable" : {
+                "defense_bonus" : 0.1,
+                "slot" : "Legs"
+            }
         }
     ],
     "mobs" : [

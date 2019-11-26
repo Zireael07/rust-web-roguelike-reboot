@@ -44,6 +44,10 @@ pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
 
     // Starting equipment
     spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Baton", SpawnType::Equipped{by : player}); //<- this is why we put the player into a variable
+    // clothing
+    spawn_named_entity(&RAWS.lock().unwrap(), ecs, "T-shirt", SpawnType::Equipped{by : player});
+    spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Jeans", SpawnType::Equipped{by : player});
+    spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Boots", SpawnType::Equipped{by : player});
 
     player
 }

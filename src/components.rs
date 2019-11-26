@@ -130,7 +130,7 @@ pub struct Confusion {
 }
 
 #[derive(PartialEq, Copy, Clone)]
-pub enum EquipmentSlot { Melee, Shield }
+pub enum EquipmentSlot { Melee, Shield, Head, Torso, Legs, Feet, Hands }
 
 #[derive(Component, Clone)]
 pub struct Equippable {
@@ -155,7 +155,7 @@ pub struct MeleeWeapon {
 
 #[derive(Component, Clone)]
 pub struct DefenseBonus {
-    pub defense : i32
+    pub defense : f32
 }
 
 #[derive(Component, Debug, Clone)]

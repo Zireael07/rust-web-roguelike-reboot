@@ -69,11 +69,14 @@ impl<'a> System<'a> for MeleeCombatSystem {
 
                     //defense item bonus
                     let mut defensive_bonus = 0;
+                    let mut defensive_bonus_f = 0.0;
                     for (_item_entity, defense_bonus, equipped_by) in (&entities, &defense_bonuses, &equipped).join() {
                         if equipped_by.owner == wants_melee.target {
-                            defensive_bonus += defense_bonus.defense;
+                            defensive_bonus_f += defense_bonus.defense;
                         }
                     }
+                    //convert to int
+                    defensive_bonus = defensive_bonus_f as i32;
 
                     let damage = i32::max(0, (base_damage + attr_damage_bonus + weapon_damage_bonus) - defensive_bonus);
 
