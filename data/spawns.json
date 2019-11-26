@@ -84,7 +84,7 @@
             },
             "weapon" : {
                 "range" : "melee",
-                "power_bonus" : 2
+                "base_damage" : "1d4"
             }
         },
 

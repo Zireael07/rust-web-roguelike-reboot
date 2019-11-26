@@ -6,6 +6,30 @@ use crate::random_table::{RandomTable};
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{console};
 use crate::{attr_bonus};
+use regex::Regex;
+
+pub fn parse_dice_string(dice : &str) -> (i32, i32, i32) {
+    lazy_static! {
+        static ref DICE_RE : Regex = Regex::new(r"(\d+)d(\d+)([\+\-]\d+)?").unwrap();
+    }
+    let mut n_dice = 1;
+    let mut die_type = 4;
+    let mut die_bonus = 0;
+    for cap in DICE_RE.captures_iter(dice) {
+        if let Some(group) = cap.get(1) {
+            n_dice = group.as_str().parse::<i32>().expect("Not a digit");
+        }
+        if let Some(group) = cap.get(2) {
+            die_type = group.as_str().parse::<i32>().expect("Not a digit");
+        }
+        if let Some(group) = cap.get(3) {
+            die_bonus = group.as_str().parse::<i32>().expect("Not a digit");
+        }
+
+    }
+    (n_dice, die_type, die_bonus)
+}
+
 
 pub enum SpawnType {
     AtPosition { x: i32, y: i32 }
@@ -154,7 +178,13 @@ pub fn spawn_named_item(raws: &RawMaster, new_entity : EntityBuilder, key : &str
 
         if let Some(weapon) = &item_template.weapon {
             eb = eb.with(Equippable{ slot: EquipmentSlot::Melee });
-            eb = eb.with(MeleePowerBonus{ power : weapon.power_bonus });
+            let (n_dice, die_type, bonus) = parse_dice_string(&weapon.base_damage);
+            let mut wpn = MeleeWeapon{
+                damage_n_dice : n_dice,
+                damage_die_type : die_type,
+                damage_bonus : bonus,
+            };
+            eb = eb.with(wpn);
         }
         
         if let Some(shield) = &item_template.shield {

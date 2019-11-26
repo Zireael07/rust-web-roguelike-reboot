@@ -145,8 +145,12 @@ pub struct Equipped {
 }
 
 #[derive(Component, Clone)]
-pub struct MeleePowerBonus {
-    pub power : i32
+pub struct MeleeWeapon {
+    // 1 in 1d4
+    pub damage_n_dice : i32,
+    // 4 in d4
+    pub damage_die_type : i32,
+    pub damage_bonus : i32,
 }
 
 #[derive(Component, Clone)]

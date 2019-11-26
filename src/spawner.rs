@@ -3,8 +3,7 @@ use rltk::{ RGB, RandomNumberGenerator };
 extern crate specs;
 use specs::prelude::*;
 use super::{Player, Renderable, Name, Position, Viewshed, Monster, Rect, Map, TileType,
-BlocksTile, CombatStats, Item, MedItem, Consumable, Ranged, InflictsDamage, AreaOfEffect, Confusion, 
-Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus, Attributes, Attribute, Pools, Pool,
+CombatStats, Attributes, Attribute, Pools, Pool,
 random_table::RandomTable, raws::*};
 use crate::{attr_bonus};
 use std::collections::HashMap; //for region spawning

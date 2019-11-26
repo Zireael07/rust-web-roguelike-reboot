@@ -27,7 +27,7 @@ pub struct Consumable {
 #[derive(Deserialize, Debug)]
 pub struct Weapon {
     pub range: String,
-    pub power_bonus: i32
+    pub base_damage: String //because it's a dice string
 }
 
 #[derive(Deserialize, Debug)]
