@@ -151,8 +151,47 @@
                 "order" : 2
             },
             "wearable" : {
+                "defense_bonus" : 0.15,
+                "slot" : "Feet"
+            }
+        },
+        {
+            "name" : "Sneakers",
+            "renderable": {
+                "glyph" : "]",
+                "fg" : "#0017FF",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "wearable" : {
                 "defense_bonus" : 0.1,
-                "slot" : "Legs"
+                "slot" : "Feet"
+            }
+        },
+        {
+            "name" : "Sheriff's shirt",
+            "renderable": {
+                "glyph" : "]",
+                "fg" : "#2B00FF",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "wearable" : {
+                "defense_bonus" : 0.15,
+                "slot" : "Torso"
+            }
+        },
+        {
+            "name" : "Leather jacket",
+            "renderable": {
+                "glyph" : "]",
+                "fg" : "#FF7C00",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "wearable" : {
+                "defense_bonus" : 0.15,
+                "slot" : "Torso"
             }
         }
     ],
@@ -175,7 +214,8 @@
             "vision_range" : 8,
             "ai" : "bystander",
             "quips" : [ "I am keeping an eye on you!", "If you step a toe out of line...", "Keeping the village safe, eh?" ],
-            "attributes" : {}
+            "attributes" : {},
+            "equipped" : [ "Sheriff's shirt", "Jeans", "Boots"]
         },
     
         {
@@ -195,7 +235,8 @@
             },
             "vision_range" : 8,
             "ai" : "melee",
-            "attributes" : {}
+            "attributes" : {},
+            "equipped" : [ "Leather jacket", "Jeans", "Boots" ]
         },
         {
             "name" : "Barkeep",
@@ -216,7 +257,8 @@
             "ai" : "vendor",
             "attributes" : {
                 "intelligence" : 13
-            }
+            },
+            "equipped" : [ "Jeans", "Boots" ]
         },
         {
             "name" : "Shady Salesman",
@@ -235,7 +277,8 @@
             },
             "vision_range" : 4,
             "ai" : "vendor",
-            "attributes" : {}
+            "attributes" : {},
+            "equipped" : [ "T-shirt", "Jeans", "Boots" ]
         },
         
         {
@@ -256,7 +299,8 @@
             "vision_range" : 4,
             "ai" : "bystander",
             "quips" : [ "Quiet down, it's too early!", "Oh my, I drank too much.", "Still saving the world, eh?" ],
-            "attributes" : {}
+            "attributes" : {},
+            "equipped" : [ "T-shirt", "Jeans", "Boots" ]
         }
     ],
     "props" : [
