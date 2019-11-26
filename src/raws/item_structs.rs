@@ -8,7 +8,7 @@ pub struct Item {
     pub renderable : Option<Renderable>,
     pub consumable : Option<Consumable>,
     pub weapon : Option<Weapon>,
-    pub shield : Option<Shield>
+    pub wearable : Option<Wearable>
 }
 
 #[derive(Deserialize, Debug)]
@@ -31,6 +31,7 @@ pub struct Weapon {
 }
 
 #[derive(Deserialize, Debug)]
-pub struct Shield {
-    pub defense_bonus: i32
+pub struct Wearable {
+    pub defense_bonus: i32,
+    pub slot : String
 }

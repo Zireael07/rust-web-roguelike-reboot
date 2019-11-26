@@ -12,7 +12,7 @@ use rltk::{console};
 
 /// Spawns the player and returns his/her entity object.
 pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
-    ecs
+    let player = ecs
         .create_entity()
         .with(Position { x: player_x, y: player_y })
         .with(Renderable {
@@ -40,7 +40,12 @@ pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
             charisma: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11)},
         })
         .with(Player{})
-        .build()
+        .build();
+
+    // Starting equipment
+    spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Baton", SpawnType::Equipped{by : player}); //<- this is why we put the player into a variable
+
+    player
 }
 
 
@@ -117,7 +122,7 @@ pub fn spawn_entity(ecs: &mut World, spawn : &(&usize, &String)) {
     std::mem::drop(map);
 
     //spawn from data
-    let spawn_result = spawn_named_entity(&RAWS.lock().unwrap(), ecs.create_entity(), &spawn.1, SpawnType::AtPosition{ x, y});
+    let spawn_result = spawn_named_entity(&RAWS.lock().unwrap(), ecs, &spawn.1, SpawnType::AtPosition{ x, y});
     if spawn_result.is_some() {
         return;
     }
