@@ -25,11 +25,7 @@ mod rect;
 pub use rect::Rect;
 mod visibility_system;
 use visibility_system::VisibilitySystem;
-#[allow(non_snake_case)]
-mod NPC_ai_system;
-use NPC_ai_system::NPCAI;
-mod bystander_ai_system;
-use bystander_ai_system::BystanderAI;
+mod ai;
 mod spawner;
 pub mod map_builders;
 mod map_indexing_system;
@@ -252,12 +248,12 @@ impl State {
     fn run_systems(&mut self) {
         let mut vis = VisibilitySystem{};
         vis.run_now(&self.ecs);
-        let mut mob = NPCAI{};
+        let mut mob = ai::NPCAI{};
         mob.run_now(&self.ecs);
         //indexing needs to run after AI and before combat, so that combat knows the new positions
         let mut mapindex = MapIndexingSystem{};
         mapindex.run_now(&self.ecs);
-        let mut bystander = BystanderAI{};
+        let mut bystander = ai::BystanderAI{};
         bystander.run_now(&self.ecs);
         //needs to go before combat, because it can deal damage too
         let mut triggers = trigger_system::TriggerSystem{};

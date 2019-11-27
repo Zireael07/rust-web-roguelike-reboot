@@ -1,6 +1,6 @@
 extern crate specs;
 use specs::prelude::*;
-use super::{RunState, Viewshed, Position, Map, Monster, Name, WantsToMelee, Confusion, EntityMoved,
+use crate::{RunState, Viewshed, Position, Map, Monster, Name, WantsToMelee, Confusion, EntityMoved,
      particle_system::ParticleBuilder};
 extern crate rltk;
 //console is RLTK's wrapper around either println or the web console macro
