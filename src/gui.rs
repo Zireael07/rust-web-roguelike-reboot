@@ -184,13 +184,11 @@ pub fn draw_ui(ecs: &World, ctx : &mut Rltk) {
     //draw health bar
     let player_entity = ecs.fetch::<Entity>();
     let pools = ecs.read_storage::<Pools>();
-    let players = ecs.read_storage::<Player>();
-    for (_player, pool) in (&players, &pools).join() {
-        let health = format!(" HP: {} / {} ", pool.hit_points.current, pool.hit_points.max);
-        ctx.print_color(50, 1, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), &health);
+    let player_pools = pools.get(*player_entity).unwrap();
+    let health = format!(" HP: {} / {} ", player_pools.hit_points.current, player_pools.hit_points.max);
+    ctx.print_color(50, 1, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), &health);
 
-        ctx.draw_bar_horizontal(64, 1, 14, pool.hit_points.current, pool.hit_points.max, RGB::named(rltk::RED), RGB::named(rltk::BLACK));
-    }
+    ctx.draw_bar_horizontal(64, 1, 14, player_pools.hit_points.current, player_pools.hit_points.max, RGB::named(rltk::RED), RGB::named(rltk::BLACK));
 
     //draw attributes
     let attributes = ecs.read_storage::<Attributes>();
@@ -215,6 +213,17 @@ pub fn draw_ui(ecs: &World, ctx : &mut Rltk) {
     // let y_str = format!("Y: {:?}-{:?}", min_y, max_y);
     // ctx.print_color(50, 11, RGB::named(rltk::LIGHT_BLUE), RGB::named(rltk::BLACK), &x_str);
     // ctx.print_color(50, 12, RGB::named(rltk::LIGHT_BLUE), RGB::named(rltk::BLACK), &y_str);
+
+    // Equipped
+    let mut y = 13;
+    let equipped = ecs.read_storage::<Equipped>();
+    let name = ecs.read_storage::<Name>();
+    for (equipped_by, item_name) in (&equipped, &name).join() {
+        if equipped_by.owner == *player_entity {
+            ctx.print_color(50, y, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), &item_name.name);
+            y += 1;
+        }
+    }
 
     //log
     let log = ecs.fetch::<GameLog>();
