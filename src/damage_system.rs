@@ -1,6 +1,7 @@
 extern crate specs;
 use specs::prelude::*;
-use super::{Pools, SufferDamage, Player, Name, gamelog::GameLog, RunState};
+use super::{Pools, SufferDamage, Player, Name, gamelog::GameLog, RunState,
+Position, Equipped, InBackpack};
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{console};
 
@@ -50,6 +51,44 @@ pub fn delete_the_dead(ecs : &mut World) {
             }
         }
     }
+
+
+    // Drop stuff
+    { // To avoid keeping hold of borrowed entries, use a scope
+        let mut to_drop : Vec<(Entity, Position)> = Vec::new();
+        let entities = ecs.entities();
+        let mut equipped = ecs.write_storage::<Equipped>();
+        let mut carried = ecs.write_storage::<InBackpack>();
+        let mut positions = ecs.write_storage::<Position>();
+        let mut rng = ecs.write_resource::<rltk::RandomNumberGenerator>();
+        // Drop everything held by dead people
+        for victim in dead.iter() {        
+            let pos = positions.get(*victim);
+            for (entity, equipped) in (&entities, &equipped).join() {
+                if equipped.owner == *victim {
+                    // Drop their stuff
+                    if let Some(pos) = pos {
+                        to_drop.push((entity, pos.clone()));
+                    }
+                }
+            }
+            for (entity, backpack) in (&entities, &carried).join() {
+                if backpack.owner == *victim {
+                    // Drop their stuff
+                    if let Some(pos) = pos {
+                        to_drop.push((entity, pos.clone()));
+                    }
+                }
+            }
+        }
+
+        for drop in to_drop.iter() {
+            equipped.remove(drop.0);
+            carried.remove(drop.0);
+            positions.insert(drop.0, drop.1.clone()).expect("Unable to insert position");
+        }        
+    }
+
 
     for victim in dead {
         ecs.delete_entity(victim).expect("Unable to delete");
