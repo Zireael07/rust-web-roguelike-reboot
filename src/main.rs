@@ -253,6 +253,11 @@ impl State {
         vis.run_now(&self.ecs);
         let mut initiative = ai::InitiativeSystem{};
         initiative.run_now(&self.ecs);
+        //this determines who gets to act, so needs to run before main AI
+        let mut turnstatus = ai::TurnStatusSystem{};
+        turnstatus.run_now(&self.ecs);
+        let mut quipper = ai::QuipSystem{};
+        quipper.run_now(&self.ecs);
         let mut mob = ai::NPCAI{};
         mob.run_now(&self.ecs);
         //indexing needs to run after AI and before combat, so that combat knows the new positions
