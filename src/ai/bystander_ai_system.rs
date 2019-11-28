@@ -1,5 +1,5 @@
 use specs::prelude::*;
-use crate::{Viewshed, Bystander, Map, Position, RunState, EntityMoved, gamelog::GameLog, Quips, Name};
+use crate::{Viewshed, Bystander, Map, Position, RunState, EntityMoved, gamelog::GameLog, Quips, Name, MyTurn};
 use rltk::Point;
 
 pub struct BystanderAI {}
@@ -17,16 +17,17 @@ impl<'a> System<'a> for BystanderAI {
                         ReadExpect<'a, Point>,
                         WriteExpect<'a, GameLog>,
                         WriteStorage<'a, Quips>,
-                        ReadStorage<'a, Name>
+                        ReadStorage<'a, Name>,
+                        ReadStorage<'a, MyTurn>
                     );
 
     fn run(&mut self, data : Self::SystemData) {
         let (mut map, runstate, entities, mut viewshed, bystander, mut position,
-            mut entity_moved, mut rng, player_pos, mut gamelog, mut quips, names) = data;
+            mut entity_moved, mut rng, player_pos, mut gamelog, mut quips, names, turns) = data;
 
-        if *runstate != RunState::MonsterTurn { return; }
+//        if *runstate != RunState::MonsterTurn { return; }
 
-        for (entity, mut viewshed, _bystander, mut pos) in (&entities, &mut viewshed, &bystander, &mut position).join() {
+        for (entity, mut viewshed, _bystander, mut pos, _turn) in (&entities, &mut viewshed, &bystander, &mut position, &turns).join() {
             // Possibly quip
             let quip = quips.get_mut(entity);
             if let Some(quip) = quip {

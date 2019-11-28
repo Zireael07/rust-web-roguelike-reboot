@@ -184,6 +184,14 @@ pub struct LightSource {
 #[derive(Component, Debug, Clone)]
 pub struct EntityMoved {}
 
+#[derive(Component, Debug, Clone)]
+pub struct Initiative {
+    pub current : i32
+}
+
+#[derive(Component, Debug, Clone)]
+pub struct MyTurn {}
+
 //components representing intent
 #[derive(Component, Debug)]
 pub struct WantsToPickupItem {

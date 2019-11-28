@@ -64,8 +64,7 @@ const SHOW_MAPGEN_VISUALIZER : bool = true;
 pub enum RunState { 
     AwaitingInput, 
     PreRun, 
-    PlayerTurn, 
-    MonsterTurn,
+    Ticking,
     ShowInventory,
     ShowDropItem,
     ShowTargeting { range : i32, item : Entity},
@@ -141,18 +140,22 @@ impl GameState for State {
             RunState::AwaitingInput => {
                 newrunstate = player_input(self, ctx);
             }
-            RunState::PlayerTurn => {
+            RunState::Ticking => {
                 self.run_systems();
                 //makes sure used items are removed
                 self.ecs.maintain();
-                newrunstate = RunState::MonsterTurn;
+
+                match *self.ecs.fetch::<RunState>() {
+                    RunState::AwaitingInput => newrunstate = RunState::AwaitingInput,
+                    _ => newrunstate = RunState::Ticking
+                }   
             }
-            RunState::MonsterTurn => {
-                self.run_systems();
-                //makes sure used items are removed
-                self.ecs.maintain();
-                newrunstate = RunState::AwaitingInput;
-            }
+            // RunState::MonsterTurn => {
+            //     self.run_systems();
+            //     //makes sure used items are removed
+            //     self.ecs.maintain();
+            //     newrunstate = RunState::AwaitingInput;
+            // }
             RunState::ShowInventory => {
                 let result = gui::show_inventory(self, ctx);
                 match result.0 {
@@ -168,7 +171,7 @@ impl GameState for State {
                         } else {
                             let mut intent = self.ecs.write_storage::<WantsToUseItem>();
                             intent.insert(*self.ecs.fetch::<Entity>(), WantsToUseItem{ item: item_entity, target: None }).expect("Unable to insert intent");
-                            newrunstate = RunState::PlayerTurn;
+                            newrunstate = RunState::Ticking;
                         }
                     }
                 }
@@ -182,7 +185,7 @@ impl GameState for State {
                         let item_entity = result.1.unwrap();
                         let mut intent = self.ecs.write_storage::<WantsToDropItem>();
                         intent.insert(*self.ecs.fetch::<Entity>(), WantsToDropItem{ item: item_entity }).expect("Unable to insert intent");
-                        newrunstate = RunState::PlayerTurn;
+                        newrunstate = RunState::Ticking;
                     }
                 }
             }
@@ -194,7 +197,7 @@ impl GameState for State {
                     gui::ItemMenuResult::Selected => {
                         let mut intent = self.ecs.write_storage::<WantsToUseItem>();
                         intent.insert(*self.ecs.fetch::<Entity>(), WantsToUseItem{ item, target: result.1 }).expect("Unable to insert intent");
-                        newrunstate = RunState::PlayerTurn;
+                        newrunstate = RunState::Ticking;
                     }
                 }
             }
@@ -207,7 +210,7 @@ impl GameState for State {
                         let item_entity = result.1.unwrap();
                         let mut intent = self.ecs.write_storage::<WantsToRemoveItem>();
                         intent.insert(*self.ecs.fetch::<Entity>(), WantsToRemoveItem{ item: item_entity }).expect("Unable to insert intent");
-                        newrunstate = RunState::PlayerTurn;
+                        newrunstate = RunState::Ticking;
                     }
                 }
             }
@@ -248,6 +251,8 @@ impl State {
     fn run_systems(&mut self) {
         let mut vis = VisibilitySystem{};
         vis.run_now(&self.ecs);
+        let mut initiative = ai::InitiativeSystem{};
+        initiative.run_now(&self.ecs);
         let mut mob = ai::NPCAI{};
         mob.run_now(&self.ecs);
         //indexing needs to run after AI and before combat, so that combat knows the new positions
@@ -397,6 +402,8 @@ pub fn main() {
     gs.ecs.register::<Door>();
     gs.ecs.register::<LightSource>();
     gs.ecs.register::<Quips>();
+    gs.ecs.register::<Initiative>();
+    gs.ecs.register::<MyTurn>();
     gs.ecs.register::<ParticleLifetime>();
     gs.ecs.register::<Player>();
 

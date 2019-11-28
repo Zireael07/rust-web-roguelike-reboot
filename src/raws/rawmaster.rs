@@ -305,8 +305,10 @@ pub fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key : &str, pos : Spaw
 
         eb = eb.with(attr);
 
-
         eb = eb.with(Viewshed{ visible_tiles : Vec::new(), range: mob_template.vision_range, dirty: true });
+
+        // Initiative of 2
+        eb = eb.with(Initiative{current: 2});
 
         let new_mob = eb.build();
 

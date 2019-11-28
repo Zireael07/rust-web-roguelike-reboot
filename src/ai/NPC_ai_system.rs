@@ -1,6 +1,6 @@
 extern crate specs;
 use specs::prelude::*;
-use crate::{RunState, Viewshed, Position, Map, Monster, Name, WantsToMelee, Confusion, EntityMoved,
+use crate::{RunState, Viewshed, Position, Map, Monster, Name, WantsToMelee, Confusion, EntityMoved, MyTurn,
      particle_system::ParticleBuilder};
 extern crate rltk;
 //console is RLTK's wrapper around either println or the web console macro
@@ -22,17 +22,18 @@ impl<'a> System<'a> for NPCAI {
                         WriteStorage<'a, WantsToMelee>,
                         WriteStorage<'a, Confusion>,
                         WriteExpect<'a, ParticleBuilder>,
-                        WriteStorage<'a, EntityMoved>
+                        WriteStorage<'a, EntityMoved>,
+                        ReadStorage<'a, MyTurn>
                     );
 
     fn run(&mut self, data : Self::SystemData) {
         let (mut map, player_pos, player_entity, runstate, entities, mut viewshed, monster, mut position, mut wants_to_melee, 
-            mut confused, mut particle_builder, mut entity_moved) = data;
+            mut confused, mut particle_builder, mut entity_moved, turns) = data;
 
         //do nothing if not our turn
-        if *runstate != RunState::MonsterTurn { return; }
+        //if *runstate != RunState::MonsterTurn { return; }
 
-        for (entity, mut viewshed,_monster, mut pos) in (&entities, &mut viewshed, &monster, &mut position).join() {
+        for (entity, mut viewshed,_monster, mut pos, _turn) in (&entities, &mut viewshed, &monster, &mut position, &turns).join() {
             let mut can_act = true;
 
             //count down confusion turns if applicable
