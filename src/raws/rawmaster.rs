@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 use specs::prelude::*;
 use crate::components::*;
-use super::{Raws};
+use super::{Raws, faction_structs::Reaction};
 use crate::random_table::{RandomTable};
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{console};
@@ -41,16 +41,20 @@ pub struct RawMaster {
     raws : Raws,
     item_index : HashMap<String, usize>,
     mob_index : HashMap<String, usize>,
-    prop_index : HashMap<String, usize>
+    prop_index : HashMap<String, usize>,
+    faction_index : HashMap<String, HashMap<String, Reaction>>
 }
 
 impl RawMaster {
     pub fn empty() -> RawMaster {
         RawMaster {
-            raws : Raws{ items: Vec::new(), mobs: Vec::new(), props: Vec::new(), spawn_table: Vec::new() },
+            raws : Raws{
+                items: Vec::new(), mobs: Vec::new(), props: Vec::new(), spawn_table: Vec::new(), faction_table : Vec::new(), 
+            },
             item_index : HashMap::new(),
             mob_index : HashMap::new(),
-            prop_index : HashMap::new()
+            prop_index : HashMap::new(),
+            faction_index : HashMap::new()
         }
     }
 
@@ -85,6 +89,21 @@ impl RawMaster {
                 console::log(&format!("WARNING - Spawn tables references unspecified entity {}", spawn.name));
             }
         }
+        //factions
+        for faction in self.raws.faction_table.iter() {
+            let mut reactions : HashMap<String, Reaction> = HashMap::new();
+            for other in faction.responses.iter() {
+                reactions.insert(
+                    other.0.clone(),
+                    match other.1.as_str() {
+                        "ignore" => Reaction::Ignore,
+                        "flee" => Reaction::Flee,
+                        _ => Reaction::Attack
+                    }
+                );
+            }
+            self.faction_index.insert(faction.name.clone(), reactions);
+        }
     }
     
 }
@@ -109,6 +128,20 @@ pub fn get_spawn_table(raws: &RawMaster) -> RandomTable {
 }
 
 //helpers
+pub fn faction_reaction(my_faction : &str, their_faction : &str, raws : &RawMaster) -> Reaction {
+    if raws.faction_index.contains_key(my_faction) {
+        let mf = &raws.faction_index[my_faction];
+        if mf.contains_key(their_faction) {
+            return mf[their_faction];
+        } else if mf.contains_key("Default") {
+            return mf["Default"];
+        } else {
+            return Reaction::Ignore;
+        }
+    }
+    Reaction::Ignore
+}
+
 pub fn string_to_slot(slot : &str) -> EquipmentSlot {
     match slot {
         "Shield" => EquipmentSlot::Shield, 
@@ -309,6 +342,12 @@ pub fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key : &str, pos : Spaw
 
         // Initiative of 2
         eb = eb.with(Initiative{current: 2});
+
+        if let Some(faction) = &mob_template.faction {
+            eb = eb.with(Faction{ name: faction.clone() });
+        } else {
+            eb = eb.with(Faction{ name : "Mindless".to_string() })
+        }
 
         let new_mob = eb.build();
 

@@ -258,6 +258,9 @@ impl State {
         turnstatus.run_now(&self.ecs);
         let mut quipper = ai::QuipSystem{};
         quipper.run_now(&self.ecs);
+        //needs to run before main AI
+        let mut adjacent = ai::AdjacentAI{};
+        adjacent.run_now(&self.ecs);
         let mut mob = ai::NPCAI{};
         mob.run_now(&self.ecs);
         //indexing needs to run after AI and before combat, so that combat knows the new positions
@@ -406,6 +409,7 @@ pub fn main() {
     gs.ecs.register::<BlocksVisibility>();
     gs.ecs.register::<Door>();
     gs.ecs.register::<LightSource>();
+    gs.ecs.register::<Faction>();
     gs.ecs.register::<Quips>();
     gs.ecs.register::<Initiative>();
     gs.ecs.register::<MyTurn>();

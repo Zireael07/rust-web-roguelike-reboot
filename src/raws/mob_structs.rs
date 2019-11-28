@@ -11,7 +11,8 @@ pub struct Mob {
     pub ai : String,
     pub quips : Option<Vec<String>>,
     pub attributes : MobAttributes,
-    pub equipped : Option<Vec<String>>
+    pub equipped : Option<Vec<String>>,
+    pub faction : Option<String>
 }
 
 #[derive(Deserialize, Debug)]

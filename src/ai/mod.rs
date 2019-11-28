@@ -9,3 +9,5 @@ mod turn_status;
 pub use turn_status::TurnStatusSystem;
 mod quipping;
 pub use quipping::QuipSystem;
+mod ai_adjacent_system;
+pub use ai_adjacent_system::AdjacentAI;

@@ -192,6 +192,11 @@ pub struct Initiative {
 #[derive(Component, Debug, Clone)]
 pub struct MyTurn {}
 
+#[derive(Component, Debug, Clone)]
+pub struct Faction {
+    pub name : String
+}
+
 //components representing intent
 #[derive(Component, Debug)]
 pub struct WantsToPickupItem {

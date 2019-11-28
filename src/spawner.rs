@@ -3,7 +3,7 @@ use rltk::{ RGB, RandomNumberGenerator };
 extern crate specs;
 use specs::prelude::*;
 use super::{Player, Renderable, Name, Position, Viewshed, Monster, Rect, Map, TileType,
-CombatStats, Attributes, Attribute, Pools, Pool, Initiative,
+CombatStats, Attributes, Attribute, Pools, Pool, Initiative, Faction,
 random_table::RandomTable, raws::*};
 use crate::{attr_bonus};
 use std::collections::HashMap; //for region spawning
@@ -40,6 +40,7 @@ pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
             charisma: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11)},
         })
         .with(Initiative{current: 0})
+        .with(Faction{name : "Player".to_string() })
         .with(Player{})
         .build();
 

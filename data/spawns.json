@@ -11,6 +11,12 @@
         { "name" : "Neon Lantern", "weight" : 15 },
         { "name" : "Bear Trap", "weight" : 5 }
     ],
+    "faction_table" : [
+        { "name" : "Player", "responses": { }},
+        { "name" : "Mindless", "responses": { "Default" : "attack" } },
+        { "name" : "Townsfolk", "responses" : { "Default" : "ignore" } },
+        { "name" : "Bandits", "responses" : { "Default" : "attack" } }
+    ],
     "items" : [
         {
             "name" : "Medkit",
@@ -213,6 +219,7 @@
             },
             "vision_range" : 8,
             "ai" : "bystander",
+            "faction" : "Townsfolk",
             "quips" : [ "I am keeping an eye on you!", "If you step a toe out of line...", "Keeping the village safe, eh?" ],
             "attributes" : {},
             "equipped" : [ "Sheriff's shirt", "Jeans", "Boots"]
@@ -235,6 +242,7 @@
             },
             "vision_range" : 8,
             "ai" : "melee",
+            "faction" : "Bandit",
             "attributes" : {},
             "equipped" : [ "Leather jacket", "Jeans", "Boots" ]
         },
@@ -255,6 +263,7 @@
             },
             "vision_range" : 4,
             "ai" : "vendor",
+            "faction" : "Townsfolk",
             "attributes" : {
                 "intelligence" : 13
             },
@@ -277,6 +286,7 @@
             },
             "vision_range" : 4,
             "ai" : "vendor",
+            "faction" : "Townsfolk",
             "attributes" : {},
             "equipped" : [ "T-shirt", "Jeans", "Boots" ]
         },
@@ -298,6 +308,7 @@
             },
             "vision_range" : 4,
             "ai" : "bystander",
+            "faction" : "Townsfolk",
             "quips" : [ "Quiet down, it's too early!", "Oh my, I drank too much.", "Still saving the world, eh?" ],
             "attributes" : {},
             "equipped" : [ "T-shirt", "Jeans", "Boots" ]
