@@ -14,7 +14,7 @@
     "faction_table" : [
         { "name" : "Player", "responses": { }},
         { "name" : "Mindless", "responses": { "Default" : "attack" } },
-        { "name" : "Townsfolk", "responses" : { "Default" : "ignore" } },
+        { "name" : "Townsfolk", "responses" : { "Default" : "flee", "Player" : "ignore", "Townsfolk" : "ignore" } },
         { "name" : "Bandits", "responses" : { "Default" : "attack" } }
     ],
     "items" : [
@@ -242,7 +242,7 @@
             },
             "vision_range" : 8,
             "ai" : "melee",
-            "faction" : "Bandit",
+            "faction" : "Bandits",
             "attributes" : {},
             "equipped" : [ "Leather jacket", "Jeans", "Boots" ]
         },

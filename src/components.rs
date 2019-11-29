@@ -198,6 +198,16 @@ pub struct Faction {
 }
 
 //components representing intent
+#[derive(Component, Debug, Clone)]
+pub struct WantsToApproach {
+    pub idx : i32
+}
+
+#[derive(Component, Debug, Clone)]
+pub struct WantsToFlee {
+    pub indices : Vec<i32>
+}
+
 #[derive(Component, Debug)]
 pub struct WantsToPickupItem {
     pub collected_by : Entity,

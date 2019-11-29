@@ -261,8 +261,14 @@ impl State {
         //needs to run before main AI
         let mut adjacent = ai::AdjacentAI{};
         adjacent.run_now(&self.ecs);
-        let mut mob = ai::NPCAI{};
-        mob.run_now(&self.ecs);
+        let mut visible = ai::VisibleAI{};
+        visible.run_now(&self.ecs);
+        let mut approach = ai::ApproachAI{};
+        approach.run_now(&self.ecs);
+        let mut flee = ai::FleeAI{};
+        flee.run_now(&self.ecs);
+        //let mut mob = ai::NPCAI{};
+        //mob.run_now(&self.ecs);
         //indexing needs to run after AI and before combat, so that combat knows the new positions
         let mut mapindex = MapIndexingSystem{};
         mapindex.run_now(&self.ecs);
@@ -394,6 +400,8 @@ pub fn main() {
     gs.ecs.register::<InflictsDamage>();
     gs.ecs.register::<AreaOfEffect>();
     gs.ecs.register::<Confusion>();
+    gs.ecs.register::<WantsToApproach>();
+    gs.ecs.register::<WantsToFlee>();
     gs.ecs.register::<WantsToPickupItem>();
     gs.ecs.register::<WantsToUseItem>();
     gs.ecs.register::<WantsToDropItem>();

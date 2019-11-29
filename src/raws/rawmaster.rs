@@ -104,6 +104,7 @@ impl RawMaster {
             }
             self.faction_index.insert(faction.name.clone(), reactions);
         }
+        //console::log(format!("{:?}", self.faction_index));
     }
     
 }
