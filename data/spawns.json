@@ -218,7 +218,7 @@
                 "power" : 4
             },
             "vision_range" : 8,
-            "ai" : "bystander",
+            "movement" : "random",
             "faction" : "Townsfolk",
             "quips" : [ "I am keeping an eye on you!", "If you step a toe out of line...", "Keeping the village safe, eh?" ],
             "attributes" : {},
@@ -241,7 +241,7 @@
                 "power" : 3
             },
             "vision_range" : 8,
-            "ai" : "melee",
+            "movement" : "static",
             "faction" : "Bandits",
             "attributes" : {},
             "equipped" : [ "Leather jacket", "Jeans", "Boots" ]
@@ -262,7 +262,7 @@
                 "power" : 4
             },
             "vision_range" : 4,
-            "ai" : "vendor",
+            "movement" : "static",
             "faction" : "Townsfolk",
             "attributes" : {
                 "intelligence" : 13
@@ -285,7 +285,7 @@
                 "power" : 4
             },
             "vision_range" : 4,
-            "ai" : "vendor",
+            "movement" : "static",
             "faction" : "Townsfolk",
             "attributes" : {},
             "equipped" : [ "T-shirt", "Jeans", "Boots" ]
@@ -307,7 +307,7 @@
                 "power" : 4
             },
             "vision_range" : 4,
-            "ai" : "bystander",
+            "movement" : "random",
             "faction" : "Townsfolk",
             "quips" : [ "Quiet down, it's too early!", "Oh my, I drank too much.", "Still saving the world, eh?" ],
             "attributes" : {},

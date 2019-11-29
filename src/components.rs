@@ -197,6 +197,19 @@ pub struct Faction {
     pub name : String
 }
 
+//Rust enum is really an union, so we can do RandomWaypoint...
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+pub enum Movement { 
+    Static, 
+    Random,
+    RandomWaypoint{ path : Option<Vec<i32>> },
+}
+
+#[derive(Component, Debug, Clone)]
+pub struct MoveMode {
+    pub mode : Movement
+}
+
 //components representing intent
 #[derive(Component, Debug, Clone)]
 pub struct WantsToApproach {

@@ -281,11 +281,10 @@ pub fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key : &str, pos : Spaw
 
         eb = eb.with(Name{ name : mob_template.name.clone() });
 
-        match mob_template.ai.as_ref() {
-            "melee" => eb = eb.with(Monster{}),
-            "bystander" => eb = eb.with(Bystander{}),
-            "vendor" => eb = eb.with(Vendor{}),
-            _ => {}
+        match mob_template.movement.as_ref() {
+            "random" => eb = eb.with(MoveMode{ mode: Movement::Random }),
+            "random_waypoint" => eb = eb.with(MoveMode{ mode: Movement::RandomWaypoint{ path: None } }),
+            _ => eb = eb.with(MoveMode{ mode: Movement::Static })
         }
 
         if let Some(quips) = &mob_template.quips {

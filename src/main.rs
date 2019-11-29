@@ -267,13 +267,11 @@ impl State {
         approach.run_now(&self.ecs);
         let mut flee = ai::FleeAI{};
         flee.run_now(&self.ecs);
-        //let mut mob = ai::NPCAI{};
-        //mob.run_now(&self.ecs);
         //indexing needs to run after AI and before combat, so that combat knows the new positions
         let mut mapindex = MapIndexingSystem{};
         mapindex.run_now(&self.ecs);
-        let mut bystander = ai::BystanderAI{};
-        bystander.run_now(&self.ecs);
+        let mut defaultmove = ai::DefaultMoveAI{};
+        defaultmove.run_now(&self.ecs);
         //needs to go before combat, because it can deal damage too
         let mut triggers = trigger_system::TriggerSystem{};
         triggers.run_now(&self.ecs);
@@ -400,6 +398,7 @@ pub fn main() {
     gs.ecs.register::<InflictsDamage>();
     gs.ecs.register::<AreaOfEffect>();
     gs.ecs.register::<Confusion>();
+    gs.ecs.register::<MoveMode>();
     gs.ecs.register::<WantsToApproach>();
     gs.ecs.register::<WantsToFlee>();
     gs.ecs.register::<WantsToPickupItem>();

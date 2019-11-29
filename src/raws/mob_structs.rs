@@ -8,7 +8,7 @@ pub struct Mob {
     pub blocks_tile : bool,
     pub stats : MobStats,
     pub vision_range : i32,
-    pub ai : String,
+    pub movement : String,
     pub quips : Option<Vec<String>>,
     pub attributes : MobAttributes,
     pub equipped : Option<Vec<String>>,
