@@ -2,7 +2,7 @@ extern crate rltk;
 use rltk::{ RGB, RandomNumberGenerator };
 extern crate specs;
 use specs::prelude::*;
-use super::{Player, Renderable, Name, Position, Viewshed, Monster, Rect, Map, TileType,
+use super::{Player, Renderable, Name, Position, Viewshed, Rect, Map, TileType,
 CombatStats, Attributes, Attribute, Pools, Pool, Initiative, Faction,
 random_table::RandomTable, raws::*};
 use crate::{attr_bonus};

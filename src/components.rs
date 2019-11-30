@@ -25,15 +25,6 @@ pub struct Viewshed {
 }
 
 //AI
-#[derive(Component, Debug)]
-pub struct Monster {}
-
-#[derive(Component, Debug, Clone)]
-pub struct Bystander {}
-
-#[derive(Component, Debug, Clone)]
-pub struct Vendor {}
-
 #[derive(Component, Debug, Clone)]
 pub struct Quips {
     pub available : Vec<String>
