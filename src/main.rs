@@ -141,14 +141,16 @@ impl GameState for State {
                 newrunstate = player_input(self, ctx);
             }
             RunState::Ticking => {
-                self.run_systems();
-                //makes sure used items are removed
-                self.ecs.maintain();
+                while newrunstate == RunState::Ticking {
+                    self.run_systems();
+                    //makes sure used items are removed
+                    self.ecs.maintain();
 
-                match *self.ecs.fetch::<RunState>() {
-                    RunState::AwaitingInput => newrunstate = RunState::AwaitingInput,
-                    _ => newrunstate = RunState::Ticking
-                }   
+                    match *self.ecs.fetch::<RunState>() {
+                        RunState::AwaitingInput => newrunstate = RunState::AwaitingInput,
+                        _ => newrunstate = RunState::Ticking
+                    }  
+                }
             }
             // RunState::MonsterTurn => {
             //     self.run_systems();
