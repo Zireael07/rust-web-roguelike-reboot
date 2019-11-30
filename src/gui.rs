@@ -214,8 +214,16 @@ pub fn draw_ui(ecs: &World, ctx : &mut Rltk) {
     // ctx.print_color(50, 11, RGB::named(rltk::LIGHT_BLUE), RGB::named(rltk::BLACK), &x_str);
     // ctx.print_color(50, 12, RGB::named(rltk::LIGHT_BLUE), RGB::named(rltk::BLACK), &y_str);
 
+    // Item weight
+    ctx.print_color(50, 14, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK), 
+        &format!("{:.0} lbs ({} lbs max)", 
+            player_pools.total_weight, 
+            (attr.strength.base + attr.strength.modifiers) * 15
+        )
+    );
+
     // Equipped
-    let mut y = 13;
+    let mut y = 17;
     let equipped = ecs.read_storage::<Equipped>();
     let name = ecs.read_storage::<Name>();
     for (equipped_by, item_name) in (&equipped, &name).join() {

@@ -253,6 +253,9 @@ impl State {
     fn run_systems(&mut self) {
         let mut vis = VisibilitySystem{};
         vis.run_now(&self.ecs);
+        //needs to go before initiative
+        let mut encumbrance = ai::EncumbranceSystem{};
+        encumbrance.run_now(&self.ecs);
         let mut initiative = ai::InitiativeSystem{};
         initiative.run_now(&self.ecs);
         //this determines who gets to act, so needs to run before main AI
@@ -395,6 +398,7 @@ pub fn main() {
     gs.ecs.register::<MedItem>();
     gs.ecs.register::<Consumable>();
     gs.ecs.register::<InBackpack>();
+    gs.ecs.register::<EquipmentChanged>();
     gs.ecs.register::<Ranged>();
     gs.ecs.register::<InflictsDamage>();
     gs.ecs.register::<AreaOfEffect>();

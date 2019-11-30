@@ -1,3 +1,5 @@
+mod ai_encumbrance_system;
+pub use ai_encumbrance_system::EncumbranceSystem;
 mod initiative_system; 
 pub use initiative_system::InitiativeSystem;
 mod turn_status;

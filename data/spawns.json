@@ -28,7 +28,9 @@
             },
             "consumable" : {
                 "effects" : { "med_item" : "8" }
-            }
+            },
+            "weight_lbs" : 3.9,
+            "base_value" : 50.0
         },
     
         {
@@ -44,7 +46,9 @@
                     "ranged" : "6",
                     "damage" : "8"
                 }
-            }
+            },
+            "weight_lbs" : 1.6,
+            "base_value" : 500.0
         },
 
         {
@@ -61,7 +65,9 @@
                     "damage" : "10",
                     "area_of_effect" : "3"
                 }
-            }
+            },
+            "weight_lbs" : 0.4,
+            "base_value" : 400.0
         },
     
         {
@@ -77,7 +83,9 @@
                     "ranged" : "6",
                     "confusion" : "4"
                 }
-            }
+            },
+            "weight_lbs" : 0.5,
+            "base_value" : 420.0
         },
 
         {
@@ -91,7 +99,9 @@
             "weapon" : {
                 "range" : "melee",
                 "base_damage" : "1d6"
-            }
+            },
+            "weight_lbs" : 1.23,
+            "base_value" : 1.5
         },
 
         {
@@ -105,7 +115,9 @@
             "weapon" : {
                 "range" : "melee",
                 "base_damage" : "1d4"
-            }
+            },
+            "weight_lbs" : 1.5,
+            "base_value" : 1.75
         },
 
         {
@@ -119,7 +131,9 @@
             "wearable" : {
                 "defense_bonus" : 1,
                 "slot" : "Shield"
-            }
+            },
+            "weight_lbs" : 8.5,
+            "base_value" : 100.0
         },
 
         {
@@ -133,7 +147,9 @@
             "wearable" : {
                 "defense_bonus" : 0.15,
                 "slot" : "Torso"
-            }
+            },
+            "weight_lbs" : 0.33,
+            "base_value" : 8.0
         },
         {
             "name" : "Jeans",
@@ -146,7 +162,9 @@
             "wearable" : {
                 "defense_bonus" : 0.1,
                 "slot" : "Legs"
-            }
+            },
+            "weight_lbs" : 1.32,
+            "base_value" : 18.0
         },
         {
             "name" : "Boots",
@@ -159,7 +177,9 @@
             "wearable" : {
                 "defense_bonus" : 0.15,
                 "slot" : "Feet"
-            }
+            },
+            "weight_lbs" : 4.4,
+            "base_value" : 12.0
         },
         {
             "name" : "Sneakers",
@@ -172,7 +192,9 @@
             "wearable" : {
                 "defense_bonus" : 0.1,
                 "slot" : "Feet"
-            }
+            },
+            "weight_lbs" : 4.4,
+            "base_value" : 10.0
         },
         {
             "name" : "Sheriff's shirt",
@@ -185,7 +207,9 @@
             "wearable" : {
                 "defense_bonus" : 0.15,
                 "slot" : "Torso"
-            }
+            },
+            "weight_lbs" : 1.2,
+            "base_value" : 12.0
         },
         {
             "name" : "Leather jacket",
@@ -198,7 +222,9 @@
             "wearable" : {
                 "defense_bonus" : 0.15,
                 "slot" : "Torso"
-            }
+            },
+            "weight_lbs" : 4.4,
+            "base_value" : 15.0
         }
     ],
     "mobs" : [

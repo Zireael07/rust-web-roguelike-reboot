@@ -54,7 +54,8 @@ pub struct Pool {
 
 #[derive(Component, Debug, Clone)]
 pub struct Pools {
-    pub hit_points : Pool
+    pub hit_points : Pool,
+    pub total_weight : f32, //to avoid recalculating
 }
 
 #[derive(Debug, Clone)]
@@ -85,7 +86,10 @@ pub struct SufferDamage {
 }
 
 #[derive(Component, Debug)]
-pub struct Item {}
+pub struct Item {
+    pub weight_lbs : f32,
+    pub base_value : f32,
+}
 
 #[derive(Component, Debug)]
 pub struct MedItem {
@@ -96,6 +100,9 @@ pub struct MedItem {
 pub struct InBackpack {
     pub owner : Entity
 }
+
+#[derive(Component, Debug, Clone)]
+pub struct EquipmentChanged {}
 
 #[derive(Component, Debug)]
 pub struct Consumable {}

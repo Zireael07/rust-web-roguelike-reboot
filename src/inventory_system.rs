@@ -2,7 +2,7 @@ extern crate specs;
 use specs::prelude::*;
 use super::{WantsToPickupItem, Name, InBackpack, Position, gamelog::GameLog, Map,
     WantsToUseItem, MedItem, Pools, WantsToDropItem, Consumable, InflictsDamage, SufferDamage, AreaOfEffect, Confusion,
-    Equippable, Equipped, WantsToRemoveItem, particle_system::ParticleBuilder};
+    Equippable, Equipped, EquipmentChanged, WantsToRemoveItem, particle_system::ParticleBuilder};
 
 pub struct ItemCollectionSystem {}
 
@@ -13,15 +13,17 @@ impl<'a> System<'a> for ItemCollectionSystem {
                         WriteStorage<'a, WantsToPickupItem>,
                         WriteStorage<'a, Position>,
                         ReadStorage<'a, Name>,
-                        WriteStorage<'a, InBackpack>
+                        WriteStorage<'a, InBackpack>,
+                        WriteStorage<'a, EquipmentChanged>
                       );
 
     fn run(&mut self, data : Self::SystemData) {
-        let (player_entity, mut gamelog, mut wants_pickup, mut positions, names, mut backpack) = data;
+        let (player_entity, mut gamelog, mut wants_pickup, mut positions, names, mut backpack, mut dirty) = data;
 
         for pickup in wants_pickup.join() {
             positions.remove(pickup.item);
             backpack.insert(pickup.item, InBackpack{ owner: pickup.collected_by }).expect("Unable to insert backpack entry");
+            dirty.insert(pickup.collected_by, EquipmentChanged{}).expect("Unable to insert");
 
             if pickup.collected_by == *player_entity {
                 // the tutorial inserts at 0, so the latest is at the top. we do what is more usual, append, so the latest is at bottom
@@ -43,11 +45,12 @@ impl<'a> System<'a> for ItemDropSystem {
                         WriteStorage<'a, WantsToDropItem>,
                         ReadStorage<'a, Name>,
                         WriteStorage<'a, Position>,
-                        WriteStorage<'a, InBackpack>
+                        WriteStorage<'a, InBackpack>,
+                        WriteStorage<'a, EquipmentChanged>
                       );
 
     fn run(&mut self, data : Self::SystemData) {
-        let (player_entity, mut gamelog, entities, mut wants_drop, names, mut positions, mut backpack) = data;
+        let (player_entity, mut gamelog, entities, mut wants_drop, names, mut positions, mut backpack, mut dirty) = data;
 
         for (entity, to_drop) in (&entities, &wants_drop).join() {
             let mut dropper_pos : Position = Position{x:0, y:0};
@@ -58,6 +61,7 @@ impl<'a> System<'a> for ItemDropSystem {
             }
             positions.insert(to_drop.item, Position{ x : dropper_pos.x, y : dropper_pos.y }).expect("Unable to insert position");
             backpack.remove(to_drop.item);
+            dirty.insert(entity, EquipmentChanged{}).expect("Unable to insert");
 
             if entity == *player_entity {
                 gamelog.entries.insert(0, format!("You drop up the {}.", names.get(to_drop.item).unwrap().name));
@@ -112,6 +116,7 @@ impl<'a> System<'a> for ItemUseSystem {
                         ReadStorage<'a, Equippable>,
                         WriteStorage<'a, Equipped>,
                         WriteStorage<'a, InBackpack>,
+                        WriteStorage<'a, EquipmentChanged>,
                         //particles
                         WriteExpect<'a, ParticleBuilder>,
                         ReadStorage<'a, Position>
@@ -120,9 +125,10 @@ impl<'a> System<'a> for ItemUseSystem {
     fn run(&mut self, data : Self::SystemData) {
         let (player_entity, mut gamelog, map, entities, mut wants_use, names, 
             consumables, inflict_damage, meditems, mut pools, mut suffer_damage, aoe, mut confused,
-            equippable, mut equipped, mut backpack, mut particle_builder, positions) = data;
+            equippable, mut equipped, mut backpack, mut dirty, mut particle_builder, positions) = data;
 
         for (entity, useitem) in (&entities, &wants_use).join() {
+            dirty.insert(entity, EquipmentChanged{});
 
             // Targeting
             let mut targets : Vec<Entity> = Vec::new();
