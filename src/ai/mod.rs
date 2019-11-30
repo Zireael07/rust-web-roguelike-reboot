@@ -14,6 +14,8 @@ mod ai_approach_system;
 pub use ai_approach_system::ApproachAI;
 mod ai_flee_system;
 pub use ai_flee_system::FleeAI;
+mod ai_chase_system;
+pub use ai_chase_system::ChaseAI;
 //movement
 mod default_move_system;
 pub use default_move_system::DefaultMoveAI;

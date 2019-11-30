@@ -210,6 +210,11 @@ pub struct MoveMode {
     pub mode : Movement
 }
 
+#[derive(Component, Debug, Clone)]
+pub struct Chasing {
+    pub target : Entity
+}
+
 //components representing intent
 #[derive(Component, Debug, Clone)]
 pub struct WantsToApproach {

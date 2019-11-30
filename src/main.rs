@@ -267,6 +267,8 @@ impl State {
         approach.run_now(&self.ecs);
         let mut flee = ai::FleeAI{};
         flee.run_now(&self.ecs);
+        let mut chase = ai::ChaseAI{};
+        chase.run_now(&self.ecs);
         //indexing needs to run after AI and before combat, so that combat knows the new positions
         let mut mapindex = MapIndexingSystem{};
         mapindex.run_now(&self.ecs);
@@ -399,6 +401,7 @@ pub fn main() {
     gs.ecs.register::<AreaOfEffect>();
     gs.ecs.register::<Confusion>();
     gs.ecs.register::<MoveMode>();
+    gs.ecs.register::<Chasing>();
     gs.ecs.register::<WantsToApproach>();
     gs.ecs.register::<WantsToFlee>();
     gs.ecs.register::<WantsToPickupItem>();
