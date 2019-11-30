@@ -269,11 +269,11 @@ impl State {
         flee.run_now(&self.ecs);
         let mut chase = ai::ChaseAI{};
         chase.run_now(&self.ecs);
+        let mut defaultmove = ai::DefaultMoveAI{};
+        defaultmove.run_now(&self.ecs);
         //indexing needs to run after AI and before combat, so that combat knows the new positions
         let mut mapindex = MapIndexingSystem{};
         mapindex.run_now(&self.ecs);
-        let mut defaultmove = ai::DefaultMoveAI{};
-        defaultmove.run_now(&self.ecs);
         //needs to go before combat, because it can deal damage too
         let mut triggers = trigger_system::TriggerSystem{};
         triggers.run_now(&self.ecs);
