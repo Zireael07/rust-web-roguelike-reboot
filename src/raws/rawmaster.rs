@@ -170,6 +170,23 @@ fn find_slot_for_equippable_item(tag : &str, raws: &RawMaster) -> EquipmentSlot 
     panic!("Trying to equip {}, but it has no slot tag.", tag);
 }
 
+pub fn get_vendor_items(categories: &[String], raws : &RawMaster) -> Vec<(String, f32)> {
+    let mut result : Vec<(String, f32)> = Vec::new();
+
+    for item in raws.raws.items.iter() {
+        if let Some(cat) = &item.vendor_category {
+            if categories.contains(cat) && item.base_value.is_some() {
+                result.push((
+                    item.name.clone(),
+                    item.base_value.unwrap()
+                ));
+            }
+        }
+    }
+
+    result
+}
+
 //lifetime marker <'a> necessary because we're accessing raws, which we need to find item's slot
 fn spawn_position<'a>(pos : SpawnType, new_entity : EntityBuilder<'a>, tag : &str, raws: &RawMaster) -> EntityBuilder<'a> {
     let eb = new_entity;
@@ -359,6 +376,11 @@ pub fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key : &str, pos : Spaw
         } else {
             eb = eb.with(Faction{ name : "Mindless".to_string() })
         }
+
+        if let Some(vendor) = &mob_template.vendor {
+            eb = eb.with(Vendor{ categories : vendor.clone() });
+        }
+
 
         eb = eb.with(EquipmentChanged{});
         

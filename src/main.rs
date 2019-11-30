@@ -46,6 +46,7 @@ pub use gamesystem::*;
 
 //load json data
 pub mod raws;
+use raws::*;
 #[macro_use]
 extern crate lazy_static;
 
@@ -61,6 +62,10 @@ rltk::add_wasm_support!();
 const SHOW_MAPGEN_VISUALIZER : bool = true;
 
 #[derive(PartialEq, Copy, Clone)]
+pub enum VendorMode { Buy, Sell }
+
+
+#[derive(PartialEq, Copy, Clone)]
 pub enum RunState { 
     AwaitingInput, 
     PreRun, 
@@ -71,6 +76,7 @@ pub enum RunState {
     ShowRemoveItem,
     MainMenu { menu_selection : gui::MainMenuSelection },
     GameOver,
+    ShowVendor { vendor: Entity, mode : VendorMode },
     MapGeneration
 }
 
@@ -214,6 +220,32 @@ impl GameState for State {
                         intent.insert(*self.ecs.fetch::<Entity>(), WantsToRemoveItem{ item: item_entity }).expect("Unable to insert intent");
                         newrunstate = RunState::Ticking;
                     }
+                }
+            }
+            RunState::ShowVendor{vendor, mode} => {
+                let result = gui::show_vendor_menu(self, ctx, vendor, mode);
+                match result.0 {
+                    gui::VendorResult::Cancel => newrunstate = RunState::AwaitingInput,
+                    gui::VendorResult::NoResponse => {}
+                    gui::VendorResult::Sell => {
+                        let price = self.ecs.read_storage::<Item>().get(result.1.unwrap()).unwrap().base_value * 0.8;
+                        self.ecs.write_storage::<Pools>().get_mut(*self.ecs.fetch::<Entity>()).unwrap().money += price;
+                        self.ecs.delete_entity(result.1.unwrap()).expect("Unable to delete");
+                    }
+                    gui::VendorResult::Buy => {
+                        let tag = result.2.unwrap();
+                        let price = result.3.unwrap();
+                        let mut pools = self.ecs.write_storage::<Pools>();
+                        let player_pools = pools.get_mut(*self.ecs.fetch::<Entity>()).unwrap();
+                        if player_pools.money >= price {
+                            player_pools.money -= price;
+                            std::mem::drop(pools);
+                            let player_entity = *self.ecs.fetch::<Entity>();
+                            crate::raws::spawn_named_item(&RAWS.lock().unwrap(), &mut self.ecs, &tag, SpawnType::Carried{ by: player_entity });
+                        }
+                    }
+                    gui::VendorResult::BuyMode => newrunstate = RunState::ShowVendor{ vendor, mode: VendorMode::Buy },
+                    gui::VendorResult::SellMode => newrunstate = RunState::ShowVendor{ vendor, mode: VendorMode::Sell }
                 }
             }
             RunState::MapGeneration => {
@@ -424,6 +456,7 @@ pub fn main() {
     gs.ecs.register::<LightSource>();
     gs.ecs.register::<Faction>();
     gs.ecs.register::<Quips>();
+    gs.ecs.register::<Vendor>();
     gs.ecs.register::<Initiative>();
     gs.ecs.register::<MyTurn>();
     gs.ecs.register::<ParticleLifetime>();

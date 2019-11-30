@@ -13,7 +13,8 @@ pub struct Mob {
     pub attributes : MobAttributes,
     pub equipped : Option<Vec<String>>,
     pub faction : Option<String>,
-    pub money : Option<String> //dice roll
+    pub money : Option<String>, //dice roll
+    pub vendor : Option<Vec<String>>
 }
 
 #[derive(Deserialize, Debug)]

@@ -295,7 +295,8 @@
                 "intelligence" : 13
             },
             "money" : "4d6",
-            "equipped" : [ "Jeans", "Boots" ]
+            "equipped" : [ "Jeans", "Boots" ],
+            "vendor" : [ "food" ]
         },
         {
             "name" : "Shady Salesman",

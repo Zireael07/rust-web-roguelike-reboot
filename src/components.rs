@@ -30,6 +30,11 @@ pub struct Quips {
     pub available : Vec<String>
 }
 
+#[derive(Component, Debug, Clone)]
+pub struct Vendor {
+    pub categories : Vec<String>
+}
+
 #[derive(Component, Debug)]
 pub struct Name {
     pub name : String

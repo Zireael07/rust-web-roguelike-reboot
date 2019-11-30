@@ -1,16 +1,18 @@
 use rltk::{VirtualKeyCode, Rltk, Point};
 use specs::prelude::*;
 use super::{Position, Player, Viewshed, Pools, WantsToMelee, 
-    TileType, State, Map, RunState, Entity, Item, WantsToPickupItem, EntityMoved, Faction, raws::Reaction,
+    TileType, State, Map, RunState, Entity, Item, WantsToPickupItem, EntityMoved, 
+    Faction, raws::Reaction, Vendor, VendorMode,
     Door, BlocksVisibility, BlocksTile, Renderable, gamelog::GameLog};
 use std::cmp::{min, max};
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{console};
 
-// Handle player movement. Delta X and Y are the relative move
+// Handle player movement. 
+// Delta X and Y are the relative move
 // requested by the player. We calculate the new coordinates,
 // and if it is a floor - move the player there.
-pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
+pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState {
     let mut positions = ecs.write_storage::<Position>();
     let mut players = ecs.write_storage::<Player>();
     let mut viewsheds = ecs.write_storage::<Viewshed>();
@@ -26,6 +28,8 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut renderables = ecs.write_storage::<Renderable>();
     //non-hostile NPCs
     let factions = ecs.read_storage::<Faction>();
+    let vendors = ecs.read_storage::<Vendor>();
+    let mut result = RunState::AwaitingInput;
 
     let mut swap_entities : Vec<(Entity, i32, i32)> = Vec::new();
 
@@ -37,6 +41,10 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
 
                 //handle move targets
                 for potential_target in map.tile_content[destination_idx].iter() {
+                    //handle vendors first
+                    if let Some(_vendor) = vendors.get(*potential_target) {
+                        return RunState::ShowVendor{ vendor: *potential_target, mode : VendorMode::Sell }
+                    }
                     let mut hostile = true;
                     if pools.get(*potential_target).is_some() {
                         // is it hostile?
@@ -69,7 +77,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
                         if let Some(_target) = target {
                             wants_to_melee.insert(entity, WantsToMelee{ target: *potential_target }).expect("Add target failed");
                             //console::log(&format!("We want to melee: {:?}", target));
-                            return;
+                            return result;
                         }
                     }
                     let door = doors.get_mut(*potential_target);
@@ -111,6 +119,8 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
             their_pos.y = m.2;
         }
     }
+
+    result
 }
 
 fn get_item(ecs: &mut World) {
@@ -144,14 +154,14 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
     // New: Handle web buttons
     if let Some(btn) = &ctx.web_button {
         match btn.trim() {
-            "go_nw" => try_move_player(-1, -1, &mut gs.ecs),
-            "go_n" => try_move_player(0, -1, &mut gs.ecs),
-            "go_ne" => try_move_player(1, -1, &mut gs.ecs),
-            "go_w" => try_move_player(-1, 0, &mut gs.ecs),
-            "go_e" => try_move_player(1, 0, &mut gs.ecs),
-            "go_sw" => try_move_player(-1, 1, &mut gs.ecs),
-            "go_s" => try_move_player(0, 1, &mut gs.ecs),
-            "go_se" => try_move_player(1, 1, &mut gs.ecs),
+            "go_nw" => return try_move_player(-1, -1, &mut gs.ecs),
+            "go_n" => return try_move_player(0, -1, &mut gs.ecs),
+            "go_ne" => return try_move_player(1, -1, &mut gs.ecs),
+            "go_w" => return try_move_player(-1, 0, &mut gs.ecs),
+            "go_e" => return try_move_player(1, 0, &mut gs.ecs),
+            "go_sw" => return try_move_player(-1, 1, &mut gs.ecs),
+            "go_s" => return try_move_player(0, 1, &mut gs.ecs),
+            "go_se" => return try_move_player(1, 1, &mut gs.ecs),
             //skip turn
             "go_wait" => return RunState::Ticking,
             //others
@@ -173,28 +183,28 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
                     // and applying movement via the move_player function.
 
                     // Numpad
-                    VirtualKeyCode::Numpad8 => try_move_player(0, -1, &mut gs.ecs),
-                    VirtualKeyCode::Numpad4 => try_move_player(-1, 0, &mut gs.ecs),
-                    VirtualKeyCode::Numpad6 => try_move_player(1, 0, &mut gs.ecs),
-                    VirtualKeyCode::Numpad2 => try_move_player(0, 1, &mut gs.ecs),
+                    VirtualKeyCode::Numpad8 => return try_move_player(0, -1, &mut gs.ecs),
+                    VirtualKeyCode::Numpad4 => return try_move_player(-1, 0, &mut gs.ecs),
+                    VirtualKeyCode::Numpad6 => return try_move_player(1, 0, &mut gs.ecs),
+                    VirtualKeyCode::Numpad2 => return try_move_player(0, 1, &mut gs.ecs),
 
                     // Numpad diagonals
-                    VirtualKeyCode::Numpad7 => try_move_player(-1, -1, &mut gs.ecs),
-                    VirtualKeyCode::Numpad9 => try_move_player(1, -1, &mut gs.ecs),
-                    VirtualKeyCode::Numpad1 => try_move_player(-1, 1, &mut gs.ecs),
-                    VirtualKeyCode::Numpad3 => try_move_player(1, 1, &mut gs.ecs),
+                    VirtualKeyCode::Numpad7 => return try_move_player(-1, -1, &mut gs.ecs),
+                    VirtualKeyCode::Numpad9 => return try_move_player(1, -1, &mut gs.ecs),
+                    VirtualKeyCode::Numpad1 => return try_move_player(-1, 1, &mut gs.ecs),
+                    VirtualKeyCode::Numpad3 => return try_move_player(1, 1, &mut gs.ecs),
 
                     //vi keys
-                    VirtualKeyCode::Y => try_move_player(-1, -1, &mut gs.ecs),
-                    VirtualKeyCode::U => try_move_player(1, -1, &mut gs.ecs),
-                    VirtualKeyCode::B => try_move_player(-1, 1, &mut gs.ecs),
-                    VirtualKeyCode::N => try_move_player(1, 1, &mut gs.ecs),
+                    VirtualKeyCode::Y => return try_move_player(-1, -1, &mut gs.ecs),
+                    VirtualKeyCode::U => return try_move_player(1, -1, &mut gs.ecs),
+                    VirtualKeyCode::B => return try_move_player(-1, 1, &mut gs.ecs),
+                    VirtualKeyCode::N => return try_move_player(1, 1, &mut gs.ecs),
 
                     // Cursors
-                    VirtualKeyCode::Up => try_move_player(0, -1, &mut gs.ecs),
-                    VirtualKeyCode::Down => try_move_player(0, 1, &mut gs.ecs),
-                    VirtualKeyCode::Left => try_move_player(-1, 0, &mut gs.ecs),
-                    VirtualKeyCode::Right => try_move_player(1, 0, &mut gs.ecs),
+                    VirtualKeyCode::Up => return try_move_player(0, -1, &mut gs.ecs),
+                    VirtualKeyCode::Down => return try_move_player(0, 1, &mut gs.ecs),
+                    VirtualKeyCode::Left => return try_move_player(-1, 0, &mut gs.ecs),
+                    VirtualKeyCode::Right => return try_move_player(1, 0, &mut gs.ecs),
 
                     // Skip turn
                     VirtualKeyCode::Numpad5 => return RunState::Ticking,
