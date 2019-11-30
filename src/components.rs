@@ -82,7 +82,8 @@ pub struct WantsToMelee {
 
 #[derive(Component, Debug)]
 pub struct SufferDamage {
-    pub amount : i32
+    pub amount : i32,
+    pub from_player: bool //some things treat player special
 }
 
 #[derive(Component, Debug)]

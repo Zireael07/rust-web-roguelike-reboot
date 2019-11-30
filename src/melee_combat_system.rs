@@ -1,6 +1,6 @@
 extern crate specs;
 use specs::prelude::*;
-use super::{Attributes, Pools, WantsToMelee, Name, SufferDamage, gamelog::GameLog,
+use super::{Attributes, Pools, WantsToMelee, Name, SufferDamage, Entity, gamelog::GameLog,
 MeleeWeapon, EquipmentSlot, DefenseBonus, Equipped, particle_system::ParticleBuilder, Position};
 //console is RLTK's wrapper around either println or the web console macro
 use rltk::{console};
@@ -21,12 +21,13 @@ impl<'a> System<'a> for MeleeCombatSystem {
                         ReadStorage<'a, Equipped>,
                         WriteExpect<'a, ParticleBuilder>,
                         ReadStorage<'a, Position>,
-                        WriteExpect<'a, rltk::RandomNumberGenerator>
+                        WriteExpect<'a, rltk::RandomNumberGenerator>,
+                        ReadExpect<'a, Entity>
                       );
 
     fn run(&mut self, data : Self::SystemData) {
         let (entities, mut log, mut wants_melee, names, attributes, pools, mut inflict_damage, 
-            melee_weapons, defense_bonuses, equipped, mut particle_builder, positions, mut rng) = data;
+            melee_weapons, defense_bonuses, equipped, mut particle_builder, positions, mut rng, player_entity) = data;
 
         for (entity, wants_melee, name, attacker_attributes, attacker_pools) in (&entities, &wants_melee, &names, &attributes, &pools).join() {
             // Are the attacker and defender alive? Only attack if they are
@@ -85,7 +86,13 @@ impl<'a> System<'a> for MeleeCombatSystem {
                         log.entries.push(format!("{} is unable to hurt {}", &name.name, &target_name.name));
                     } else {
                         log.entries.push(format!("{} hits {}, for {} hp.", &name.name, &target_name.name, damage));
-                        inflict_damage.insert(wants_melee.target, SufferDamage{ amount: damage }).expect("Unable to do damage");
+                        //inflict_damage.insert(wants_melee.target, SufferDamage{ amount: damage }).expect("Unable to do damage");
+                        inflict_damage.insert(wants_melee.target, 
+                            SufferDamage{ 
+                                amount: damage,
+                                from_player: entity == *player_entity
+                            }
+                        ).expect("Unable to insert damage component");
                     }
                     //particle
                     let pos = positions.get(wants_melee.target);
