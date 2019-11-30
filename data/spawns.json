@@ -270,6 +270,7 @@
             "movement" : "static",
             "faction" : "Bandits",
             "attributes" : {},
+            "money" : "2d6",
             "equipped" : [ "Leather jacket", "Jeans", "Boots" ]
         },
         {
@@ -293,6 +294,7 @@
             "attributes" : {
                 "intelligence" : 13
             },
+            "money" : "4d6",
             "equipped" : [ "Jeans", "Boots" ]
         },
         {
@@ -314,6 +316,7 @@
             "movement" : "static",
             "faction" : "Townsfolk",
             "attributes" : {},
+            "money" : "3d6",
             "equipped" : [ "T-shirt", "Jeans", "Boots" ]
         },
         

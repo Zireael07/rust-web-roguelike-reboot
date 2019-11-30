@@ -31,6 +31,7 @@ pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
                 max: 30 
             },
             total_weight : 0.0,
+            money : 0.0
         })
         .with(Attributes{
             strength: Attribute{ base: 13, modifiers: 0, bonus: attr_bonus(11) },

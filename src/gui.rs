@@ -221,6 +221,7 @@ pub fn draw_ui(ecs: &World, ctx : &mut Rltk) {
             (attr.strength.base + attr.strength.modifiers) * 15
         )
     );
+    ctx.print_color(50,15, rltk::RGB::named(rltk::CYAN), RGB::named(rltk::BLACK), &format!("Credits: {:.1} cr", player_pools.money));
 
     // Equipped
     let mut y = 17;

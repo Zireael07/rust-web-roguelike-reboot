@@ -56,6 +56,7 @@ pub struct Pool {
 pub struct Pools {
     pub hit_points : Pool,
     pub total_weight : f32, //to avoid recalculating
+    pub money : f32,
 }
 
 #[derive(Debug, Clone)]

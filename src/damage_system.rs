@@ -9,13 +9,27 @@ pub struct DamageSystem {}
 
 impl<'a> System<'a> for DamageSystem {
     type SystemData = ( WriteStorage<'a, Pools>,
-                        WriteStorage<'a, SufferDamage> );
+                        WriteStorage<'a, SufferDamage>,
+                        ReadExpect<'a, Entity>,
+                    );
 
     fn run(&mut self, data : Self::SystemData) {
-        let (mut pools, mut damage) = data;
+        let (mut pools, mut damage, player) = data;
+        let mut money_gain = 0.0f32;
 
         for (mut pool, damage) in (&mut pools, &damage).join() {
             pool.hit_points.current -= damage.amount;
+
+            // if player, gain money
+            if pool.hit_points.current < 1 && damage.from_player {
+                money_gain += pool.money;
+            }
+        }
+
+        //effectively auto-pickup money
+        if money_gain != 0.0 {
+            let mut player_stats = pools.get_mut(*player).unwrap();
+            player_stats.money += money_gain;
         }
 
         damage.clear();

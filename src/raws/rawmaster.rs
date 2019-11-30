@@ -309,6 +309,13 @@ pub fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key : &str, pos : Spaw
         let pools = Pools{
             hit_points : Pool{ current: mob_template.stats.hp, max: mob_template.stats.max_hp },
             total_weight : 0.0,
+            money : if let Some(money) = &mob_template.money {    
+                let mut rng = rltk::RandomNumberGenerator::new();                
+                let (n, d, b) = parse_dice_string(&money);
+                (rng.roll_dice(n, d) + b) as f32
+            } else {
+                0.0
+            }
         };
         eb = eb.with(pools);
 
