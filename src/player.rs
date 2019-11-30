@@ -77,7 +77,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
                         if let Some(_target) = target {
                             wants_to_melee.insert(entity, WantsToMelee{ target: *potential_target }).expect("Add target failed");
                             //console::log(&format!("We want to melee: {:?}", target));
-                            return result;
+                            return RunState::Ticking;
                         }
                     }
                     let door = doors.get_mut(*potential_target);
@@ -89,6 +89,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
                         let glyph = renderables.get_mut(*potential_target).unwrap();
                         glyph.glyph = rltk::to_cp437('±');
                         viewshed.dirty = true;
+                        result = RunState::Ticking;
                     }
                 }
 
@@ -106,6 +107,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
                     let mut ppos = ecs.write_resource::<Point>();
                     ppos.x = pos.x;
                     ppos.y = pos.y;
+                    result = RunState::Ticking;
                 }
             }
         }
