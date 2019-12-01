@@ -175,6 +175,7 @@ impl BSPTownBuilder {
             build_data.take_snapshot();
         }
 
+        console::log(format!("Buildings: {:?}", rooms_copy));
         let building_size = self.sort_buildings(&rooms_copy);
         console::log(format!("Buildings sorted: {:?}", building_size));
         self.building_factory(rng, build_data, &rooms_copy, &building_size);

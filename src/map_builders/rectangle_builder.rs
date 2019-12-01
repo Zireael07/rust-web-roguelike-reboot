@@ -78,7 +78,7 @@ impl RectBuilder {
             ret.push(row);
             //console::log(&format!("{:?}", row));
         }
-        console::log(&format!("{:?}", ret));
+        //console::log(&format!("{:?}", ret));
         return ret;
     }
 
@@ -97,7 +97,7 @@ impl RectBuilder {
 
         //sort (cmp works by reference)
         rects.sort_by(|a, b| a.0.cmp(&b.0));
-        console::log(&format!("Rects sorted: {:?}", rects));
+        //console::log(&format!("Rects sorted: {:?}", rects));
 
         //it seems to work on ascending order by default, so get the last
         //console::log(&format!("Biggest rect: {:?}", rects[rects.len()-1]));
