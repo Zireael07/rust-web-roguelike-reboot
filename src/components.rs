@@ -60,6 +60,8 @@ pub struct Pool {
 #[derive(Component, Debug, Clone)]
 pub struct Pools {
     pub hit_points : Pool,
+    pub hunger : i32,
+    pub thirst : i32,
     pub total_weight : f32, //to avoid recalculating
     pub money : f32,
 }
@@ -112,7 +114,7 @@ pub struct InBackpack {
 pub struct EquipmentChanged {}
 
 #[derive(Component, Debug)]
-pub struct Consumable {}
+pub struct Consumable {} //in the sense that it's limited use-only
 
 #[derive(Component, Debug)]
 pub struct Ranged {
@@ -133,6 +135,12 @@ pub struct AreaOfEffect {
 pub struct Confusion {
     pub turns : i32
 }
+
+#[derive(Component, Debug, Clone)]
+pub struct ProvidesFood {}
+
+#[derive(Component, Debug, Clone)]
+pub struct ProvidesQuench {}
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum EquipmentSlot { Melee, Shield, Head, Torso, Legs, Feet, Hands }

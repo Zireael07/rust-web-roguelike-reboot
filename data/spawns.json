@@ -225,6 +225,53 @@
             },
             "weight_lbs" : 4.4,
             "base_value" : 15.0
+        },
+        {
+            "name" : "Rations",
+            "renderable": {
+                "glyph" : "%",
+                "fg" : "#00FF00",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "consumable" : {
+                "effects" : { 
+                    "food" : ""
+                }
+            },
+            "weight_lbs" : 2.0,
+            "base_value" : 1.0,
+            "vendor_category" : "food"
+        },
+        {
+            "name" : "Bottle of Water",
+            "renderable": {
+                "glyph" : "¡",
+                "fg" : "#00F4FF",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "consumable" : {
+                "effects" : { "drink" : "" }
+            },
+            "weight_lbs" : 2.0,
+            "base_value" : 1.0,
+            "vendor_category" : "food"
+        },
+        {
+            "name" : "Beer",
+            "renderable": {
+                "glyph" : "¡",
+                "fg" : "#FFB200",
+                "bg" : "#000000",
+                "order" : 2
+            },
+            "consumable" : {
+                "effects" : { "drink" : "" }
+            },
+            "weight_lbs" : 2.0,
+            "base_value" : 1.5,
+            "vendor_category" : "food"
         }
     ],
     "mobs" : [

@@ -30,6 +30,8 @@ pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
                 current: 30, 
                 max: 30 
             },
+            hunger: 500,
+            thirst: 300,
             total_weight : 0.0,
             money : 0.0
         })

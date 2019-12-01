@@ -1,7 +1,7 @@
 extern crate specs;
 use specs::prelude::*;
 use super::{WantsToPickupItem, Name, InBackpack, Position, gamelog::GameLog, Map,
-    WantsToUseItem, MedItem, Pools, WantsToDropItem, Consumable, InflictsDamage, SufferDamage, AreaOfEffect, Confusion,
+    WantsToUseItem, MedItem, Pools, WantsToDropItem, Consumable, InflictsDamage, SufferDamage, AreaOfEffect, Confusion, ProvidesFood, ProvidesQuench,
     Equippable, Equipped, EquipmentChanged, WantsToRemoveItem, particle_system::ParticleBuilder};
 
 pub struct ItemCollectionSystem {}
@@ -112,6 +112,8 @@ impl<'a> System<'a> for ItemUseSystem {
                         WriteStorage<'a, SufferDamage>,
                         ReadStorage<'a, AreaOfEffect>,
                         WriteStorage<'a, Confusion>,
+                        ReadStorage<'a, ProvidesFood>,
+                        ReadStorage<'a, ProvidesQuench>,
                         //for equipment
                         ReadStorage<'a, Equippable>,
                         WriteStorage<'a, Equipped>,
@@ -124,7 +126,7 @@ impl<'a> System<'a> for ItemUseSystem {
 
     fn run(&mut self, data : Self::SystemData) {
         let (player_entity, mut gamelog, map, entities, mut wants_use, names, 
-            consumables, inflict_damage, meditems, mut pools, mut suffer_damage, aoe, mut confused,
+            consumables, inflict_damage, meditems, mut pools, mut suffer_damage, aoe, mut confused, provides_food, provides_quench,
             equippable, mut equipped, mut backpack, mut dirty, mut particle_builder, positions) = data;
 
         for (entity, useitem) in (&entities, &wants_use).join() {
@@ -193,6 +195,51 @@ impl<'a> System<'a> for ItemUseSystem {
                 }
             }
 
+            // It it is edible, eat it!
+            let item_edible = provides_food.get(useitem.item);
+            match item_edible {
+                None => {}
+                Some(_) => {
+                    let target = targets[0];
+                    let pool = pools.get_mut(target);
+                    if let Some(pool) = pool {
+                        pool.hunger = pool.hunger + 150;
+                        gamelog.entries.push(format!("You eat the {}.", names.get(useitem.item).unwrap().name));
+                    }
+
+                    //destroy if consumable
+                    let consumable = consumables.get(useitem.item);
+                    match consumable {
+                        None => {}
+                        Some(_) => {
+                            entities.delete(useitem.item).expect("Delete failed");
+                        }
+                    }
+                }
+            }
+
+            // It it is drinkable, drink it!
+            let item_potable = provides_quench.get(useitem.item);
+            match item_potable {
+                None => {}
+                Some(_) => {
+                    let target = targets[0];
+                    let pool = pools.get_mut(target);
+                    if let Some(pool) = pool {
+                        pool.thirst = pool.thirst + 250;
+                        gamelog.entries.push(format!("You drink the {}.", names.get(useitem.item).unwrap().name));
+                    }
+
+                    //destroy if consumable
+                    let consumable = consumables.get(useitem.item);
+                    match consumable {
+                        None => {}
+                        Some(_) => {
+                            entities.delete(useitem.item).expect("Delete failed");
+                        }
+                    }
+                }
+            }
 
             //if it's a medkit, heal
             let meditem = meditems.get(useitem.item);

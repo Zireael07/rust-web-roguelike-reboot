@@ -256,6 +256,8 @@ pub fn spawn_named_item(raws: &RawMaster, ecs: &mut World, key : &str, pos : Spa
                     "damage" => { eb = eb.with(InflictsDamage{ damage : effect.1.parse::<i32>().unwrap() }) }
                     "area_of_effect" => { eb = eb.with(AreaOfEffect{ radius: effect.1.parse::<i32>().unwrap() }) }
                     "confusion" => { eb = eb.with(Confusion{ turns: effect.1.parse::<i32>().unwrap() }) }
+                    "food" => { eb = eb.with(ProvidesFood{}) }
+                    "drink" => { eb = eb.with(ProvidesQuench{}) }
                     _ => {
                         println!("Warning: consumable effect {} not implemented.", effect_name);
                     }
@@ -325,6 +327,8 @@ pub fn spawn_named_mob(raws: &RawMaster, ecs: &mut World, key : &str, pos : Spaw
 
         let pools = Pools{
             hit_points : Pool{ current: mob_template.stats.hp, max: mob_template.stats.max_hp },
+            hunger: 500,
+            thirst: 300,
             total_weight : 0.0,
             money : if let Some(money) = &mob_template.money {    
                 let mut rng = rltk::RandomNumberGenerator::new();                

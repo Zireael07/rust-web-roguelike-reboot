@@ -38,6 +38,7 @@ mod inventory_system;
 use inventory_system::*;
 mod trigger_system;
 use trigger_system::TriggerSystem;
+pub mod hunger_system;
 pub mod random_table;
 pub mod particle_system;
 pub mod lighting_system;
@@ -327,6 +328,8 @@ impl State {
         drop_items.run_now(&self.ecs);
         let mut item_remove = ItemRemoveSystem{};
         item_remove.run_now(&self.ecs);
+        let mut hunger = hunger_system::HungerSystem{};
+        hunger.run_now(&self.ecs);
         //goes last because nearly anything can in theory produce one of those
         let mut particles = particle_system::ParticleSpawnSystem{};
         particles.run_now(&self.ecs);
@@ -435,6 +438,8 @@ pub fn main() {
     gs.ecs.register::<InflictsDamage>();
     gs.ecs.register::<AreaOfEffect>();
     gs.ecs.register::<Confusion>();
+    gs.ecs.register::<ProvidesFood>();
+    gs.ecs.register::<ProvidesQuench>();
     gs.ecs.register::<MoveMode>();
     gs.ecs.register::<Chasing>();
     gs.ecs.register::<WantsToApproach>();

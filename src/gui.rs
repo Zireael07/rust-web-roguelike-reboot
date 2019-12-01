@@ -191,6 +191,9 @@ pub fn draw_ui(ecs: &World, ctx : &mut Rltk) {
 
     ctx.draw_bar_horizontal(64, 1, 14, player_pools.hit_points.current, player_pools.hit_points.max, RGB::named(rltk::RED), RGB::named(rltk::BLACK));
 
+    ctx.draw_bar_horizontal(64, 2, 14, player_pools.hunger, 500, RGB::named(rltk::GREEN), RGB::named(rltk::BLACK));
+    ctx.draw_bar_horizontal(64, 3, 14, player_pools.thirst, 300, RGB::named(rltk::BLUE), RGB::named(rltk::BLACK));
+
     //draw attributes
     let attributes = ecs.read_storage::<Attributes>();
     let attr = attributes.get(*player_entity).unwrap();
