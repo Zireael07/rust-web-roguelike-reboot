@@ -1,4 +1,4 @@
-use super::{InitialMapBuilder, BuilderMap, TileType};
+use super::{InitialMapBuilder, BuilderMap, TileType, apply_paint};
 use rltk::RandomNumberGenerator;
 use rltk::{NoiseType, FractalType};
 
@@ -34,10 +34,12 @@ impl NoiseMapBuilder {
                 let n = noise.get_noise((x as f32) / ((build_data.map.width*2) as f32), (y as f32) / ((build_data.map.height*2) as f32));
                 let idx = ((y * build_data.map.width) + x) as usize;
                 if n < 0.0 {
-                    build_data.map.tiles[idx] = TileType::Floor;
+                    apply_paint(&mut build_data.map, 2, x, y, TileType::Floor);
+                    //build_data.map.tiles[idx] = TileType::Floor;
                     //self.colors[idx] = RGB::from_f32(0.0, 0.0, 1.0 - (0.0 - n));
                 } else {
-                    build_data.map.tiles[idx] = TileType::Tree;
+                    apply_paint(&mut build_data.map, 2, x, y, TileType::Tree);
+                    //build_data.map.tiles[idx] = TileType::Tree;
                     //self.colors[idx] = RGB::from_f32(0.0, n, 0.0);
                 }
             }

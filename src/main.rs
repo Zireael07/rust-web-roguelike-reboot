@@ -345,7 +345,7 @@ impl State {
         self.mapgen_timer = 0.0;
         self.mapgen_history.clear();
         let mut rng = self.ecs.write_resource::<rltk::RandomNumberGenerator>();
-        let mut builder = map_builders::random_builder(&mut rng, 80, 60); //80,60 usually unless testing
+        let mut builder = map_builders::random_builder(&mut rng, 160, 120); //80,60 usually unless testing
         console::log("Generating world...");
         builder.build_map(&mut rng);
 
