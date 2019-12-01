@@ -60,49 +60,49 @@ pub fn draw_corridor(map: &mut Map, x1:i32, y1:i32, x2:i32, y2:i32) -> Vec<usize
 //brushes
 pub fn paint(map: &mut Map, mode: Symmetry, brush_size: i32, x: i32, y:i32) {
     match mode {
-        Symmetry::None => apply_paint(map, brush_size, x, y),
+        Symmetry::None => apply_paint(map, brush_size, x, y, TileType::Floor),
         Symmetry::Horizontal => {
             let center_x = map.width / 2;
             if x == center_x {
-                apply_paint(map, brush_size, x, y);                    
+                apply_paint(map, brush_size, x, y, TileType::Floor);                    
             } else {
                 let dist_x = i32::abs(center_x - x);
-                apply_paint(map, brush_size, center_x + dist_x, y);
-                apply_paint(map, brush_size, center_x - dist_x, y);
+                apply_paint(map, brush_size, center_x + dist_x, y, TileType::Floor);
+                apply_paint(map, brush_size, center_x - dist_x, y, TileType::Floor);
             }
         }
         Symmetry::Vertical => {
             let center_y = map.height / 2;
             if y == center_y {
-                apply_paint(map, brush_size, x, y);
+                apply_paint(map, brush_size, x, y, TileType::Floor);
             } else {
                 let dist_y = i32::abs(center_y - y);
-                apply_paint(map, brush_size, x, center_y + dist_y);
-                apply_paint(map, brush_size, x, center_y - dist_y);
+                apply_paint(map, brush_size, x, center_y + dist_y, TileType::Floor);
+                apply_paint(map, brush_size, x, center_y - dist_y, TileType::Floor);
             }
         }
         Symmetry::Both => {
             let center_x = map.width / 2;
             let center_y = map.height / 2;
             if x == center_x && y == center_y {
-                apply_paint(map, brush_size, x, y);
+                apply_paint(map, brush_size, x, y, TileType::Floor);
             } else {
                 let dist_x = i32::abs(center_x - x);
-                apply_paint(map, brush_size, center_x + dist_x, y);
-                apply_paint(map, brush_size, center_x - dist_x, y);
+                apply_paint(map, brush_size, center_x + dist_x, y, TileType::Floor);
+                apply_paint(map, brush_size, center_x - dist_x, y, TileType::Floor);
                 let dist_y = i32::abs(center_y - y);
-                apply_paint(map, brush_size, x, center_y + dist_y);
-                apply_paint(map, brush_size, x, center_y - dist_y);
+                apply_paint(map, brush_size, x, center_y + dist_y, TileType::Floor);
+                apply_paint(map, brush_size, x, center_y - dist_y, TileType::Floor);
             }
         }
     }
 }
 
-fn apply_paint(map: &mut Map, brush_size: i32, x: i32, y: i32) {
+pub fn apply_paint(map: &mut Map, brush_size: i32, x: i32, y: i32, tile: TileType) {
     match brush_size {
         1 => {
             let digger_idx = map.xy_idx(x, y);
-            map.tiles[digger_idx] = TileType::Floor;
+            map.tiles[digger_idx] = tile;
         }
 
         _ => {
@@ -111,7 +111,7 @@ fn apply_paint(map: &mut Map, brush_size: i32, x: i32, y: i32) {
                 for brush_x in x-half_brush_size .. x+half_brush_size {
                     if brush_x > 1 && brush_x < map.width-1 && brush_y > 1 && brush_y < map.height-1 {
                         let idx = map.xy_idx(brush_x, brush_y);
-                        map.tiles[idx] = TileType::Floor;
+                        map.tiles[idx] = tile;
                     }
                 }
             }
