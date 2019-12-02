@@ -14,6 +14,7 @@ use std::panic;
 pub mod camera;
 mod gui;
 mod gamelog;
+use gamelog::GameLog;
 
 mod components;
 pub use components::*;
@@ -242,7 +243,17 @@ impl GameState for State {
                             player_pools.money -= price;
                             std::mem::drop(pools);
                             let player_entity = *self.ecs.fetch::<Entity>();
-                            crate::raws::spawn_named_item(&RAWS.lock().unwrap(), &mut self.ecs, &tag, SpawnType::Carried{ by: player_entity });
+                            let item = crate::raws::spawn_named_item(&RAWS.lock().unwrap(), &mut self.ecs, &tag, SpawnType::Carried{ by: player_entity });
+                            //log message
+                            if item.is_some()  {
+                                let ent = item.unwrap();
+                                let mut gamelog = self.ecs.write_resource::<GameLog>();
+                                let names = self.ecs.read_storage::<Name>();
+                                let item_name = names.get(ent);
+                                if let Some(item_name) = item_name {
+                                    gamelog.entries.push(format!("You bought the {}.", &item_name.name));
+                                }
+                            }
                         }
                     }
                     gui::VendorResult::BuyMode => newrunstate = RunState::ShowVendor{ vendor, mode: VendorMode::Buy },
@@ -497,6 +508,7 @@ pub fn main() {
     rltk::register_html_button("remove");
     //inventory
     rltk::register_html_button("escape");
+    rltk::register_html_button("tab");
     rltk::register_html_button("a");
     rltk::register_html_button("b");
     rltk::register_html_button("c");
