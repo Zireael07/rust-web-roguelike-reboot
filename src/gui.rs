@@ -525,18 +525,60 @@ fn vendor_sell_menu(gs : &mut State, ctx : &mut Rltk, _vendor : Entity, _mode : 
         j += 1;
     }
 
-    match ctx.key {
-        None => (VendorResult::NoResponse, None, None, None),
-        Some(key) => {
-            match key {
-                VirtualKeyCode::Tab => { (VendorResult::BuyMode, None, None, None) }
-                VirtualKeyCode::Escape => { (VendorResult::Cancel, None, None, None) }
-                _ => { 
-                    let selection = rltk::letter_to_option(key);
-                    if selection > -1 && selection < count as i32 {
-                        return (VendorResult::Sell, Some(equippable[selection as usize]), None, None);
+    // New: Handle web buttons
+    if let Some(btn) = &ctx.web_button {
+        match btn.trim() {
+            "escape" => { (VendorResult::Cancel, None, None, None) },
+            "a" => {
+                //select and return
+                let selection = 0;
+                if selection > -1 && selection < count as i32 {
+                    return (VendorResult::Sell, Some(equippable[selection as usize]), None, None);
+                }
+                (VendorResult::NoResponse, None, None, None)
+            },
+            "b" => {
+                //select and return
+                let selection = 1;
+                if selection > -1 && selection < count as i32 {
+                    return (VendorResult::Sell, Some(equippable[selection as usize]), None, None);
+                }
+                (VendorResult::NoResponse, None, None, None)
+            },
+            "c" => {
+                //select and return
+                let selection = 2;
+                if selection > -1 && selection < count as i32 {
+                    return (VendorResult::Sell, Some(equippable[selection as usize]), None, None);
+                }
+                (VendorResult::NoResponse, None, None, None)
+            },
+            "d" => {
+                //select and return
+                let selection = 3;
+                if selection > -1 && selection < count as i32 {
+                    return (VendorResult::Sell, Some(equippable[selection as usize]), None, None);
+                }
+                (VendorResult::NoResponse, None, None, None)
+            },
+            "tab" => { (VendorResult::BuyMode, None, None, None) }
+            _ => (VendorResult::NoResponse, None, None, None),
+        }
+    }
+    else {
+        match ctx.key {
+            None => (VendorResult::NoResponse, None, None, None),
+            Some(key) => {
+                match key {
+                    VirtualKeyCode::Tab => { (VendorResult::BuyMode, None, None, None) }
+                    VirtualKeyCode::Escape => { (VendorResult::Cancel, None, None, None) }
+                    _ => { 
+                        let selection = rltk::letter_to_option(key);
+                        if selection > -1 && selection < count as i32 {
+                            return (VendorResult::Sell, Some(equippable[selection as usize]), None, None);
+                        }
+                        (VendorResult::NoResponse, None, None, None)
                     }
-                    (VendorResult::NoResponse, None, None, None)
                 }
             }
         }
@@ -566,18 +608,60 @@ fn vendor_buy_menu(gs : &mut State, ctx : &mut Rltk, vendor : Entity, _mode : Ve
         y += 1;
     }
 
-    match ctx.key {
-        None => (VendorResult::NoResponse, None, None, None),
-        Some(key) => {
-            match key {
-                VirtualKeyCode::Tab => { (VendorResult::SellMode, None, None, None) }
-                VirtualKeyCode::Escape => { (VendorResult::Cancel, None, None, None) }
-                _ => {
-                    let selection = rltk::letter_to_option(key);
-                    if selection > -1 && selection < count as i32 {
-                        return (VendorResult::Buy, None, Some(inventory[selection as usize].0.clone()), Some(inventory[selection as usize].1));
+    // New: Handle web buttons
+    if let Some(btn) = &ctx.web_button {
+        match btn.trim() {
+            "escape" => { (VendorResult::Cancel, None, None, None) },
+            "a" => {
+                //select and return
+                let selection = 0;
+                if selection > -1 && selection < count as i32 {
+                    return (VendorResult::Buy, None, Some(inventory[selection as usize].0.clone()), Some(inventory[selection as usize].1));
+                }
+                (VendorResult::NoResponse, None, None, None)
+            },
+            "b" => {
+                //select and return
+                let selection = 1;
+                if selection > -1 && selection < count as i32 {
+                    return (VendorResult::Buy, None, Some(inventory[selection as usize].0.clone()), Some(inventory[selection as usize].1));
+                }
+                (VendorResult::NoResponse, None, None, None)
+            },
+            "c" => {
+                //select and return
+                let selection = 2;
+                if selection > -1 && selection < count as i32 {
+                    return (VendorResult::Buy, None, Some(inventory[selection as usize].0.clone()), Some(inventory[selection as usize].1));
+                }
+                (VendorResult::NoResponse, None, None, None)
+            },
+            "d" => {
+                //select and return
+                let selection = 3;
+                if selection > -1 && selection < count as i32 {
+                    return (VendorResult::Buy, None, Some(inventory[selection as usize].0.clone()), Some(inventory[selection as usize].1));
+                }
+                (VendorResult::NoResponse, None, None, None)
+            },
+            "tab" => { (VendorResult::SellMode, None, None, None) }
+            _ => (VendorResult::NoResponse, None, None, None),
+        }
+    }
+    else {
+        match ctx.key {
+            None => (VendorResult::NoResponse, None, None, None),
+            Some(key) => {
+                match key {
+                    VirtualKeyCode::Tab => { (VendorResult::SellMode, None, None, None) }
+                    VirtualKeyCode::Escape => { (VendorResult::Cancel, None, None, None) }
+                    _ => {
+                        let selection = rltk::letter_to_option(key);
+                        if selection > -1 && selection < count as i32 {
+                            return (VendorResult::Buy, None, Some(inventory[selection as usize].0.clone()), Some(inventory[selection as usize].1));
+                        }
+                        (VendorResult::NoResponse, None, None, None)
                     }
-                    (VendorResult::NoResponse, None, None, None)
                 }
             }
         }
