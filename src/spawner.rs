@@ -55,6 +55,10 @@ pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
     spawn_named_entity(&RAWS.lock().unwrap(), ecs, "T-shirt", SpawnType::Equipped{by : player});
     spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Jeans", SpawnType::Equipped{by : player});
     spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Boots", SpawnType::Equipped{by : player});
+    //inventory
+    spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Medkit", SpawnType::Carried{by : player});
+    spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Bottle of Water", SpawnType::Carried{by : player});
+    spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Rations", SpawnType::Carried{by : player});
 
     player
 }
